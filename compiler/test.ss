@@ -79,18 +79,6 @@
     (rm-rf testdir)
     (mkdir testdir))
 
-  (define (pretty-print/formats pretty-formats x)
-    (let loop ([alist pretty-formats])
-      (if (null? alist)
-          (pretty-print x)
-          (let ([a (car alist)] [alist (cdr alist)])
-            (parameterize ([(let ([name (car a)])
-                              (case-lambda
-                                [() (pretty-format name)]
-                                [(x) (pretty-format name x)]))
-                            (cdr a)])
-              (loop alist))))))
-
   (define (print-result pretty-formats result)
     (pretty-print/formats
       (cons
@@ -2341,6 +2329,77 @@
     (oops
       message: "~a:\n  ~?"
       irritants: '("testfile.compact line 4 char 50" "parse error: found ~a looking for~?" ("\";\"" "~#[ nothing~; ~a~; ~a or ~a~:;~@{~#[~; or~] ~a~^,~}~]" ("\"(\"" "\"{\""))))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo as peter, foo as paul, foo as mary, foo } from M;"
+      "import { foo as peter, foo as paul, foo as mary, foo } from M prefix M$;"
+      "export { peter, paul, mary, foo };"
+      "export { M$peter, M$paul, M$mary, M$foo };"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "module M {"
+        "  export ledger F: Field;"
+        "  export circuit foo(ix: Field): Field {"
+        "    F = disclose(ix + ix);"
+        "    return F;"
+        "  }"
+        "}"
+        ""
+        "import { foo as peter, foo as paul, foo as mary, foo } from M;"
+        ""
+        "import { foo as peter, foo as paul, foo as mary, foo } from M prefix M$;"
+        ""
+        "export { peter, paul, mary, foo };"
+        ""
+        "export { M$peter, M$paul, M$mary, M$foo };"))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo as peter, foo as paul, foo as mary, foo,"
+      "         foo as red, foo as blue, foo as green, foo as yellow }"
+      "  from M;"
+      "export { foo, peter, paul, mary, red, blue, green, yellow };"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "module M {"
+        "  export ledger F: Field;"
+        "  export circuit foo(ix: Field): Field {"
+        "    F = disclose(ix + ix);"
+        "    return F;"
+        "  }"
+        "}"
+        ""
+        "import"
+        "  { foo as peter,"
+        "    foo as paul,"
+        "    foo as mary,"
+        "    foo,"
+        "    foo as red,"
+        "    foo as blue,"
+        "    foo as green,"
+        "    foo as yellow }"
+        "  from M;"
+        ""
+        "export { foo, peter, paul, mary, red, blue, green, yellow };"))
     )
 )
 
@@ -64155,6 +64214,119 @@
         "test('check 1', () => {"
         "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
         "  expect(C.circuits.foo(Ctxt, 17n, new Uint8Array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])).result).toEqual([1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 0n]);"
+        "});"
+        ))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo, F } from M;"
+      "export { foo };"
+      "enum F { a, b, c };"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 10 char 1" "another binding found for ~s in the same scope at ~a" (F "line 8 char 15")))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo, F as G } from M;"
+      "export { foo };"
+      "enum F { a, b, c };"
+      )
+    (stage-javascript
+      `(
+        "test('check 1', () => {"
+        "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
+        "  expect(C.circuits.foo(Ctxt, 17n).result).toEqual(34n);"
+        "});"
+        ))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo } from M;"
+      "export { foo };"
+      "enum F { a, b, c };"
+      )
+    (stage-javascript
+      `(
+        "test('check 1', () => {"
+        "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
+        "  expect(C.circuits.foo(Ctxt, 17n).result).toEqual(34n);"
+        "});"
+        ))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo as bar } from M;"
+      "export { bar };"
+      )
+    (stage-javascript
+      `(
+        "test('check 1', () => {"
+        "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
+        "  expect(C.circuits.bar(Ctxt, 17n).result).toEqual(34n);"
+        "});"
+        ))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo as peter, foo as paul, foo as mary, foo } from M;"
+      "export { peter, paul, mary, foo };"
+      "import { foo as peter, foo as paul, foo as mary, foo } from M prefix M$;"
+      "export { M$peter, M$paul, M$mary, M$foo };"
+      )
+    (stage-javascript
+      `(
+        "test('check 1', () => {"
+        "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
+        "  expect(C.circuits.foo(Ctxt, 17n).result).toEqual(34n);"
+        "  expect(C.circuits.peter(Ctxt, 17n).result).toEqual(34n);"
+        "  expect(C.circuits.paul(Ctxt, 17n).result).toEqual(34n);"
+        "  expect(C.circuits.mary(Ctxt, 17n).result).toEqual(34n);"
+        "  expect(C.circuits.M$foo(Ctxt, 17n).result).toEqual(34n);"
+        "  expect(C.circuits.M$peter(Ctxt, 17n).result).toEqual(34n);"
+        "  expect(C.circuits.M$paul(Ctxt, 17n).result).toEqual(34n);"
+        "  expect(C.circuits.M$mary(Ctxt, 17n).result).toEqual(34n);"
         "});"
         ))
     )
