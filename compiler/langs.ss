@@ -88,6 +88,11 @@
   (define (max-merkle-tree-depth) 32)
   (define (min-merkle-tree-depth) 2)
 
+  (define (zkir-field-rep? x)
+    (and (integer? x)
+         (exact? x)
+         (<= (- (max-field)) x (max-field))))
+
   (define-record-type vm-expr
     (nongenerative)
     (fields expr))
@@ -1125,8 +1130,10 @@
   (define-language/pretty Lzkir (entry Program)
     (terminals
       (field (arg-count var imm nat))
+      (zkir-field-rep (fr))
       (source-object (src))
-      (symbol (name)))
+      (symbol (name))
+      (Lflattened-Alignment (alignment)))
     (Program (p)
       (program src cdefn* ...) => (program #f cdefn* ...))
     (Circuit-Definition (cdefn)
@@ -1145,10 +1152,11 @@
       (ec_mul_generator var)
       (hash_to_curve var* ...)
       (less_than var0 var1 imm)
-      (load_imm imm)
+      (load_imm fr)
       (mul var0 var1)
       (neg var)
       (output var)
+      (persistent_hash (alignment* ...) var* ...)
       (pi_skip var imm)
       (private_input)
       (private_input var)
