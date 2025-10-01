@@ -59,6 +59,7 @@
   (define keywordImport '(
     export
     import
+    from
     module))
   (define keywordControl '(
     as
@@ -73,7 +74,6 @@
     enum
     fold
     for
-    from
     if
     include
     ledger
