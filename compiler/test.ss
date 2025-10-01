@@ -79,6 +79,18 @@
     (rm-rf testdir)
     (mkdir testdir))
 
+  (define (pretty-print/formats pretty-formats x)
+    (let loop ([alist pretty-formats])
+      (if (null? alist)
+          (pretty-print x)
+          (let ([a (car alist)] [alist (cdr alist)])
+            (parameterize ([(let ([name (car a)])
+                              (case-lambda
+                                [() (pretty-format name)]
+                                [(x) (pretty-format name x)]))
+                            (cdr a)])
+              (loop alist))))))
+
   (define (print-result pretty-formats result)
     (pretty-print/formats
       (cons
@@ -410,7 +422,7 @@
         (if (condition? x)
             (condition! x)
             (let* ([printed-result (with-output-to-string (lambda () (print-result pretty-formats x)))]
-                   [feedback (lambda () printed-result)])
+                   [feedback (lambda () (display-string printed-result))])
               (let-values ([(op get-output) (open-string-output-port)])
                 (if (parameterize ([current-output-port op])
                       (test-equal? pretty-formats x k))
@@ -478,7 +490,7 @@
                    (andmap equal? (map condition-message c*) (map car ls))
                    (andmap equal? (map condition-irritants c*) (map cdr ls)))
               (begin
-                (set! positive-feedback (cons feedback negative-feedback))
+                (set! positive-feedback (cons feedback positive-feedback))
                 #t)
               (begin
                 (set! negative-feedback (cons feedback negative-feedback))
@@ -1326,6 +1338,7 @@
       (program
         (include "empty")
         (import CompactStandardLibrary () "")
+        (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
           (struct #t frob () [q (tfield)])
           (struct #t pair ()
@@ -3012,6 +3025,7 @@
       (program
         (include "empty")
         (import CompactStandardLibrary () "")
+        (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
           (struct #t frob () [q (tfield)])
           (struct #t pair ()
@@ -6954,6 +6968,7 @@
     (returns
       (program
         (import CompactStandardLibrary () "")
+        (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
           (struct #t frob () [q (tfield)])
           (struct #t pair ()
@@ -7445,6 +7460,7 @@
     (returns
       (program
         (import CompactStandardLibrary () "")
+        (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
           (struct #t frob () [q (tfield)])
           (struct #t pair ()
@@ -7702,6 +7718,7 @@
     (returns
       (program
         (import CompactStandardLibrary () "")
+        (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
           (struct #t frob () [q (tfield)])
           (struct #t pair ()
@@ -64234,6 +64251,23 @@
     (oops
       message: "~a:\n  ~?"
       irritants: '("testfile.compact line 10 char 1" "another binding found for ~s in the same scope at ~a" (F "line 8 char 15")))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    F = disclose(ix + ix);"
+      "    return F;"
+      "  }"
+      "}"
+      "import {} from M;"
+      "export { foo };"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 9 char 10" "unbound identifier ~s" (foo)))
     )
 
   (test
