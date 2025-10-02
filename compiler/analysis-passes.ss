@@ -641,17 +641,23 @@
                (if maybe-ielt*
                    (let ([export-ht (make-hashtable symbol-hash eq?)])
                      (for-each
-                       (lambda (x) (hashtable-set! export-ht (exportit-name x) (exportit-info x)))
+                       (lambda (x)
+                         (hashtable-update! export-ht (exportit-name x)
+                           (lambda (info*) (cons (exportit-info x) info*))
+                           '()))
                        export*)
                      (for-each
                        (lambda (ielt)
                          (nanopass-case (Lpreexpand Import-Element) ielt
                            [(,src ,name ,name^)
-                            (let ([info (or (hashtable-ref export-ht name #f)
-                                            (source-errorf #f "no export named ~a in module ~a"
-                                                           name
-                                                           import-name))])
-                              (import-insert! src name^ info))]))
+                            (let ([info* (hashtable-ref export-ht name '())])
+                              (when (null? info*)
+                                (source-errorf #f "no export named ~a in module ~a"
+                                               name
+                                               import-name))
+                              (for-each
+                                (lambda (info) (import-insert! src name^ info))
+                                info*))]))
                        maybe-ielt*))
                    (for-each
                      (lambda (x) (import-insert! src (exportit-name x) (exportit-info x)))
@@ -4313,6 +4319,9 @@
                                contract-name))))
                 (loop (cdr elt-name*) (cdr pure-dcl*))))]
          [else (assert cannot-happen)])])
+    (Tuple-Argument : Tuple-Argument (ir function-name) -> Tuple-Argument ())
+    (Map-Argument : Map-Argument (ir function-name) -> Map-Argument ())
+    (Ledger-Accessor : Ledger-Accessor (ir function-name) -> Ledger-Accessor ())
     (Function : Function (ir function-name) -> Function ()
       [(fref ,src ,function-name^)
        (process-function-name! function-name src function-name^)

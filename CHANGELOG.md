@@ -11,11 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Selective module import and renaming, e.g.:
     `import { getMatch, putMatch as $putMatch } from Matching;`
-      imports `getMatch` as `getMatch`, `putMatch` as `originalPutMatch`
+      imports `getMatch` as `getMatch`, `putMatch` as `$putMatch`
     `import { getMatch, putMatch as originalPutMatch } from Matching prefix M$;`
-      imports `getMatch` as `M$getmatch`, `putMatch` as `M$originalPutMatch`
+      imports `getMatch` as `M$getMatch`, `putMatch` as `M$originalPutMatch`
   The original form of import is still supported:
     `import Matching;`
-      imports everything from `Matching` under its unchanged export name
+      imports everything from `Matching` under their unchanged export names
     `import Matching prefix M$;`
       imports everything from `Matching` with prefix M$
+
+### Fixed
+
+- A bug that sometimes caused impure circuits to be identified as pure

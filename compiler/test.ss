@@ -25867,6 +25867,33 @@
     )
 )
 
+(run-tests identify-pure-circuits
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    const x = disclose(ix);"
+      "    F = disclose(x * 3);"
+      "    return F;"
+      "  }"
+      "  export circuit foo(ix: Field, iy: Field): Field {"
+      "    const x = disclose(ix), y = disclose(iy);"
+      "    F = disclose(x + y);"
+      "    return F;"
+      "  }"
+      "}"
+      "import M;"
+      "export pure circuit bar(ix: Uint<32>): [Field, Field] {"
+      "  return [foo(ix), foo(ix, ix)];"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 15 char 1" "circuit ~a is marked pure but is actually impure because it calls (directly or indirectly) impure circuit ~a;\n    ~:*~a is impure because it ~a at ~a" (bar foo "accesses ledger field F" "line 6 char 12")))
+    )
+)
+
 (run-tests propagate-ledger-paths
   (test
     '(
@@ -64361,6 +64388,35 @@
         "  expect(C.circuits.M$peter(Ctxt, 17n).result).toEqual(34n);"
         "  expect(C.circuits.M$paul(Ctxt, 17n).result).toEqual(34n);"
         "  expect(C.circuits.M$mary(Ctxt, 17n).result).toEqual(34n);"
+        "});"
+        ))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export ledger F: Field;"
+      "  export circuit foo(ix: Field): Field {"
+      "    const x = disclose(ix);"
+      "    F = disclose(x * 3);"
+      "    return F;"
+      "  }"
+      "  export circuit foo(ix: Field, iy: Field): Field {"
+      "    const x = disclose(ix), y = disclose(iy);"
+      "    F = disclose(x + y);"
+      "    return F;"
+      "  }"
+      "}"
+      "import { foo } from M;"
+      "export circuit bar(ix: Uint<32>): [Field, Field] {"
+      "  return [foo(ix), foo(ix, ix)];"
+      "}"
+      )
+    (stage-javascript
+      `(
+        "test('check 1', () => {"
+        "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
+        "  expect(C.circuits.bar(Ctxt, 17n).result).toEqual([51n, 34n]);"
         "});"
         ))
     )
