@@ -139,8 +139,6 @@
         (assert (and (fixnum? n) (fx<= 0 n #xff))))
 
       (define (assert-nibble n)
-        (unless (and (fixnum? n) (fx<= 0 n #xf))
-          (fprintf (current-error-port) "not nibble: ~s\n" n))
         (assert (and (fixnum? n) (fx<= 0 n #xf))))
 
       ;; Impact opcodes are one byte, sometimes with an operand encoded in the low nibble.  It's
@@ -334,47 +332,52 @@
               (fprintf (current-error-port) "Instruction ~s\n" impact-instr)
               (assert not-implemented)])))
 
+      ;; We patch up popeq and popeqc instructions.
+      (define (popeq? code*)
+        (and (pair? code*)
+             (Impact-code-case (car code*)
+               [(Ie-imm n) (<= #xc n #xd)]
+               [else #f])))
+
       (define (assemble test-var alignment* var-name* src path env vm-code instr*)
         (let ([code (expand-vm-code src path #f env (vm-code-code vm-code))])
           (with-output-language (Lzkir Instruction)
             (fold-left
               (lambda (instr* impact-instr)
                 (let ([code* (assemble1 impact-instr var-name* alignment*)])
-                  ;; There is at most one pusheq.  It needs public_input instructions for each
-                  ;; result, they're emitted here before any load_imm to match the ZKIR v2
-                  ;; implementation.
-                  (define (pusheq? code*)
-                    (and (pair? code*)
-                         (Impact-code-case (car code*)
-                           [(Ie-imm n) (<= #xc n #xd)]
-                           [else #f])))
-                  (let ([instr* (if (not (pusheq? code*))
-                                    instr*
-                                    (fold-left
-                                      (lambda (instr* var-name)
-                                        (cons
-                                          ;; A weird case duplicated from ZKIR v2.
-                                          (if (eq? test-var (hashtable-ref immediate-ht 1 #f))
-                                              `(public_input)
-                                              `(public_input ,test-var))
-                                          instr*))
-                                      instr* var-name*))])
-                    ;; The ZKIR v2 implementation emits all the load_imm before any
-                    ;; declare_pub_input.  That's not necessary but we maintain that behavior for
-                    ;; now to avoid rebasing all our tests.
-                    (let-values ([(vars instr*)
-                                  (let loop ([code* code*] [vars '()] [instr* instr*])
-                                    (if (null? code*)
-                                        (values (reverse vars) instr*)
-                                        (Impact-code-case (car code*)
-                                          [(Ie-imm n)
-                                           (let-values ([(var instr*) (emit-immediate n instr*)])
-                                             (loop (cdr code*) (cons var vars) instr*))]
-                                          [(Ie-var n) (loop (cdr code*) (cons n vars) instr*)])))])
-                      (let ([instr* (fold-left (lambda (instr* var)
-                                                 (cons `(declare_pub_input ,var) instr*))
-                                      instr* vars)])
-                        (cons `(pi_skip ,test-var ,(length vars)) instr*))))))
+                  ;; A "suppress" operand was an instruction to skip the instruction, empty code.
+                  (if (null? code*)
+                      instr*
+                      ;; There is at most one popeq.  It needs public_input instructions for each
+                      ;; result, they're emitted here before any load_imm to match the ZKIR v2
+                      ;; implementation.
+                      (let ([instr* (if (not (popeq? code*))
+                                        instr*
+                                        (fold-left
+                                          (lambda (instr* var-name)
+                                            (cons
+                                              ;; A weird case duplicated from ZKIR v2.
+                                              (if (eq? test-var (hashtable-ref immediate-ht 1 #f))
+                                                  `(public_input)
+                                                  `(public_input ,test-var))
+                                              instr*))
+                                          instr* var-name*))])
+                        ;; The ZKIR v2 implementation emits all the load_imm before any
+                        ;; declare_pub_input.  That's not necessary but we maintain that behavior
+                        ;; for now to avoid rebasing all our tests.
+                        (let-values ([(vars instr*)
+                                      (let loop ([code* code*] [vars '()] [instr* instr*])
+                                        (if (null? code*)
+                                            (values (reverse vars) instr*)
+                                            (Impact-code-case (car code*)
+                                              [(Ie-imm n)
+                                               (let-values ([(var instr*) (emit-immediate n instr*)])
+                                                 (loop (cdr code*) (cons var vars) instr*))]
+                                              [(Ie-var n) (loop (cdr code*) (cons n vars) instr*)])))])
+                          (let ([instr* (fold-left (lambda (instr* var)
+                                                     (cons `(declare_pub_input ,var) instr*))
+                                          instr* vars)])
+                            (cons `(pi_skip ,test-var ,(length vars)) instr*)))))))
               instr* code))))
 
       ;; ==== Per-circuit state ====
@@ -404,8 +407,6 @@
 
       ;; Lookup a variable's index.
       (define (lookup name)
-        (unless (hashtable-contains? environment-ht name)
-          (fprintf (current-error-port) "unbound: ~s\n" name))
         (assert (hashtable-contains? environment-ht name))
         (hashtable-ref environment-ht name #f))
 
