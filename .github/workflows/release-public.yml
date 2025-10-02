@@ -74,8 +74,4 @@ jobs:
     with:
       version: ${{ inputs.version }}
       branch: ${{ inputs.branch }}
-    secrets:
-      GH_USERNAME: ${{ secrets.GH_USERNAME }}
-      GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
-      MIDNIGHTBOT_PACKAGES_WRITE: ${{ secrets.MIDNIGHTBOT_PACKAGES_WRITE }}
-      ATTIC_CACHE_TOKEN: ${{ secrets.ATTIC_CACHE_TOKEN }}
+    secrets: inherit
