@@ -56,7 +56,7 @@
                                instr* triv*)])
                 (fold-left
                   (lambda (instr* var-name primitive-type)
-                    (let* ([var (bind var-name)]
+                    (let* ([var (allocate-var var-name)]
                            ;; The ZKIR v2 backend has this special case for literal true guards.
                            [instr* (cons (if (eq? test 1)
                                              `(private_input)
@@ -78,43 +78,54 @@
                                    (loop (cdr triv*) instr* (cons var var*)))))])
               ;; Generally assume that the arity is correct here.
               (case name
+                [(degradeToTransient)
+                 (bind (car var-name*) (cadr input-var*))
+                 instr*]
                 [(ecAdd)
-                 (for-each bind var-name*)
+                 (for-each allocate-var var-name*)
                  (cons (apply (lambda (ax ay bx by) `(ec_add ,ax ,ay ,bx ,by)) input-var*)
                    instr*)]
                 [(ecMul)
-                 (for-each bind var-name*)
+                 (for-each allocate-var var-name*)
                  (cons (apply (lambda (ax ay scalar) `(ec_mul ,ax ,ay ,scalar)) input-var*)
                    instr*)]
                 [(ecMulGenerator)
-                 (for-each bind var-name*)
+                 (for-each allocate-var var-name*)
                  (cons `(ec_mul_generator ,(car input-var*)) instr*)]
                 [(hashToCurve)
-                 (for-each bind var-name*)
+                 (for-each allocate-var var-name*)
                  (cons `(hash_to_curve ,input-var* ...) instr*)]
+                [(persistentCommit)
+                 (for-each allocate-var var-name*)
+                 ;; The last two inputs need to be moved first and kept in order.
+                 ;; Their alignment atom is (abytes 32).
+                 (let* ([rev (reverse input-var*)]
+                        [var* (cons* (cadr rev) (car rev) (reverse (cddr rev)))]
+                        [alignment*
+                          (cons
+                            (with-output-language (Lflattened Alignment) `(abytes ,32))
+                            (nanopass-case (Lflattened Argument) (car arg*)
+                              [(argument (,var-name ...) (ty (,alignment* ...)
+                                                           (,primitive-type* ...)))
+                               alignment*]))])
+                   (cons `(persistent_hash (,alignment* ...) ,var* ...) instr*))]
+                [(persistentHash)
+                 (for-each allocate-var var-name*)
+                 (let ([alignment*
+                         (nanopass-case (Lflattened Argument)  (car arg*)
+                           [(argument (,var-name ...) (ty (,alignment* ...)
+                                                        (,primitive-type* ...)))
+                            alignment*])])
+                   (cons `(persistent_hash (,alignment* ...) ,input-var* ...) instr*))]
                 [(transientCommit)
-                 (bind (car var-name*))
+                 (allocate-var (car var-name*))
                  ;; The last input needs to be moved first.
                  (let* ([rev (reverse input-var*)]
                         [var* (cons (car rev) (reverse (cdr rev)))])
                    (cons `(transient_hash ,var* ...) instr*))]
                 [(transientHash)
-                 (bind (car var-name*))
+                 (allocate-var (car var-name*))
                  (cons `(transient_hash ,input-var* ...) instr*)]
-                [(persistentCommit)
-                 (for-each bind var-name*)
-                 ;; The last two inputs need to be moved first and kept in order.
-                 ;; Their alignment atom is (abytes 32).
-                 (let* ([rev (reverse input-var*)]
-                        [var* (cons* (car rev) (cadr rev) (reverse (cddr rev)))]
-                        [alignment*
-                          (cons
-                            (with-output-language (Lflattened Alignment) `(abytes ,2))
-                            (nanopass-case (Lflattened Argument) (car arg*)
-                              [(argument (,var-name ...)
-                                 (ty (,alignment* ...) (,primitive-type ...)))
-                               alignment*]))])
-                   (cons `(persistent_hash (,alignment* ...) ,var* ...) instr*))]
                 [else
                   (fprintf (current-error-port) "unknown native: ~s\n" name)
                   (assert not-implemented)])))))
@@ -178,6 +189,7 @@
           [(not (VMop? rand)) (cons (Ie-imm rand) code*)]
           [else
             (VMop-case rand
+              [(VMstack) (cons (Ie-imm -1) code*)]
               [(VMalign value bytes)
                (assert-byte bytes)
                ;; Encoding is length=1 bytes value (in reverse).
@@ -259,18 +271,24 @@
             ;; eq --> 0x02
             [("eq") (list (Ie-imm #x02))]
 
+            ;; type --> 0x03
+            [("type") (list (Ie-imm #x03))]
+
             ;; size --> 0x04
             [("size") (list (Ie-imm #x04))]
+
+            ;; neg --> 0x08
+            [("neg") (list (Ie-imm #x08))]
 
             ;; root --> 0x0a
             [("root") (list (Ie-imm #x0a))]
 
             ;; popeq  --> 0x0c result
             ;; popeqc --> 0x0d result
-            ;; This instruction occurs at most once in a program, so it's OK to bind the
-            ;; variable names.
+            ;; This instruction occurs at most once in a program, so it's OK to allocate indexes for
+            ;; the variable names.
             [("popeq")
-             (let* ([output-vars (maplr (lambda (vn) (Ie-var (bind vn))) var-name*)]
+             (let* ([output-vars (maplr (lambda (vn) (Ie-var (allocate-var vn))) var-name*)]
                     [alignment (map assemble-alignment-atom alignment*)])
                (cons*
                  (Ie-imm (if (cdr (assoc "cached" rands)) #xd #xc))
@@ -290,6 +308,16 @@
             [("push")
              (let ([code* (assemble-operand (cdr (assoc "value" rands)))])
                (cons (Ie-imm (if (cdr (assoc "storage" rands)) #x11 #x10)) code*))]
+
+            ;; branch --> 0x12 u21
+            [("branch")
+             (let ([n (cdr (assoc "skip" rands))])
+               ;; TODO(kmillikin): Is this guaranteed to be in range?
+               (assert (<= (integer-length n) 21))
+               (list (Ie-imm #x12) (Ie-imm n)))]
+
+            ;; add --> 0x14
+            [("add") (list (Ie-imm #x14))]
 
             ;; member --> 0x18
             [("member") (list (Ie-imm #x18))]
@@ -398,12 +426,18 @@
           index))
 
       ;; Allocate an output index for a variable name, returning the index.
-      (define (bind name)
+      (define (allocate-var name)
         ;; Names in Lflattened should be unique.
         (assert (not (hashtable-contains? environment-ht name)))
         (let ([index (allocate-index)])
           (hashtable-set! environment-ht name index)
           index))
+
+      ;; Bind an existing output index to a variable name.
+      (define (bind name index)
+        (assert (and (not (hashtable-contains? environment-ht name))
+                     (< index next-index)))
+        (hashtable-set! environment-ht name index))
 
       ;; Lookup a variable's index.
       (define (lookup name)
@@ -495,8 +529,8 @@
        ;; - Add instructions for the outputs
        (reset-state!)
        (let-values ([(name* type*) (unzip-arguments arg*)])
-         ;; Bind the first N indexes to the input names before emitting any instructions.
-         (for-each bind name*)
+         ;; Allocate the first N indexes for the input names before emitting any instructions.
+         (for-each allocate-var name*)
          (let* ([constraint*
                   (fold-left (lambda (constraint* name type)
                                (emit-constraints-for (lookup name) type constraint*))
@@ -530,8 +564,8 @@
                (hashtable-set! environment-ht var-name1 var1)
                (cons `(constrain_bits ,var1 ,(* len 8)) instr*))
              (let-values ([(var instr*) (Triv triv instr*)])
-               (bind var-name0)
-               (bind var-name1)
+               (allocate-var var-name0)
+               (allocate-var var-name1)
                (cons `(div_mod_power_of_two ,var ,(* (field-bytes) 8)) instr*))))]
       [(= (,var-name* ...) (public-ledger ,src ,test ,ledger-field-name ,sugar? (,path-elt* ...)
                              ,src^ ,adt-op ,triv* ...))
@@ -591,39 +625,39 @@
        (with-output-language (Lzkir Instruction)
          (let*-values ([(var0 instr*) (Triv triv0 instr*)]
                        [(var1 instr*) (Triv triv1 instr*)])
-           (bind var-name)
+           (allocate-var var-name)
            (cons `(add ,var0 ,var1) instr*)))]
       [(- ,mbits ,triv0 ,triv1)
        (with-output-language (Lzkir Instruction)
          (let*-values ([(var0 instr*) (Triv triv0 instr*)]
                        [(var1 instr*) (Triv triv1 instr*)]
                        [(var2 instr*) (values (allocate-index) (cons `(neg ,var1) instr*))])
-           (bind var-name)
+           (allocate-var var-name)
            (cons `(add ,var0 ,var2) instr*)))]
       [(* ,mbits ,triv0 ,triv1)
        (with-output-language (Lzkir Instruction)
          (let*-values ([(var0 instr*) (Triv triv0 instr*)]
                        [(var1 instr*) (Triv triv1 instr*)])
-           (bind var-name)
+           (allocate-var var-name)
            (cons `(mul ,var0 ,var1) instr*)))]
       [(< ,mbits ,triv0 ,triv1)
        (with-output-language (Lzkir Instruction)
          (let*-values ([(var0 instr*) (Triv triv0 instr*)]
                        [(var1 instr*) (Triv triv1 instr*)])
-           (bind var-name)
+           (allocate-var var-name)
            (cons `(less_than ,var0 ,var1 ,mbits) instr*)))]
       [(== ,triv0 ,triv1)
        (with-output-language (Lzkir Instruction)
          (let*-values ([(var0 instr*) (Triv triv0 instr*)]
                        [(var1 instr*) (Triv triv1 instr*)])
-           (bind var-name)
+           (allocate-var var-name)
            (cons `(test_eq ,var0 ,var1) instr*)))]
       [(select ,triv0 ,triv1 ,triv2)
        (with-output-language (Lzkir Instruction)
          (let*-values ([(var0 instr*) (Triv triv0 instr*)]
                        [(var1 instr*) (Triv triv1 instr*)]
                        [(var2 instr*) (Triv triv2 instr*)])
-           (bind var-name)
+           (allocate-var var-name)
            (cons `(select ,var0 ,var1 ,var2) instr*)))]
       [(bytes->field ,src ,test ,len ,triv0 ,triv1)
        ;; TODO(kmillikin): This should respect test and be conditional in the ZKIR output.
@@ -632,7 +666,7 @@
          (assert (> len (field-bytes)))
          (let*-values ([(var0 instr*) (Triv triv0 instr*)]
                        [(var1 instr*) (Triv triv1 instr*)])
-           (bind var-name)
+           (allocate-var var-name)
            (cons `(reconstitute_field ,var0 ,var1 ,(* 8 (field-bytes))) instr*)))]
       [(downcast-unsigned ,src ,test ,nat ,triv)
        ;; TODO(kmillikin): This needs to be conditional on test.
@@ -642,7 +676,7 @@
                            (with-output-language (Lflattened Primitive-Type) `(tfield ,nat))
                            instr*)])
              ;; TODO(kmillikin): The `copy` here is unnecessary.  Remove it.
-             (bind var-name)
+             (allocate-var var-name)
              (cons `(copy ,var) instr*))))]
       [else (assert cannot-happen)])
 
@@ -671,12 +705,26 @@
       (define (alignment-atom->alist atom)
         (nanopass-case (Lflattened Alignment) atom
           [(acompress) `((tag . "atom") (value . ((tag . "compress"))))]
-          [(abytes ,nat) `((tag . "atom") (value . ((length . 32) (tag . "bytes"))))]
+          [(abytes ,nat) `((tag . "atom") (value . ((length . ,nat) (tag . "bytes"))))]
           [(afield) `((tag . "atom") (value . ((tag . "field"))))]
           ;; Alignment for ADT and contract types can't appear?
           [else (assert cannot-happen)]))
       (define (alignment->vector alignment*)
-        (list->vector (map alignment-atom->alist alignment*))))
+        (list->vector (map alignment-atom->alist alignment*)))
+      ;; Field representations (which *can* be negative) are represented with a leading sign and
+      ;; then hexadecimal byte values in little endian order.
+      (define (field-rep->string fr)
+        (call-with-string-output-port
+          (lambda (sp)
+            (let ([fr (if (< fr 0)
+                          (begin (put-char sp #\-) (- fr))
+                          fr)])
+              (let loop ([fr fr])
+                (if (< fr 256)
+                    (fprintf sp "~2,'0x" fr)
+                    (begin (fprintf sp "~2,'0x" (remainder fr 256))
+                           (loop (quotient fr 256)))))))))
+      )
     (Program : Program (ir) -> Program ()
       [(program ,src ,[] ...) ir])
     (Circuit-Definition : Circuit-Definition (ir) -> * ()
@@ -731,9 +779,7 @@
       [(less_than ,var0 ,var1 ,imm)
        `((op . "less_than") (a . ,var0) (b . ,var1) (bits . ,imm))]
       [(load_imm ,fr)
-       `((op . "load_imm") (imm . ,(if (< fr 0)
-                                       (format "-~2,'0x" (- fr))
-                                       (format "~2,'0x" fr))))]
+       `((op . "load_imm") (imm . ,(field-rep->string fr)))]
       [(mul ,var0 ,var1)
        `((op . "mul") (a . ,var0) (b . ,var1))]
       [(neg ,var)
