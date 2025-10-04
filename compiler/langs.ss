@@ -17,7 +17,7 @@
 
 (library (langs)
   (export max-field field-bytes max-unsigned unsigned-bits field? datum? path-index?
-          max-bytes/vector-size len? max-merkle-tree-depth min-merkle-tree-depth
+          max-bytes/vector-size len? kindex? max-merkle-tree-depth min-merkle-tree-depth
           maximum-ledger-segment-length 
           make-vm-expr vm-expr? vm-expr-expr make-vm-code vm-code? vm-code-code
           Lsrc unparse-Lsrc Lsrc-pretty-formats Lsrc-Include?
@@ -84,6 +84,11 @@
     (and (integer? x)
          (exact? x)
          (<= 0 x (max-bytes/vector-size))))
+
+  (define (kindex? x)
+    (and (integer? x)
+         (exact? x)
+         (<= 0 x (- (max-bytes/vector-size) 1))))
 
   (define (max-merkle-tree-depth) 32)
   (define (min-merkle-tree-depth) 2)
@@ -563,7 +568,7 @@
 
   (define-language/pretty Ltypes (entry Program)
     (terminals
-      (field (nat))
+      (field (nat kindex))
       (len (size len))
       (maybe-bits (mbits))
       (symbol (export-name contract-name struct-name enum-name type-name tvar-name elt-name ledger-op ledger-op-class adt-name adt-formal))
@@ -638,8 +643,8 @@
       ; for vector, the elements must all have the same type
       (vector src tuple-arg* ...)             => (vector tuple-arg* ...)
       ; for tuple-ref and tuple-slice, the index (nat) is constant, and expr's elements can have different, even unrelated types
-      (tuple-ref src expr nat)                => (tuple-ref #f expr #f nat)
-      (tuple-slice src type expr nat size)    => (tuple-slice #f expr #f nat #f size)
+      (tuple-ref src expr kindex)                => (tuple-ref #f expr #f kindex)
+      (tuple-slice src type expr kindex size)    => (tuple-slice #f expr #f kindex #f size)
       ; for vector-ref and vector-slice, index is an arbitrary expression and expr's elements must all have the same type
       ; NB: index must eventually reduce to a constant, but that manifests in a later language.  for now, it is constrained
       ; only to have some Uint type
@@ -903,10 +908,10 @@
     (Expression (expr index)
       (- (bytes-ref src type expr index)
          (vector-ref src type expr index)
-         (tuple-slice src type expr nat size)
+         (tuple-slice src type expr kindex size)
          (bytes-slice src type expr index size)
          (vector-slice src type expr index size))
-      (+ (bytes-ref src expr nat) => (bytes-ref expr nat))))
+      (+ (bytes-ref src expr kindex) => (bytes-ref expr kindex))))
 
   (define-language/pretty Lcircuit (entry Program)
     (terminals
