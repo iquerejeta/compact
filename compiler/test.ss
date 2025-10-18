@@ -12251,6 +12251,16 @@
       message: "~a:\n  ~?"
       irritants: '("testfile.compact line 7 char 21" "no export named ~a in module ~a" (t Test)))
     )
+
+  (test
+    '(
+      "export circuit foo(x: Uint<0..0>): [] {"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 1 char 23" "Uint range end must be at least 1 (the range end is exclusive)" (0)))
+    )
 )
 
 (run-tests infer-types

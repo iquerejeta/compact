@@ -1103,7 +1103,7 @@
        (unless (= nat 0)
          (source-errorf src "Uint range start must be 0" nat))
        (unless (<= 1 nat^)
-         (source-errorf src "Uint range end\n    ~d\n  is not at least 1 (the range end is exclusive)"
+         (source-errorf src "Uint range end must be at least 1 (the range end is exclusive)"
                         nat^))
        (unless (<= nat^ (+ (max-unsigned) 1))
          (source-errorf src "Uint range end\n    ~d\n  exceeds the limit of\n    ~d (2^~d)\n  (the range end is exclusive)"
