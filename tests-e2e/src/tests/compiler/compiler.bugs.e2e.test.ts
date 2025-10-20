@@ -234,7 +234,7 @@ describe('[Bugs] Compiler', () => {
         const result: Result = await compile([Arguments.VSCODE, filePath, outputDir]);
 
         expectCompilerResult(result).toBeFailure(
-            /Exception: pm-16065.compact line 19 char 25: vector type size\/length; 43590753987470154073008687018949015693739732443847; exceeds the maximum vector size\/length allowed; 16777216/,
+            /Exception: pm-16065.compact line 19 char 25: vector type size\/length; 43590753987470154073008687018949015693739732443847 exceeds the maximum vector size\/length allowed; 16777216/,
             compilerDefaultOutput(),
         );
         expectFiles(outputDir).thatNoFilesAreGenerated();
