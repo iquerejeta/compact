@@ -166,7 +166,7 @@
           ,(let* ([bv (string->utf8 (token-value str))]
                   [n (bytevector-length bv)])
              (unless (len? n)
-               (source-errorf src "length of the UTF-8 representation of string constant ~a exceeds the maximum length ~d allowed"
+               (source-errorf src "length of the UTF-8 representation of string constant ~a exceeds the maximum supported length ~d"
                               n
                               (max-bytes/vector-length)))
              bv))]

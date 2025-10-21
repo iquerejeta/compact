@@ -21476,7 +21476,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: `("testfile.compact line 2 char 13" "length of the UTF-8 representation of string constant ~a exceeds the maximum length ~d allowed" (,(+ (max-bytes/vector-length) 1) ,(max-bytes/vector-length))))
+      irritants: `("testfile.compact line 2 char 13" "length of the UTF-8 representation of string constant ~a exceeds the maximum supported length ~d" (,(+ (max-bytes/vector-length) 1) ,(max-bytes/vector-length))))
     )
 )
 
