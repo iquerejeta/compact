@@ -870,21 +870,12 @@
                                nexpected
                                external-name)))
             x)))
-
-      (define (Type-Size->length tsize p src what)
-        (let ([len (Type-Size->nat tsize p)])
-          (if (len? len)
-              len
-              (source-errorf src "~a size/length\n    ~d exceeds the maximum ~a size/length allowed\n    ~d"
-                             what
-                             len
-                             (case what
-                               [("tuple/vector slice") "tuple/vector"]
-                               [("tuple type")         "tuple"]
-                               [("vector type")        "vector"]
-                               [("Bytes type")         "bytes"]
-                               [else (internal-errorf 'len?-check (format "invalid what ~a passed to Type-Size->length" what))])
-                             (max-bytes/vector-size)))))
+      (define (check-length! src what len)
+        (unless (len? len)
+          (source-errorf src "~a length\n  ~d\n  exceeds the maximum supported length ~d"
+                         what
+                         len
+                         (max-bytes/vector-length))))
       )
     (Program : Program (ir) -> Program ()
       (definitions
@@ -1075,8 +1066,9 @@
        (let ([id (make-source-id src var-name)] [p (add-rib p)])
          (env-insert! p src var-name (Info-var id))
          `(for ,src ,id ,expr1 ,(Expression expr2 p)))]
-      [(tuple-slice ,src ,[expr] ,[index] ,[Type-Size->length : tsize p src "tuple/vector slice" -> * len])
-       `(tuple-slice ,src ,expr ,index ,len)]
+      [(tuple-slice ,src ,[expr] ,[index] ,[Type-Size->nat : tsize p -> * nat])
+       (check-length! src "slice" nat)
+       `(tuple-slice ,src ,expr ,index ,nat)]
       [(elt-ref ,src ,expr ,elt-name^)
        (or (nanopass-case (Lpreexpand Expression) expr
              [(var-ref ,src^ ,var-name)
@@ -1122,21 +1114,14 @@
                         nat^
                         (max-unsigned)))
        `(tunsigned ,src ,nat^)]
-      [(tvector ,src ,[Type-Size->length : tsize p src "vector type" -> * len] ,[type])
-       `(tvector ,src ,len ,type)]
-      [(tbytes ,src ,[Type-Size->length : tsize p src "Bytes type" -> * len])
-       `(tbytes ,src ,len)]
+      [(tvector ,src ,[Type-Size->nat : tsize p -> * nat] ,[type])
+       (check-length! src "vector type" nat)
+       `(tvector ,src ,nat ,type)]
+      [(tbytes ,src ,[Type-Size->nat : tsize p -> * nat])
+       (check-length! src "bytes type" nat)
+       `(tbytes ,src ,nat)]
       [(ttuple ,src ,[type*] ...)
-       (Type-Size->length (with-output-language (Lpreexpand Type-Size)
-                            `(type-size ,src ,(length type*)))
-                          p
-                          src
-                          "tuple type")
-       #;(let ([len (length type*)])
-         (unless (len? len)
-           (source-errorf src "Tuple type length\n    ~d\n  exceeds the maximum tuple length allowed\n    ~d"
-                          len
-                          (max-bytes/vector-size))))
+       (check-length! src "tuple type" (length type*))
        `(ttuple ,src ,type* ...)])
     (Type-Ref->Type : Type-Ref (ir p) -> Type ()
       [(type-ref ,src ,tvar-name ,[Type-Argument->info : targ* p -> * info*] ...)
@@ -2496,7 +2481,7 @@
                (unless (len? len)
                  (source-errorf src "the size of tuple/vector construction expression with vector-typed spread\n    ~d\n  exceeds the maximum vector size allowed\n    ~d"
                                 len
-                                (max-bytes/vector-size)))
+                                (max-bytes/vector-length)))
                (with-output-language (Ltypes Type)
                  `(tvector ,src ,len ,elt-type)))
              (values
@@ -2514,7 +2499,7 @@
              (unless (len? len)
                (source-errorf src "the size of tuple/vector construction expression with tuple-typed spread\n    ~d\n  exceeds the maximum tuple size allowed\n    ~d"
                               len
-                              (max-bytes/vector-size)))
+                              (max-bytes/vector-length)))
              (values
                `(tuple ,src ,(map (lambda (kind nat expr)
                                     (if (eq? kind 'single)
@@ -2525,16 +2510,16 @@
                (with-output-language (Ltypes Type)
                  `(ttuple ,src ,elt-type* ...)))))]
       [(bytes ,src ,[Bytes-Argument : tuple-arg* nat*] ...)
-       (let ([nat-total (apply + nat*)])
-         (unless (len? nat-total)
+       (let ([len-total (apply + nat*)])
+         (unless (len? len-total)
            (source-errorf src "Bytes construction length\n    ~d exceeds the maximum bytes length allowed\n    ~d"
-                          nat-total
-                          (max-bytes/vector-size)))
+                          len-total
+                          (max-bytes/vector-length)))
          (values
-           `(vector->bytes ,src ,nat-total
+           `(vector->bytes ,src ,len-total
               (vector ,src ,tuple-arg* ...))
            (with-output-language (Ltypes Type)
-             `(tbytes ,src ,nat-total))))]
+             `(tbytes ,src ,len-total))))]
       [(tuple-ref ,src ,[Care : expr expr-type] ,[Care : index index-type])
        (nanopass-case (Ltypes Type) index-type
          [(tunsigned ,src^ ,nat) nat]
@@ -2553,7 +2538,7 @@
              (unless (kindex? datum)
                 (source-errorf src "index ~d exceeds maximum allowed index ~d for a ~a reference"
                                datum
-                               (- (max-bytes/vector-size) 1)
+                               (- (max-bytes/vector-length) 1)
                                (nanopass-case (Ltypes Type) expr-type
                                  [(ttuple ,src^ ,type* ...) "tuple"]
                                  [(tvector ,src^ ,len^ ,type^) "vector"])))
@@ -2563,10 +2548,7 @@
             (define (bounds-check what len)
               (unless (< kindex len)
                 (source-errorf src "index ~d is out-of-bounds for a ~a of length ~d"
-                               kindex what len))
-              ; there is no need for a kindex? check in values since if the index violates kindex? it will be caught
-              ; by the check above
-              )
+                               kindex what len)))
             (values
               `(tuple-ref ,src ,expr ,kindex)
               (nanopass-case (Ltypes Type) expr-type
@@ -2591,7 +2573,7 @@
               (values
                 `(vector-ref ,src ,vector-type ,expr ,index)
                 elt-type)))])]
-      [(tuple-slice ,src ,[Care : expr expr-type] ,[Care : index index-type] ,size)
+      [(tuple-slice ,src ,[Care : expr expr-type] ,[Care : index index-type] ,len)
        (nanopass-case (Ltypes Type) index-type
          [(tunsigned ,src^ ,nat) nat]
          [else (source-errorf src "expected index to have an unsigned type, received ~a"
@@ -2602,56 +2584,53 @@
             ; reinforce len
             [(tbytes ,src ,len) len]
             [else #f]) =>
-          (lambda (len)
-            (unless (<= size len)
-              (source-errorf src "slice size ~d exceeds the length ~d of the input Bytes" size len))
+          (lambda (input-len)
+            (unless (<= len input-len)
+              (source-errorf src "slice length ~d exceeds the length ~d of the input Bytes" len input-len))
             (values
-              `(bytes-slice ,src ,expr-type,expr ,index ,size)
-              (with-output-language (Ltypes Type) `(tbytes ,src ,size))))]
+              `(bytes-slice ,src ,expr-type,expr ,index ,len)
+              (with-output-language (Ltypes Type) `(tbytes ,src ,len))))]
          [(nanopass-case (Ltypes Expression) index
             [(quote ,src ,datum)
              (unless (kindex? datum)
                 (source-errorf src "index ~d exceeds maximum index allowed ~d for a ~a slicing"
                                datum
-                               (- (max-bytes/vector-size) 1)
+                               (- (max-bytes/vector-length) 1)
                                (nanopass-case (Ltypes Type) expr-type
                                  [(ttuple ,src^ ,type* ...) "tuple"]
                                  [(tvector ,src^ ,len^ ,type^) "vector"])))
              (and (field? datum) datum)]
             [else #f]) =>
           (lambda (kindex)
-            (define (bounds-check what len)
-              (unless (<= (+ kindex size) len)
-                (source-errorf src "slice index ~d plus size ~d is out-of-bounds for a ~a of length ~d"
-                               kindex size what len))
-              ; there is no need for a kindex? check in values since if the index violates kindex? it will be caught
-              ; by the check above
-            )
+            (define (bounds-check what input-len)
+              (unless (<= (+ kindex len) input-len)
+                (source-errorf src "slice index ~d plus length ~d is out-of-bounds for a ~a of length ~d"
+                               kindex len what input-len)))
             (values
-              `(tuple-slice ,src ,expr-type ,expr ,kindex ,size)
+              `(tuple-slice ,src ,expr-type ,expr ,kindex ,len)
               (with-output-language (Ltypes Type)
                 (nanopass-case (Ltypes Type) expr-type
                   [(ttuple ,src^ ,type* ...)
                    (bounds-check "tuple" (length type*))
-                   `(ttuple ,src ,(list-head (list-tail type* kindex) size) ...)]
+                   `(ttuple ,src ,(list-head (list-tail type* kindex) len) ...)]
                   [(tvector ,src^ ,len^ ,type)
                    (bounds-check "vector" len^)
-                   `(tvector ,src ,size ,type)]
+                   `(tvector ,src ,len ,type)]
                   [else (source-errorf src "expected a tuple, Vector, or Bytes type, received ~a"
                                        (format-type expr-type))]))))]
          [else
-          (let-values ([(len^ elt-type) (vector-element-type src "tuple slice with a non-constant index" expr-type)])
-            (unless (<= size len^)
-              (source-errorf src "slice size ~d exceeds the length ~d of the input vector" size len^))
+          (let-values ([(input-len elt-type) (vector-element-type src "tuple slice with a non-constant index" expr-type)])
+            (unless (<= len input-len)
+              (source-errorf src "slice length ~d exceeds the length ~d of the input vector" len input-len))
             (let* ([vector-type (with-output-language (Ltypes Type)
                                   ; there is no need to check (len? len^) since since if the check is violated the construction of expr-type
                                   ; would have already caught it
-                                  `(tvector ,src ,len^ ,elt-type))]
+                                  `(tvector ,src ,input-len ,elt-type))]
                    [expr (maybe-upcast src vector-type expr-type expr)])
               (values
-                `(vector-slice ,src ,vector-type ,expr ,index ,size)
+                `(vector-slice ,src ,vector-type ,expr ,index ,len)
                 (with-output-language (Ltypes Type)
-                  `(tvector ,src ,size ,elt-type)))))])]
+                  `(tvector ,src ,len ,elt-type)))))])]
       [(+ ,src ,expr1 ,expr2)
        (arithmetic-binop src '+ expr1 expr2
          (lambda (mbits expr1 expr2)
@@ -2690,12 +2669,12 @@
            `(!= ,src ,type ,expr1 ,expr2)))]
       [(for ,src ,var-name ,expr1 ,expr2)
        (let-values ([(expr1 type1) (Care expr1)])
-         (let-values ([(nat elt-type) (vector-element-type src "for 'of' expression" type1)])
+         (let-values ([(len elt-type) (vector-element-type src "for 'of' expression" type1)])
            (set-idtype! var-name (Idtype-Base elt-type))
            (let-values ([(expr2 type2) (Care expr2)])
              (unset-idtype! var-name)
              (values
-               `(fold ,src ,nat
+               `(fold ,src ,len
                   ,(let ([t (make-temp-id src 't)])
                      (with-output-language (Ltypes Function)
                        `(circuit ,src ((,t (ttuple ,src))
@@ -2725,13 +2704,13 @@
       [(fold ,src ,fun ,expr0 ,expr ,expr* ...)
        (let*-values ([(expr0 actual-type0) (Care expr0)]
                      [(expr+ actual-type+) (maplr2 Care (cons expr expr*))]
-                     [(nat actual-elt-type+) (vector-element-types src 'fold actual-type+ 3)])
+                     [(len actual-elt-type+) (vector-element-types src 'fold actual-type+ 3)])
          (do-call src #t fun (cons actual-type0 actual-elt-type+)
            (lambda (declared-type+ return-type fun)
              (let ([declared-type0 (car declared-type+)] [declared-type+ (cdr declared-type+)])
                (let ([expr0 (maybe-upcast src declared-type0 actual-type0 expr0)])
                  (values
-                   `(fold ,src ,nat ,fun
+                   `(fold ,src ,len ,fun
                       (,expr0 ,declared-type0)
                       ; see the note about map args above
                       (,(car expr+) ,(car actual-type+) ,(car declared-type+))
@@ -3677,18 +3656,18 @@
           ; can't presently happen: we never construct an enum-ref unless we have an enum type
           (source-errorf src "expected enum type, received ~a"
                          (format-type type))])]
-      [(tuple-ref ,src ,[Care : expr -> * expr-type] ,nat)
-       (define (bounds-check nat^)
-         (unless (< nat nat^)
+      [(tuple-ref ,src ,[Care : expr -> * expr-type] ,kindex)
+       (define (bounds-check len)
+         (unless (< kindex len)
            (source-errorf src "index ~s is out-of-bounds for tuple or vector of length ~s"
-                          nat nat^)))
+                          kindex len)))
        (nanopass-case (Lnodca Type) expr-type
-         [(ttuple ,src^ ,type* ...)
+         [(ttuple ,src ,type* ...)
           (bounds-check (length type*))
-          (list-ref type* nat)]
-         [(tvector ,src^ ,len^ ,type^)
-          (bounds-check len^)
-          type^]
+          (list-ref type* kindex)]
+         [(tvector ,src ,len ,type)
+          (bounds-check len)
+          type]
          [else (source-errorf src "expected tuple or vector type, received ~a"
                               (format-type expr-type))])]
       [(bytes-ref ,src ,type ,[Care : expr -> * expr-type] ,[Care : index -> * index-type])
@@ -3717,11 +3696,11 @@
           type^]
          [else (source-errorf src "expected vector-ref expr to have a non-empty vector type, received ~a"
                               (format-type expr-type))])]
-      [(tuple-slice ,src ,[type] ,[Care : expr -> * expr-type] ,nat ,size)
-       (define (bounds-check nat^)
-         (unless (<= (+ nat size) nat^)
-           (source-errorf src "index ~d plus size ~d is out-of-bounds for a tuple or vector of length ~d"
-                          nat size nat^)))
+      [(tuple-slice ,src ,[type] ,[Care : expr -> * expr-type] ,kindex ,len)
+       (define (bounds-check input-len)
+         (unless (<= (+ kindex len) input-len)
+           (source-errorf src "index ~d plus length ~d is out-of-bounds for a tuple or vector of length ~d"
+                          kindex len input-len)))
        (unless (sametype? expr-type type)
          (source-errorf src "expected slice argument to have type ~a, received ~a"
                         (format-type type) (format-type expr-type)))
@@ -3729,13 +3708,13 @@
          (nanopass-case (Lnodca Type) expr-type
            [(ttuple ,src^ ,type* ...)
             (bounds-check (length type*))
-            `(ttuple ,src ,(list-head (list-tail type* nat) size) ...)]
+            `(ttuple ,src ,(list-head (list-tail type* kindex) len) ...)]
            [(tvector ,src^ ,len^ ,type)
             (bounds-check len^)
-            `(tvector ,src ,size ,type)]
+            `(tvector ,src ,len ,type)]
            [else (source-errorf src "expected tuple or vector type, received ~a"
                                 (format-type expr-type))]))]
-      [(bytes-slice ,src ,type ,[Care : expr -> * expr-type] ,[Care : index -> * index-type] ,size)
+      [(bytes-slice ,src ,type ,[Care : expr -> * expr-type] ,[Care : index -> * index-type] ,len)
        (nanopass-case (Lnodca Type) index-type
          [(tunsigned ,src^ ,nat) nat]
          [else (source-errorf src "expected index to have an unsigned type, received ~a"
@@ -3743,15 +3722,15 @@
        (unless (sametype? expr-type type)
          (source-errorf src "expected slice argument to have type ~a, received ~a"
                         (format-type type) (format-type expr-type)))
-       (let ([len^ (nanopass-case (Lnodca Type) expr-type
-                     [(tbytes ,src^ ,len^) len^]
-                     [else (source-errorf src "expected slice expr to have a Bytes type, received ~a"
-                                          (format-type expr-type))])])
-         (unless (<= size len^)
-           (source-errorf src "slice size ~d exceeds the length ~d of the input Bytes" size len^))
+       (let ([input-len (nanopass-case (Lnodca Type) expr-type
+                          [(tbytes ,src ,len) len]
+                          [else (source-errorf src "expected slice expr to have a Bytes type, received ~a"
+                                               (format-type expr-type))])])
+         (unless (<= len input-len)
+           (source-errorf src "slice length ~d exceeds the length ~d of the input Bytes" len input-len))
          (with-output-language (Lnodca Type)
-           `(tbytes ,src ,size)))]
-      [(vector-slice ,src ,type ,[Care : expr -> * expr-type] ,[Care : index -> * index-type] ,size)
+           `(tbytes ,src ,len)))]
+      [(vector-slice ,src ,type ,[Care : expr -> * expr-type] ,[Care : index -> * index-type] ,len)
        (nanopass-case (Lnodca Type) index-type
          [(tunsigned ,src^ ,nat) nat]
          [else (source-errorf src "expected index to have an unsigned type, received ~a"
@@ -3759,18 +3738,18 @@
        (unless (sametype? expr-type type)
          (source-errorf src "expected slice argument to have type ~a, received ~a"
                         (format-type type) (format-type expr-type)))
-       (let-values ([(len^ elt-type) (nanopass-case (Lnodca Type) expr-type
-                                       [(tvector ,src^ ,len^ ,type^) (values len^ type^)]
-                                       [(ttuple ,src^) (values 0 (with-output-language (Lnodca Type) `(tunknown)))]
-                                       [(ttuple ,src^ ,type^ ,type^* ...)
-                                        (guard (andmap (lambda (type^^) (sametype? type^^ type^)) type^*))
-                                        (values (fx+ (length type^*) 1) type^)]
-                                       [else (source-errorf src "expected slice expr to have a vector type, received ~a"
-                                                            (format-type expr-type))])])
-         (unless (<= size len^)
-           (source-errorf src "slice size ~d exceeds the length ~d of the input vector" size len^))
+       (let-values ([(input-len elt-type) (nanopass-case (Lnodca Type) expr-type
+                                            [(tvector ,src^ ,len^ ,type^) (values len^ type^)]
+                                            [(ttuple ,src^) (values 0 (with-output-language (Lnodca Type) `(tunknown)))]
+                                            [(ttuple ,src^ ,type^ ,type^* ...)
+                                             (guard (andmap (lambda (type^^) (sametype? type^^ type^)) type^*))
+                                             (values (fx+ (length type^*) 1) type^)]
+                                            [else (source-errorf src "expected slice expr to have a vector type, received ~a"
+                                                                 (format-type expr-type))])])
+         (unless (<= len input-len)
+           (source-errorf src "slice length ~d exceeds the length ~d of the input vector" len input-len))
          (with-output-language (Lnodca Type)
-           `(tvector ,src ,size ,elt-type)))]
+           `(tvector ,src ,len ,elt-type)))]
       [(+ ,src ,mbits ,expr1 ,expr2)
        (arithmetic-binop src "+" mbits expr1 expr2)]
       [(- ,src ,mbits ,expr1 ,expr2)
@@ -3789,16 +3768,16 @@
        (equality-operator src type expr1 expr2)]
       [(!= ,src ,type ,expr1 ,expr2)
        (equality-operator src type expr1 expr2)]
-      [(map ,src ,nat ,fun ,map-arg ,map-arg* ...)
+      [(map ,src ,len ,fun ,map-arg ,map-arg* ...)
        (let ([elt-type+ (let ([map-arg+ (cons map-arg map-arg*)])
                           (map (lambda (map-arg i)
-                                 (Map-Argument map-arg src 'map nat (fx+ i 1)))
+                                 (Map-Argument map-arg src 'map len (fx+ i 1)))
                                map-arg+
                                (enumerate map-arg+)))])
          (let ([return-type (do-call src #f fun elt-type+)])
            (with-output-language (Lnodca Type)
-             `(tvector ,src ,nat ,return-type))))]
-      [(fold ,src ,nat ,fun (,expr0 ,type0) ,map-arg ,map-arg* ...)
+             `(tvector ,src ,len ,return-type))))]
+      [(fold ,src ,len ,fun (,expr0 ,type0) ,map-arg ,map-arg* ...)
        (let ([type0^ (Care expr0)])
          (unless (sametype? type0^ type0)
            (source-errorf src "mismatch between actual type ~a and declared type ~a of fold first argument"
@@ -3806,7 +3785,7 @@
                           (format-type type0))))
        (let ([elt-type+ (let ([map-arg+ (cons map-arg map-arg*)])
                           (map (lambda (map-arg i)
-                                 (Map-Argument map-arg src 'fold nat (fx+ i 2)))
+                                 (Map-Argument map-arg src 'fold len (fx+ i 2)))
                                map-arg+
                                (enumerate map-arg+)))])
          (do-call src #t fun (cons type0 elt-type+)))]
@@ -5035,10 +5014,10 @@
          [(Abs-multiple abs*) (list-ref abs* nat)]
          [else (assert cannot-happen)])]
 
-      [(tuple-ref ,src ,[* abs] ,nat)
+      [(tuple-ref ,src ,[* abs] ,kindex)
        (Abs-case abs
          [(Abs-single abs) abs]
-         [(Abs-multiple abs*) (list-ref abs* nat)]
+         [(Abs-multiple abs*) (list-ref abs* kindex)]
          [else (assert cannot-happen)])]
 
       [(bytes-ref ,src ,type ,[* abs] ,[* abs^])
@@ -5056,18 +5035,18 @@
            [(Abs-multiple abs*) (fold-left combine-abs (car abs*) (cdr abs*))]
            [else (assert cannot-happen)]))]
 
-      [(tuple-slice ,src ,type ,[* abs] ,nat ,size)
+      [(tuple-slice ,src ,type ,[* abs] ,kindex ,len)
        (Abs-case abs
          [(Abs-single abs^) abs]
-         [(Abs-multiple abs*) (Abs-multiple (list-head (list-tail abs* nat) size))]
+         [(Abs-multiple abs*) (Abs-multiple (list-head (list-tail abs* kindex) len))]
          [else (assert cannot-happen)])]
 
-      [(bytes-slice ,src ,type ,[* abs] ,[* abs^] ,size)
+      [(bytes-slice ,src ,type ,[* abs] ,[* abs^] ,len)
        (add-witnesses
          (abs->witnesses abs^)
          abs)]
 
-      [(vector-slice ,src ,type ,[* abs] ,[* abs^] ,size)
+      [(vector-slice ,src ,type ,[* abs] ,[* abs^] ,len)
        (add-witnesses
          (abs->witnesses abs^)
          (Abs-single
@@ -5095,16 +5074,16 @@
       [(== ,src ,type ,[* abs1] ,[* abs2]) (handle-comparison src abs1 abs2)]
       [(!= ,src ,type ,[* abs1] ,[* abs2]) (handle-comparison src abs1 abs2)]
 
-      [(map ,src ,nat ,fun ,[* abs] ,[* abs*] ...)
-       (if (= nat 0)
+      [(map ,src ,len ,fun ,[* abs] ,[* abs*] ...)
+       (if (= len 0)
            (Abs-multiple '())
            (let ([abs+ (cons abs abs*)])
              (if (ormap (lambda (abs) (Abs-case abs [(Abs-multiple abs*) #t] [else #f])) abs+)
                  (Abs-multiple
                    (let f ([abs++ (map (lambda (abs)
                                          (Abs-case abs
-                                           [(Abs-single abs) (make-list nat abs)]
-                                           [(Abs-atomic witness*) (make-list nat abs)]
+                                           [(Abs-single abs) (make-list len abs)]
+                                           [(Abs-atomic witness*) (make-list len abs)]
                                            [(Abs-multiple abs*) abs*]
                                            [else (assert cannot-happen)]))
                                      abs+)])
@@ -5121,16 +5100,16 @@
                                   abs+)])
                    (Abs-single (Function fun src p abs+ control-witness*))))))]
 
-      [(fold ,src ,nat ,fun (,[* abs0] ,type0) ,[* abs] ,[* abs*] ...)
-       (if (= nat 0)
+      [(fold ,src ,len ,fun (,[* abs0] ,type0) ,[* abs] ,[* abs*] ...)
+       (if (= len 0)
            abs0
            (let ([abs+ (cons abs abs*)])
              (if (ormap (lambda (abs) (Abs-case abs [(Abs-multiple abs*) #t] [else #f])) abs+)
                  (let loop ([abs abs0]
                             [abs++ (map (lambda (abs)
                                           (Abs-case abs
-                                            [(Abs-single abs) (make-list nat abs)]
-                                            [(Abs-atomic witness*) (make-list nat abs)]
+                                            [(Abs-single abs) (make-list len abs)]
+                                            [(Abs-atomic witness*) (make-list len abs)]
                                             [(Abs-multiple abs*) abs*]
                                             [else (assert cannot-happen)]))
                                       abs+)])
@@ -5145,13 +5124,13 @@
                                       [(Abs-atomic witness*) abs]
                                       [else (assert cannot-happen)]))
                                   abs+)])
-                   (let loop ([abs (Function fun src p (cons abs0 abs+) control-witness*)] [nat nat])
-                     (if (= nat 1)
+                   (let loop ([abs (Function fun src p (cons abs0 abs+) control-witness*)] [len len])
+                     (if (= len 1)
                          abs
                          (let ([abs^ (Function fun src p (cons abs abs+) control-witness*)])
                            (if (abs-equal? abs^ abs)
                                abs
-                               (loop abs^ (- nat 1))))))))))]
+                               (loop abs^ (- len 1))))))))))]
 
       [(call ,src ,function-name ,[* abs*] ...) (handle-call src function-name abs* control-witness* #f)]
 
