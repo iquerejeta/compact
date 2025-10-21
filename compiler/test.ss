@@ -4418,7 +4418,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 2 char 10" "cannot pad ~s to length ~s since it's utf8-equivalent already exceeds that length" ("abcdefghijkl" 10)))
+      irritants: '("testfile.compact line 2 char 10" "cannot pad ~s to length ~s since its utf8-equivalent already exceeds that length" ("abcdefghijkl" 10)))
     )
 
   (test
@@ -21476,7 +21476,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: `("testfile.compact line 2 char 13" "Bytes length ~d of ~a exceeds the maximum bytes length ~d allowed" (,(+ (max-bytes/vector-length) 1) ,(string->utf8 (format "~a" (make-string (+ (max-bytes/vector-length) 1) #\x))) ,(max-bytes/vector-length))))
+      irritants: `("testfile.compact line 2 char 13" "length of the UTF-8 representation of string constant ~a exceeds the maximum length ~d allowed" (,(+ (max-bytes/vector-length) 1) ,(max-bytes/vector-length))))
     )
 )
 
@@ -21498,7 +21498,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 2 char 10" "cannot pad ~s to length ~s since it's utf8-equivalent already exceeds that length" ("a" 0)))
+      irritants: '("testfile.compact line 2 char 10" "cannot pad ~s to length ~s since its utf8-equivalent already exceeds that length" ("a" 0)))
     )
 
   (test
