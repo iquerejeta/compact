@@ -22101,10 +22101,10 @@
                (safe-cast (tunsigned ,(max-bytes/vector-length)) (tunsigned 1) 1)))))))
 
   (test
-    '(
+    `(
       "import CompactStandardLibrary;"
       "constructor(){"
-      "  for (const bob of slice<0>(default<Field>, 59678140419694436266049418467513904948)) {"
+      ,(format "  for (const bob of slice<0>(default<Field>, ~d)) {" (max-bytes/vector-length))
       "  }"
       "}"
       )
@@ -22114,10 +22114,10 @@
     )
 
   (test
-    '(
+    `(
       "import CompactStandardLibrary;"
       "constructor(){"
-      "  const x = default<Field>[59678140419694436266049418467513904948];"
+      ,(format "  const x = default<Field>[~d];" (max-bytes/vector-length))
       "}"
       )
     (oops
@@ -22129,10 +22129,10 @@
 
 (run-tests resolve-indices/simplify
   (test
-    '(
+    `(
       "import CompactStandardLibrary;"
       "constructor(){"
-      "  for (const bob of slice<0>(default<Bytes<32>>, 59678140419694436266049418467513904948)) {"
+      ,(format "  for (const bob of slice<0>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
       "  }"
       "}"
       )
@@ -22143,12 +22143,12 @@
     )
 
   (test
-    '(
+    `(
       "import CompactStandardLibrary;"
       "ledger x: Counter;"
       "constructor(){"
       "  x.resetToDefault();"
-      "  for (const bob of slice<2>(default<Bytes<32>>, 59678140419694436266049418467513904948)) {"
+      ,(format "  for (const bob of slice<0>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
       "    x += bob;"
       "  }"
       "}"
@@ -22160,16 +22160,16 @@
     )
 
   (test
-    '(
+    `(
       "import CompactStandardLibrary;"
       "export circuit foo(): []{"
-      "  for (const bob of slice<0>(default<Bytes<32>>, 59678140419694436266049418467513904948)) {"
+      ,(format "  for (const bob of slice<0>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
       "  }"
       "}"
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 3 char 21" "invalid slice index ~d and length ~d for a Bytes value of length ~d" (59678140419694436266049418467513904948 0 32)))
+      irritants: `("testfile.compact line 3 char 21" "invalid slice index ~d and length ~d for a Bytes value of length ~d" (,(+ (max-bytes/vector-length) 1) 0 32)))
     )
 
   (test
