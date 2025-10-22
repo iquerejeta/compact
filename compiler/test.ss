@@ -34,6 +34,62 @@
 ;;; See the License for the specific language governing permissions and
 ;;; limitations under the License.
 
+#|
+NB: Please follow the existing formatting and indentation of tests in this file.
+The formatting and indentation is specifically crafted to simplify comparison
+and updating of check forms (e.g., return and oops forms).  That is, when the
+test driver prints the actual check form, it is in the expected format and with
+the expected indentation.  This simplifies comparisons between the expected and
+actual check output and the replacement of expected check output with new expected
+output based on the actual output.
+
+For single-file tests, the test form should be indented two spaces from the left
+margin, the input filename or list of strings two spaces in from that (four total),
+and the checks also indented two spaces in from the test form (four total).
+The closing newline for the test should appear on a separate line from the last
+check. For example:
+
+  (test
+    '(
+      "circuit foo() : Bytes<20> { return 'Hello world!'; }"
+      )
+    (returns
+      (program
+        (circuit #f #f foo () ()
+            (tbytes 20)
+          (block (return ,(string->utf8 "Hello world!"))))))
+    )
+
+When replacing a check form with the one printed by the test driver, resist
+any reformtting, since this complicates comparison.  If the output is not to
+your liking, consider instead changing the formatting controls embedded in the
+lparser.ss or langs.ss intermediate language definitions.
+
+For test groups, the test-group form should be indented two spaces from the left
+margin.  The group members should be indented two spaces in from that (four total).
+The checkers should be indented one space in from that (five total).  The closing
+newline for the group member should appear on a separate line from the last check.
+For example:
+
+  (test-group
+    ((create-file "testfile.compact" '())
+     (custom-check
+       (lambda (pass-name x)
+         (chmod "compiler/testdir/testfile.compact" 000)
+         #t))
+     )
+    ((source-file "compiler/testdir/testfile.compact")
+     (oops
+       message: "error ~a: ~a"
+       irritants: '("opening source file" "failed for compiler/testdir/testfile.compact: permission denied"))
+     )
+    )
+
+The test driver knows to indent the actual check output differently for test
+groups than for single tests.
+|#
+
+
 (import (except (chezscheme) errorf)
         (nanopass)
         (langs)
@@ -3141,6 +3197,39 @@
         "import M<7>;"
         ""
         "export { foo };"))
+    )
+
+  (test
+    '(
+      "circuit A<#t>(x: Uint<0..t>): Field {"
+      "  return x;"
+      "}"
+      "export circuit B(x: Uint<0..7>): Field {"
+      "  return A<12>(x);"
+      "}"
+      )
+    (warning
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 1 char 26" "Uint range end expressed as a reference to generic size ~a is left unchanged and must be updated manually" (t)))
+    (output-file "compiler/testdir/fixup/testfile.compact"
+      '(
+        "circuit A<#t>(x: Uint<0..t>): Field {"
+        "  return x;"
+        "}"
+        ""
+        "export circuit B(x: Uint<0..8>): Field {"
+        "  return A<12>(x);"
+        "}"))
+    (returns
+      (program
+        (circuit #f #f A ((nat-valued t)) ([x (tunsigned
+                                                0
+                                                (type-size-ref t))])
+             (tfield)
+          (block (return x)))
+        (circuit #t #f B () ([x (tunsigned 0 8)])
+             (tfield)
+          (block (return (call (fref A 12) x))))))
     )
 ))
 
@@ -66582,8 +66671,7 @@
     (output-file "compiler/testdir/contract/index.js"
       `(
         "import * as __compactRuntime from '@midnight-ntwrk/compact-runtime';"
-        ,(format "const expectedRuntimeVersionString = '~a';" runtime-version-string)
-        "__compactRuntime.checkRuntimeVersion(expectedRuntimeVersionString);"
+        ,(format "__compactRuntime.checkRuntimeVersion('~a');" runtime-version-string)
         ""
         "const _descriptor_0 = __compactRuntime.CompactTypeField;"
         ""
@@ -67064,7 +67152,7 @@
         "  \"sourceRoot\": \"../src/\","
         "  \"sources\": [\"examples/tiny.compact\", \"compiler/standard-library.compact\"],"
         "  \"names\": [],"
-        "  \"mappings\": \";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAsDA;;;;;;;;;;;;;MA2BA,AAAA,GAOC;;;;;cAPW,GAAQ;;;;;;;;;;;;;;;;;;yCAAR,GAAQ;;;;;;;gEAAR,GAAQ;;;OAOnB;MAWD,AAAA,GAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MASD,AAAA,KAQC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAMD,AAAA,UAEC;;OAAA;;;;;;;GAnEA;EALD;;;;;UAAY,GAAQ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAHpB;;;;;;;;;yEAA4B;IAC5B;;;;;;;;;yEAA2B;IAC3B;;;;;;;;;yEAAoB;UAEZ,IAAyB;UAC/B,KAAS,sBAAc,IAAE;IAAzB;;;;;;;2HAAA,KAAS;;yEAAA;IACT;;;;;;;2HAAiB,GAAC;;yEAAb;IACL;;;;;;;;;yEAAK;;;;;;;GACN;ECpCD,AAAA,OAEC,CAFsB,OAAQ,mCACU,OAAK,KAC7C;EAED,AAAA,OAEC,4CAAA;EAmBD,AAAA,iBAAsD,CAArB,OAAQ;oEAAR,OAAQ;;GAAa;EDqBtD,AAAA,qBAAwC;;0DAAxC,kBAAwC;;;;;;;;;;;;;;GAAA;EAQxC,AAAA,WAEC,4BAFgB,GAAQ;mCAChB;;;;;;;;;;;wGAAK;;WAAI,GAAC;GAClB;EAED,AAAA,MAOC,4BAPW,GAAQ;;;UAEZ,IAAyB;UACzB,KAAoB,sBAAH,IAAE;IACzB;;;;;;;2HAAY,KAAG;;yEAAN;IACT;;;;;;;2HAAiB,GAAC;;yEAAb;IACL;;;;;;;;;yEAAK;;GACN;EAWD,AAAA,MAEC;;kDAD0C;;;;;;;;;;;uHAAK;;;;GAC/C;EASD,AAAA,QAQC;;;UANO,IAAyB;UACzB,KAAoB,sBAAH,IAAE;0CAClB,KAAG;kEAAI;;;;;;;;;;;uIAAS;;UACvB,KAAS;IAAT;;;;;;;2HAAA,KAAS;;yEAAA;IACT;;;;;;;;;yEAAK;IACL;;;;;;;;;yEAAK;;GACN;EAMD,AAAA,aAEC,CAFkB,IAAa;;mCACmD,IAAE;GACpF;;;;;;;;;;;;;;;;;IA1ED;qCAAA;;;;;;;;;;;0GAA2B;KAAA;;;;;;;;;;EAwE3B,AAAA,UAEC;;;;UAFkB,IAAa;;;;;;;;wCAAb,IAAa;GAE/B;;;;\""
+        "  \"mappings\": \";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAsDA;;;;;;;;;;;;;MA2BA,AAAA,GAOC;;;;;cAPW,GAAQ;;;;;;;;;;;;;;;;;;yCAAR,GAAQ;;;;;;;gEAAR,GAAQ;;;OAOnB;MAWD,AAAA,GAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MASD,AAAA,KAQC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAMD,AAAA,UAEC;;OAAA;;;;;;;GAnEA;EALD;;;;;UAAY,GAAQ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAHpB;;;;;;;;;yEAA4B;IAC5B;;;;;;;;;yEAA2B;IAC3B;;;;;;;;;yEAAoB;UAEZ,IAAyB;UAC/B,KAAS,sBAAc,IAAE;IAAzB;;;;;;;2HAAA,KAAS;;yEAAA;IACT;;;;;;;2HAAiB,GAAC;;yEAAb;IACL;;;;;;;;;yEAAK;;;;;;;GACN;ECpCD,AAAA,OAEC,CAFsB,OAAQ,mCACU,OAAK,KAC7C;EAED,AAAA,OAEC,4CAAA;EAmBD,AAAA,iBAAsD,CAArB,OAAQ;oEAAR,OAAQ;;GAAa;EDqBtD,AAAA,qBAAwC;;0DAAxC,kBAAwC;;;;;;;;;;;;;;GAAA;EAQxC,AAAA,WAEC,4BAFgB,GAAQ;mCAChB;;;;;;;;;;;wGAAK;;WAAI,GAAC;GAClB;EAED,AAAA,MAOC,4BAPW,GAAQ;;;UAEZ,IAAyB;UACzB,KAAoB,sBAAH,IAAE;IACzB;;;;;;;2HAAY,KAAG;;yEAAN;IACT;;;;;;;2HAAiB,GAAC;;yEAAb;IACL;;;;;;;;;yEAAK;;GACN;EAWD,AAAA,MAEC;;kDAD0C;;;;;;;;;;;uHAAK;;;;GAC/C;EASD,AAAA,QAQC;;;UANO,IAAyB;UACzB,KAAoB,sBAAH,IAAE;0CAClB,KAAG;kEAAI;;;;;;;;;;;uIAAS;;UACvB,KAAS;IAAT;;;;;;;2HAAA,KAAS;;yEAAA;IACT;;;;;;;;;yEAAK;IACL;;;;;;;;;yEAAK;;GACN;EAMD,AAAA,aAEC,CAFkB,IAAa;;mCACmD,IAAE;GACpF;;;;;;;;;;;;;;;;;IA1ED;qCAAA;;;;;;;;;;;0GAA2B;KAAA;;;;;;;;;;EAwE3B,AAAA,UAEC;;;;UAFkB,IAAa;;;;;;;;wCAAb,IAAa;GAE/B;;;;\""
         "}"))
     (stage-javascript "test-center/ts/tiny.ts")
   )

@@ -1140,8 +1140,7 @@
       (module (print-contract.js)
         (define (print-contract-header)
           (display-string "import * as __compactRuntime from '@midnight-ntwrk/compact-runtime';\n")
-          (printf "const expectedRuntimeVersionString = '~a';\n" runtime-version-string)
-          (printf "__compactRuntime.checkRuntimeVersion(expectedRuntimeVersionString);\n")
+          (printf "__compactRuntime.checkRuntimeVersion('~a');\n" runtime-version-string)
           (display-string "\n"))
 
         (define (print-contract-descriptors src descriptor-id* type*)
