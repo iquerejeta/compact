@@ -1101,12 +1101,12 @@
        `(tunsigned ,src ,(- (expt 2 nat) 1))]
       [(tunsigned ,src ,[Type-Size->nat : tsize p -> * nat] ,[Type-Size->nat : tsize^ p -> * nat^])
        (unless (= nat 0)
-         (source-errorf src "Uint range start must be 0" nat))
+         (source-errorf src "range start for Uint type is ~d but must be 0" nat))
        (unless (<= 1 nat^)
-         (source-errorf src "Uint range end must be at least 1 (the range end is exclusive)"
+         (source-errorf src "range end for Uint type is ~d but must be at least 1 (the range end is exclusive)"
                         nat^))
        (unless (<= nat^ (+ (max-unsigned) 1))
-         (source-errorf src "Uint range end\n    ~d\n  exceeds the limit of\n    ~d (2^~d)\n  (the range end is exclusive)"
+         (source-errorf src "range end\n    ~d\n  for Uint type exceeds the limit of\n    ~d (2^~d)\n  (the range end is exclusive)"
                         nat^
                         (+ (max-unsigned) 1)
                         (unsigned-bits)))

@@ -264,7 +264,7 @@
       (tboolean src)                         => (tboolean)
       (tfield src)                           => (tfield)
       (tunsigned src tsize)                  => (tunsigned tsize)        ; range from 0 to 2^{tsize}-1
-      (tunsigned src tsize tsize^)           => (tunsigned tsize tsize^) ; range from tsize (inclusive) to tsize^ (inclusive)
+      (tunsigned src tsize tsize^)           => (tunsigned tsize tsize^) ; range from tsize (inclusive) to tsize^ (exclusive)
       (tbytes src tsize)                     => (tbytes tsize)
       (topaque src opaque-type)              => (topaque opaque-type)
       (tvector src tsize type)               => (tvector tsize type)

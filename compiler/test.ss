@@ -3005,6 +3005,36 @@
             (elt-call A insertDefault is_empty)
             (assert (not (elt-call A isEmpty)) "oops2")))))
     )
+
+  (test
+    '(
+      "circuit A<#t>(x: Uint<0..t>): Field {"
+      "  return x;"
+      "}"
+      "export circuit B(x: Uint<0..8>): Field {"
+      "  return A<12>(x);"
+      "}"
+      )
+    (output-file "compiler/testdir/fixup/testfile.compact"
+      '(
+        "circuit A<#t>(x: Uint<0..t>): Field {"
+        "  return x;"
+        "}"
+        ""
+        "export circuit B(x: Uint<0..8>): Field {"
+        "  return A<12>(x);"
+        "}"))
+    (returns
+      (program
+        (circuit #f #f A ((nat-valued t)) ([x (tunsigned
+                                                0
+                                                (type-size-ref t))])
+             (tfield)
+          (block (return x)))
+        (circuit #t #f B () ([x (tunsigned 0 8)])
+             (tfield)
+          (block (return (call (fref A 12) x))))))
+    )
 )
 
 (parameterize ([(let () (import (fixup)) update-Uint-ranges) #t])
@@ -11135,7 +11165,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 1 char 14" "Uint range start must be 0" (1)))
+      irritants: '("testfile.compact line 1 char 14" "range start for Uint type is ~d but must be 0" (1)))
     )
 
   (test
@@ -11261,7 +11291,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 1 char 18" "Uint range start must be 0" (1)))
+      irritants: '("testfile.compact line 1 char 18" "range start for Uint type is ~d but must be 0" (1)))
     )
 
   (test
@@ -12311,7 +12341,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 1 char 23" "Uint range end must be at least 1 (the range end is exclusive)" (0)))
+      irritants: '("testfile.compact line 1 char 23" "range end for Uint type is ~d but must be at least 1 (the range end is exclusive)" (0)))
     )
 )
 
@@ -15504,7 +15534,7 @@
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 2 char 15" "Uint range end\n    ~d\n  exceeds the limit of\n    ~d (2^~d)\n  (the range end is exclusive)" (28948022309329048855892746252171976963317496166410141009864396001978282409985 28948022309329048855892746252171976963317496166410141009864396001978282409984 254)))
+      irritants: '("testfile.compact line 2 char 15" "range end\n    ~d\n  for Uint type exceeds the limit of\n    ~d (2^~d)\n  (the range end is exclusive)" (28948022309329048855892746252171976963317496166410141009864396001978282409985 28948022309329048855892746252171976963317496166410141009864396001978282409984 254)))
     )
 
   (test
