@@ -22148,7 +22148,7 @@
       "ledger x: Counter;"
       "constructor(){"
       "  x.resetToDefault();"
-      ,(format "  for (const bob of slice<0>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
+      ,(format "  for (const bob of slice<2>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
       "    x += bob;"
       "  }"
       "}"
