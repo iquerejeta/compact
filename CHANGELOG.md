@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased compiler version 0.26.114 language version 0.18.103]
+
+### Added
+
+- Compact now supports the definition of type aliases:
+  - Structually typed aliases:
+    `type Name = Type;` defines `Name` to be an alias for `Type`.  For example,
+    `type U32 = Uint<32>` defines `U32` to be the equivalent of and interchangeable
+    with `Uint<32>`.
+
+  - Nominally typed aliases:
+    `new type Name = Type;` is similar, but `Name` is defined as a distinct type
+    compatible with `Type` but neither a subtype of nor a supertype of `Type` or
+    any other type.  It is compatible in the senses that (a) values of type `Name`
+    can be used by primitive operations that require a value of type `Type`, and
+    (b) values of type `Name` can be expclitly cast to and from type `Type`.
+    For example, within the scope of `type V3U16 = Vector<3, Uint<16>>`, a value
+    of type `V3U16` can be referenced or sliced just like a vector of type
+    `Vector<3, Uint<16>>`, but it cannot, for example, be passed to a function
+    that expects a value of type `Vector<3, Uint<16>>` without an explicit cast.
+
+    When one operand of an arithmetic operations (e.g., `+`) receives a value
+    of some nominally typed alias T, the other operand must also be of type T,
+    and the result is cast to type T, which might cause a run-time error if the
+    result cannot be represented by type T.
+
+    Values of some nominally typed alias T cannot be directly compared (using,
+    e.g., `<`, or `==`) with values of any other type without an explicit cast.
+
+  - Both types of aliases can take type parameters, e.g.:
+    `type V3<T> = Vector<3, T>`
+    `new type VField<#N> = Vector<N, Field>`
+
 ## [Unreleased compiler version 0.26.119 language version 0.18.103]
 
 ### Fixed

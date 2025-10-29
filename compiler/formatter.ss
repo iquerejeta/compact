@@ -785,6 +785,7 @@
                (add-modifier kwd-new?
                  (cons*
                    (make-Qtoken kwd)
+                   nbsp (make-Qtoken type-name)
                    (maybe-add Generic-Param-List generic-param-list?
                      (cons*
                        nbsp (make-Qtoken op)

@@ -1432,6 +1432,7 @@ groups than for single tests.
     (returns
       (program
         (include "empty")
+        (typedef #f #t Frob () (tunsigned 16))
         (import CompactStandardLibrary () "")
         (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
@@ -3289,6 +3290,7 @@ groups than for single tests.
     (returns
       (program
         (include "empty")
+        (typedef #f #t Frob () (tunsigned 16))
         (import CompactStandardLibrary () "")
         (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
@@ -7245,6 +7247,7 @@ groups than for single tests.
     "test-center/compact/test.compact"
     (returns
       (program
+        (typedef #f #t Frob () (tunsigned 16))
         (import CompactStandardLibrary () "")
         (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
@@ -7773,6 +7776,7 @@ groups than for single tests.
     "test-center/compact/test.compact"
     (returns
       (program
+        (typedef #f #t Frob () (tunsigned 16))
         (import CompactStandardLibrary () "")
         (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
@@ -8031,6 +8035,7 @@ groups than for single tests.
     "test-center/compact/test.compact"
     (returns
       (program
+        (typedef #f #t Frob () (tunsigned 16))
         (import CompactStandardLibrary () "")
         (import CompactStandardLibrary () "" ())
         (module #f M ((nat-valued a) b)
@@ -22132,6 +22137,57 @@ groups than for single tests.
                                    (tvector 3 (tunsigned 65535))))])
              (tunsigned 65535)
           (tuple-ref %v.2 1))))
+    )
+
+  (test
+    '(
+      "new type T = Uint<32>;"
+      "export circuit foo(t: T, x: Uint<32>): Uint<33> {"
+      "  return t + x;"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 3 char 10" "incompatible combination of types ~a and ~a for binary arithmetic operator ~s" ("T=Uint<32>" "Uint<32>" +)))
+    )
+
+  (test
+    '(
+      "new type T1 = Uint<32>;"
+      "new type T2 = Uint<32>;"
+      "export circuit foo(t1: T1, t2: T2): Field {"
+      "  return t1 == t2;"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 4 char 10" "incompatible types ~a and ~a for equality operator" ("T1=Uint<32>" "T2=Uint<32>")))
+    )
+
+  (test
+    '(
+      "new type T1 = Uint<32>;"
+      "new type T2 = Uint<32>;"
+      "export circuit foo(t1: T1, t2: T2): Field {"
+      "  return t1 < t2;"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 4 char 10" "incompatible combination of types ~a and ~a for relational operator" ("T1=Uint<32>" "T2=Uint<32>")))
+    )
+
+  (test
+    '(
+      "new type T1 = Uint<32>;"
+      "new type T2 = Uint<32>;"
+      "export circuit foo(t1: T1, t2: T2): Field {"
+      "  return t1 * t2;"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 4 char 10" "incompatible combination of types ~a and ~a for binary arithmetic operator ~s" ("T1=Uint<32>" "T2=Uint<32>" *)))
     )
 )
 
