@@ -7159,7 +7159,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 3 char 9" "unreachable statement" ()))
+      irritants: '("testfile.compact line 3 char 3" "unreachable statement" ()))
     )
 )
 

@@ -171,10 +171,11 @@
        (unless reachable? (unreachable src))
        (or (Statement stmt1 #t) (Statement stmt2 #t))]
       [(seq ,src ,stmt* ...)
-       (fold-left (lambda (reachable? stmt) (Statement stmt reachable?)) reachable? stmt*)]
+       (unless reachable? (unreachable src))
+       (fold-left (lambda (reachable? stmt) (Statement stmt reachable?)) #t stmt*)]
       [(block ,src ,stmt* ...)
        (unless reachable? (unreachable src))
-       (fold-left (lambda (reachable? stmt) (Statement stmt reachable?)) reachable? stmt*)])
+       (fold-left (lambda (reachable? stmt) (Statement stmt reachable?)) #t stmt*)])
     (Function : Function (ir) -> Function ()
       [(circuit ,src (,arg* ...) ,type ,stmt)
        (Statement stmt #t)
