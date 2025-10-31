@@ -142,7 +142,7 @@
       (module ()
         (record-writer (record-type-descriptor info-fun)
           (lambda (x p wr)
-            (fprintf p "#[info-fun ~s ~a ~s ~s]" (info-fun-seqno x) (format-source-object (info-fun-src x)) (info-fun-kind x) (info-fun-renamed? x)))))
+            (fprintf p "#[info-fun ~s ~s ~s ~s]" (info-fun-seqno x) (format-source-object (info-fun-src x)) (info-fun-kind x) (info-fun-renamed? x)))))
       (define-record-type ecdecl-circuit
         (nongenerative)
         (fields function-name pure? type* type))
@@ -459,6 +459,24 @@
                      ,(map generic-failure-kind* generic-failure*)
                      ...)
                     ...))))
+        (define fun-visited?
+          ; the same info-fun can appear in an outer contour and an inner contour due
+          ; to module import.  Consider:
+          ;   circuit f0(): [] { }
+          ;   module M {
+          ;     circuit f1(): [] { }
+          ;     export circuit f2(): [] { }
+          ;     export circuit f3(): [] { f1(); }
+          ;   }
+          ;   import M;
+          ; the environment recorded for procesing bar's body will have two contours:
+          ; an inner contour containing f1, f2, and f3 and an outer contour containing
+          ; f0, f2, and f3.  the check here prevents f1 from appearing twice in the
+          ; output of lookup-fun for the reference to f1 in the body of f3.
+          (let ([ht (make-eq-hashtable)])
+            (lambda (info-fun)
+              (let ([a (eq-hashtable-cell ht info-fun #f)])
+                (or (cdr a) (begin (set-cdr! a #t) #f))))))
         (let outer ([p p] [seen? #f] [id+* '()] [symbolic-function-name+* '()] [generic-failure* '()])
           (cond
             [(eq? p empty-env)
@@ -478,20 +496,22 @@
                                  generic-failure*)
                           (let ([info-fun (car info-fun*)]
                                 [info-fun* (cdr info-fun*)])
-                            (if (compatible-type-parameters? (info-fun-type-param* info-fun) info*)
-                                (let ([id (make/register-frob src name info-fun info* #f)])
-                                  (inner info-fun* (cons id id*) (cons symbolic-function-name symbolic-function-name*) generic-failure*))
-                                (inner info-fun* id* symbolic-function-name*
-                                       (cons (make-generic-failure
-                                               (info-fun-src info-fun)
-                                               (map (lambda (type-param)
-                                                      (nanopass-case (Lpreexpand Type-Param) type-param
-                                                        [(nat-valued ,src ,tvar-name) 'size]
-                                                        [(type-valued ,src ,tvar-name) 'type]
-                                                        ; currently not reachable since functions don't employ this kind of type-param
-                                                        [(non-adt-type-valued ,src ,tvar-name) 'non-adt-type]))
-                                                    (info-fun-type-param* info-fun)))
-                                             generic-failure*))))))]
+                            (if (fun-visited? info-fun)
+                                (inner info-fun* id* symbolic-function-name* generic-failure*)
+                                (if (compatible-type-parameters? (info-fun-type-param* info-fun) info*)
+                                    (let ([id (make/register-frob src name info-fun info* #f)])
+                                      (inner info-fun* (cons id id*) (cons symbolic-function-name symbolic-function-name*) generic-failure*))
+                                    (inner info-fun* id* symbolic-function-name*
+                                           (cons (make-generic-failure
+                                                   (info-fun-src info-fun)
+                                                   (map (lambda (type-param)
+                                                          (nanopass-case (Lpreexpand Type-Param) type-param
+                                                            [(nat-valued ,src ,tvar-name) 'size]
+                                                            [(type-valued ,src ,tvar-name) 'type]
+                                                            ; currently not reachable since functions don't employ this kind of type-param
+                                                            [(non-adt-type-valued ,src ,tvar-name) 'non-adt-type]))
+                                                        (info-fun-type-param* info-fun)))
+                                                 generic-failure*)))))))]
                    [(Info-circuit-alias aliased-name info)
                     (retry info aliased-name)]
                    [else (if seen?

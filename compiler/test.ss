@@ -9847,13 +9847,13 @@ groups than for single tests.
           (cast (tfield) %x.4))
         (circuit %bar1.6 ([%x.7 (tbytes 10)])
              (tfield)
-          (+ (call (fref ((%foo.0) (%foo.0))) %x.7 (tuple 1 2 3)) 1))
+          (+ (call (fref ((%foo.0))) %x.7 (tuple 1 2 3)) 1))
         (circuit %bar2.8 ([%x.9 (tbytes 10)])
              (tfield)
-          (+ (call (fref ((%foo.0) (%foo.0))) %x.9 (tuple 1 2 3)) 2))
+          (+ (call (fref ((%foo.0))) %x.9 (tuple 1 2 3)) 2))
         (circuit %bar3.10 ([%x.11 (tbytes 11)])
              (tfield)
-          (+ (call (fref ((%foo.3) (%foo.3))) %x.11 (tuple 1 2 3))
+          (+ (call (fref ((%foo.3))) %x.11 (tuple 1 2 3))
              3))))
     )
 
@@ -9882,17 +9882,17 @@ groups than for single tests.
         (circuit %bar1.6 ([%x.7 (tbytes 10)])
              (tstruct S (p (tbytes 10)) (q (tfield)))
           (new (tstruct S (p (tbytes 10)) (q (tfield)))
-            (p (call (fref ((%foo.0) (%foo.0))) %x.7 (tuple 1 2 3)))
+            (p (call (fref ((%foo.0))) %x.7 (tuple 1 2 3)))
             (q 1)))
         (circuit %bar2.8 ([%x.9 (tbytes 10)])
              (tstruct S (p (tbytes 10)) (q (tfield)))
           (new (tstruct S (p (tbytes 10)) (q (tfield)))
-            (p (call (fref ((%foo.0) (%foo.0))) %x.9 (tuple 1 2 3)))
+            (p (call (fref ((%foo.0))) %x.9 (tuple 1 2 3)))
             (q 2)))
         (circuit %bar3.10 ([%x.11 (tbytes 11)])
              (tstruct S (p (tbytes 11)) (q (tfield)))
           (new (tstruct S (p (tbytes 11)) (q (tfield)))
-            (p (call (fref ((%foo.3) (%foo.3))) %x.11 (tuple 1 2 3)))
+            (p (call (fref ((%foo.3))) %x.11 (tuple 1 2 3)))
             (q 3)))))
     )
 
@@ -21763,6 +21763,35 @@ groups than for single tests.
     (oops
       message: "~a:\n  ~?"
       irritants: `("testfile.compact line 2 char 16" "~a depth ~d does not fall in ~d <= depth <= ~d" (HistoricMerkleTree ,(+ (max-merkle-tree-depth) 1) ,(min-merkle-tree-depth) ,(max-merkle-tree-depth))))
+    )
+
+  ; pm-20291
+  (test
+    '(
+      "module M {"
+      "  export circuit foo<#N>(bv: Bytes<N>): Uint<8> { return bv[N-1]; }"
+      "  export circuit bar(n: Uint<16>) : Uint<8> { return foo<8, Field>(default<Bytes<8>>); }"
+      "}"
+      "import M;"
+      "export { bar };"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 3 char 54" "no compatible function named ~a is in scope at this call~@[~a~]~@[~a~]~@[~a~]" (foo "\n    one function is incomptable with the supplied generic values\n      supplied generic values:\n        <size 8, type Field>\n      declared generics for function at line 2 char 3:\n        <size>" #f #f)))
+    )
+
+  (test
+    '(
+      "module M {"
+      "  export circuit foo<#N>(n: Uint<N>): Boolean { return false; }"
+      "  export circuit bar(n: Uint<16>) : Uint<8> { return foo<8>(default<Bytes<8>>); }"
+      "}"
+      "import M;"
+      "export { bar };"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 3 char 54" "no compatible function named ~a is in scope at this call~@[~a~]~@[~a~]~@[~a~]" (foo #f "\n    one function is incompatible with the supplied argument types\n      supplied argument types:\n        (Bytes<8>)\n      declared argument types for function at line 2 char 3:\n        (Uint<8>)" #f)))
     )
 )
 
