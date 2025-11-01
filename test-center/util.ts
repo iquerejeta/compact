@@ -77,17 +77,11 @@ export function startContract<
     (wrappedImpureCircuits as any)[circuitId] = (context: any, ...args: any[]): any => {
       const circuitResult = (circuit as any)(context, ...args);
 
-      if (!fs.existsSync(module.zkirDir)) {
-        throw new Error(`Expected to find ZKIR directory ${module.zkirDir} but it does not exist.`);
-      }
-
       const zkirFile = `${module.zkirDir}/${circuitId}.zkir`;
-      if (!fs.existsSync(zkirFile)) {
-        throw new Error(`Expected to find ZKIR file ${zkirFile} for circuit ${circuitId} but it does not exist.`);
+      if (fs.existsSync(zkirFile)) {
+        const zkir = fs.readFileSync(zkirFile, 'utf-8');
+        checkProofData(zkir, circuitResult.proofData);
       }
-
-      const zkir = fs.readFileSync(zkirFile, 'utf-8');
-      checkProofData(zkir, circuitResult.proofData);
 
       return circuitResult;
     };

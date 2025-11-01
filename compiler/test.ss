@@ -125,7 +125,7 @@ groups than for single tests.
   (define contractCode*)
   (define test-root*)
 
-  (define show-last-successes (make-parameter 0))
+  (define show-last-successes (make-parameter 10))
   (define show-successes (make-parameter #f))
   (define show-all-passes (make-parameter #f))
   (define show-stack-backtrace (make-parameter #t))
@@ -51480,7 +51480,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 5 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Foo" "foo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("foo" "Foo" "line 5 char 1")))
     )
 
   (test
@@ -51499,7 +51499,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 6 char 3" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("MFoo for Foo" "Mfoo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Mfoo" "MFoo for Foo" "line 6 char 3")))
     )
 
   (test
@@ -62313,7 +62313,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 5 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Foo" "foo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("foo" "Foo" "line 5 char 1")))
     )
 
   (test
@@ -62332,7 +62332,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 6 char 3" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("MFoo for Foo" "Mfoo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Mfoo" "MFoo for Foo" "line 6 char 3")))
     )
 
   (test

@@ -1848,6 +1848,39 @@
       [(single ,src ,[Effect : expr idset]) (values expr idset)]
       [(spread ,src ,nat ,[Effect : expr idset]) (values expr idset)]))
 
+  (define-pass prune-unnecessary-circuits : Lnovectorref (ir) -> Lnovectorref ()
+    (definitions
+      (define keepers (make-eq-hashtable)))
+    (Program : Program (ir) -> Program ()
+      [(program ,src ((,export-name* ,name*) ...) ,pelt* ...)
+       (let ([pelt* (fold-right Program-Element '() pelt*)])
+         (let-values ([(export-name* name*)
+                       (let f ([export-name* export-name*] [name* name*])
+                         (if (null? export-name*)
+                             (values '() '())
+                             (let-values ([(export-name name) (values (car export-name*) (car name*))]
+                                          [(export-name* name*) (f (cdr export-name*) (cdr name*))])
+                               (if (eq-hashtable-contains? keepers name)
+                                   (values (cons export-name export-name*) (cons name name*))
+                                   (values export-name* name*)))))])
+           `(program ,src ((,export-name* ,name*) ...)
+              ,pelt*
+              ...)))])
+    (Program-Element : Program-Element (ir pelt*) -> * (pelt*)
+      [(circuit ,src ,function-name (,arg* ...) ,type ,expr)
+       (if (and (id-exported? function-name)
+                (guard (c [(eq? c 'ledger) #t])
+                  (Expression expr)
+                  #f))
+           (begin
+             (hashtable-set! keepers function-name #t)
+             (cons ir pelt*))
+           pelt*)]
+      [else (cons ir pelt*)])
+    (Expression : Expression (ir) -> Expression ()
+      [(public-ledger ,src ,ledger-field-name ,sugar? (,path-elt* ...) ,src^ ,adt-op ,[expr*] ...)
+       (raise 'ledger)]))
+
   (define-pass reduce-to-circuit : Lnovectorref (ir) -> Lcircuit ()
     (definitions
       (define fun-ht (make-eq-hashtable))
@@ -3479,6 +3512,7 @@
     (drop-safe-casts                 Lnosafecast)
     (resolve-indices/simplify        Lnovectorref)
     (discard-useless-code            Lnovectorref)
+    (prune-unnecessary-circuits      Lnovectorref)
     (reduce-to-circuit               Lcircuit)
     (flatten-datatypes               Lflattened)
     (optimize-circuit                Lflattened))
