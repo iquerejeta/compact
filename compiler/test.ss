@@ -22142,6 +22142,7 @@
         (public-ledger-declaration ())))
     )
 
+  ; FIXME PM-20353
   (test
     `(
       "import CompactStandardLibrary;"
