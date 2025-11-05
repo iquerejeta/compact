@@ -22609,9 +22609,80 @@ groups than for single tests.
             (+ 8
                (safe-cast (tunsigned ,(max-bytes/vector-length)) (tunsigned ,(- (max-bytes/vector-length) 1)) ,(- (max-bytes/vector-length) 1))
                (safe-cast (tunsigned ,(max-bytes/vector-length)) (tunsigned 1) 1)))))))
+
+  (test
+    `(
+      "import CompactStandardLibrary;"
+      "constructor(){"
+      ,(format "  for (const bob of slice<0>(default<Field>, ~d)) {" (max-bytes/vector-length))
+      "  }"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 3 char 46" "expected a tuple, Vector, or Bytes type, received ~a" ("Field")))
+    )
+
+  (test
+    `(
+      "import CompactStandardLibrary;"
+      "constructor(){"
+      ,(format "  const x = default<Field>[~d];" (max-bytes/vector-length))
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 3 char 28" "expected a tuple, Vector, or Bytes type, received ~a" ("Field")))
+    )
+
 )
 
 (run-tests resolve-indices/simplify
+  (test
+    `(
+      "import CompactStandardLibrary;"
+      "constructor(){"
+      ,(format "  for (const bob of slice<0>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
+      "  }"
+      "}"
+      )
+    (returns
+      (program
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration ())))
+    )
+
+  ; FIXME PM-20295
+  (test
+    `(
+      "import CompactStandardLibrary;"
+      "ledger x: Counter;"
+      "constructor(){"
+      "  x.resetToDefault();"
+      ,(format "  for (const bob of slice<2>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
+      "    x += bob;"
+      "  }"
+      "}"
+      )
+    (returns
+      (program
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration ((%x.1 (0) (Counter))))))
+    )
+
+  (test
+    `(
+      "import CompactStandardLibrary;"
+      "export circuit foo(): []{"
+      ,(format "  for (const bob of slice<0>(default<Bytes<32>>, ~d)) {" (+ (max-bytes/vector-length) 1))
+      "  }"
+      "}"
+      )
+    (oops
+      message: "~a:\n  ~?"
+      irritants: `("testfile.compact line 3 char 21" "invalid slice index ~d and length ~d for a Bytes value of length ~d" (,(+ (max-bytes/vector-length) 1) 0 32)))
+    )
+
   (test
     `(
       ,(format "export circuit foo(v: Vector<~d, Field>): Field { return v[~d+1]; }"

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased compiler version 0.26.117 language version 0.18.102]
+
+### Fixed
+
+- A bug in which types other than tuple, vector, and bytes do not result in an internal
+  error when checking the bounds of an index.  This was an unreleased bug, that is,
+  the bug was created in an unreleased version of the compiler.
+
 ## [Unreleased compiler version 0.26.116 language version 0.18.102]
 
 ### Fixed
