@@ -57,9 +57,11 @@
   ; one smaller than the number of bytes required to represent the maximum field value
   (define (field-bytes) (quotient (field-bits) 8))
 
-  ; unsigned values are natural numbers that fit into the number of full bits representable by
-  ; a field, i.e., natural numbers bounded by the largest power of two representable by a field
-  (define (unsigned-bits) (field-bits))
+  ; unsigned values are natural numbers that fit into the number of full bytes representable
+  ; by a field.  larger unsigned values would fit in a field when (field-bits) is not an
+  ; even multiple of (field-bytes), but the lower limit allows the ledger to measure unsigned
+  ; alignments in bytes rather than bits
+  (define (unsigned-bits) (* (field-bytes) 8))
   (define (max-unsigned) (- (expt 2 (unsigned-bits)) 1))
 
   (define (maybe-bits? x)
@@ -270,7 +272,7 @@
       (tboolean src)                         => (tboolean)
       (tfield src)                           => (tfield)
       (tunsigned src tsize)                  => (tunsigned tsize)        ; range from 0 to 2^{tsize}-1
-      (tunsigned src tsize tsize^)           => (tunsigned tsize tsize^) ; range from tsize to tsize^
+      (tunsigned src tsize tsize^)           => (tunsigned tsize tsize^) ; range from tsize (inclusive) to tsize^ (exclusive)
       (tbytes src tsize)                     => (tbytes tsize)
       (topaque src opaque-type)              => (topaque opaque-type)
       (tvector src tsize type)               => (tvector tsize type)
@@ -559,7 +561,7 @@
          (tvector src tsize type)
          (tbytes src tsize))
       (+ tvar-name
-         (tunsigned src nat)    => (tunsigned nat)
+         (tunsigned src nat)    => (tunsigned nat) ; nat = max value
          (tvector src len type) => (tvector len type)
          (tbytes src len)       => (tbytes len)
          (tcontract src contract-name (elt-name* pure-dcl* (type** ...) type*) ...) =>

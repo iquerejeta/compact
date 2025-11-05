@@ -171,6 +171,7 @@
        (unless reachable? (unreachable src))
        (or (Statement stmt1 #t) (Statement stmt2 #t))]
       [(seq ,src ,stmt* ...)
+       (unless reachable? (unreachable src))
        (fold-left (lambda (reachable? stmt) (Statement stmt reachable?)) #t stmt*)]
       [(block ,src ,stmt* ...)
        (unless reachable? (unreachable src))
