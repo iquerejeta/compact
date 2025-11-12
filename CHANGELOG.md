@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased compiler version 0.26.120 language version 0.18.103]
+
+### Changed
+
+- Changed the (experimental, not yet announced) ZKIR v3 format to use symbolic
+  names instead of indexes for instruction inputs and ouputs.
+
 ## [Unreleased compiler version 0.26.119 language version 0.18.103]
 
 ### Fixed
