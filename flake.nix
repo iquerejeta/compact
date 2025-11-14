@@ -209,7 +209,7 @@
 
           packages.compactc = pkgs.stdenv.mkDerivation {
             name = "compactc";
-            version = "0.26.120"; # NB: also update compiler-version in compiler/compiler-version.ss
+            version = "0.26.122"; # NB: also update compiler-version in compiler/compiler-version.ss
             src = inclusive.lib.inclusive ./. [
               ./test-center
               ./compiler
@@ -347,7 +347,7 @@
               chmod +x $out/bin/compactc
 
               cat <<EOF > $out/bin/compactc
-              #!/bin/bash
+              #!/usr/bin/env bash
               thisdir="\$(cd \$(dirname \$0) ; pwd -P)"
               PATH="\$thisdir:\$PATH"
               exec "\$thisdir/compactc.bin" "\$@"
