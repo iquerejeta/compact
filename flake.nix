@@ -347,7 +347,7 @@
               chmod +x $out/bin/compactc
 
               cat <<EOF > $out/bin/compactc
-              #!/bin/bash
+              #!/usr/bin/env bash
               thisdir="\$(cd \$(dirname \$0) ; pwd -P)"
               PATH="\$thisdir:\$PATH"
               exec "\$thisdir/compactc.bin" "\$@"
