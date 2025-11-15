@@ -1390,7 +1390,7 @@
                   elt-name2* pure-dcl2* type2** type2*))
         (define (sametype? type1 type2)
           (let ([type1 (de-alias type1 #f)] [type2 (de-alias type2 #f)])
-            (or #;(eq? type1 type2)
+            (or (eq? type1 type2)
                 (T type1
                    [(tboolean ,src1) (T type2 [(tboolean ,src2) #t])]
                    [(tfield ,src1) (T type2 [(tfield ,src2) #t])]
@@ -1455,7 +1455,7 @@
                              (andmap same-adt-arg? adt-arg1* adt-arg2*))])]))))
         (define (subtype? type1 type2)
           (let ([type1 (de-alias type1 #f)] [type2 (de-alias type2 #f)])
-            (or #;(eq? type1 type2)
+            (or (eq? type1 type2)
                 (T type1
                    [(tboolean ,src1) (T type2 [(tboolean ,src2) #t])]
                    [(tfield ,src1) (T type2 [(tfield ,src2) #t])]
@@ -2010,7 +2010,7 @@
                     (values
                       (with-output-language (Ltypes Expression)
                         (if nat1
-                            `(downcast-unsigned ,src ,nat1 ,result-expr)
+                            (if (eq? op '-) result-expr `(downcast-unsigned ,src ,nat1 ,result-expr))
                             `(safe-cast ,src ,type1 ,result-type ,result-expr)))
                       type1)))))))
       (define (relational-operator src expr1 expr2 k)

@@ -55,6 +55,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A bug that caused a misleading source location to be reported for some type
   errors, e.g., for invalid arguments to some calls to `map` and `fold`.
 
+### Internal notes
+
+- The Public-ledger ADT (`public-adt`) form, which describes the type of a
+  public-ledger ADT, has been replaced by a new Type `tadt` throughout the compiler.
+  This simplifies and regularizes the representation of types and allows type
+  aliases to be used for ADT types as well as for non-ADT types.
+
+- Equality testing in the unit test framework has been tightened up to avoid
+  false positives when the expected output uses different symbols to represent
+  what turns out to be the same id or gensym in the actual output.  This can
+  occur when the expected output is wrong or the compiler actually generates
+  code that uses the same id or gensym for different purposes.  Several instances
+  of the first have been fixed in the unit tests.
+
 ## [Unreleased compiler version 0.26.121 language version 0.18.103]
 
 ### Changed

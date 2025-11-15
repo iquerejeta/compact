@@ -126,7 +126,7 @@ groups than for single tests.
   (define contractCode*)
   (define test-root*)
 
-  (define show-last-successes (make-parameter 4))
+  (define show-last-successes (make-parameter 0))
   (define show-successes (make-parameter #f))
   (define show-all-passes (make-parameter #f))
   (define show-stack-backtrace (make-parameter #t))
@@ -391,16 +391,23 @@ groups than for single tests.
    ; a procedure in the second input is used as predicate for the first
     (lambda (pretty-formats x y)
       (and (not (condition? x))
-        (let ([syms (make-hashtable symbol-hash eq?)] [oops? #f])
+        (let ([syms (make-hashtable symbol-hash eq?)]
+              [ids/gensyms (make-eq-hashtable)]
+              [oops? #f])
           (let e? ([x x] [y y])
             (or (cond
                   [(pair? y) (and (pair? x) (e? (car x) (car y)) (e? (cdr x) (cdr y)))]
                   [(symbol? y)
-                   (let ([a (hashtable-cell syms y #f)])
-                     (if (cdr a)
-                         (eq? x (cdr a))
-                         (and (or (eq? x y) (id? x) (gensym? x))
-                              (begin (set-cdr! a x) #t))))]
+                   (or (eq? x y)
+                       (and (or (id? x) (gensym? x))
+                            (let ([a (hashtable-cell syms y #f)]
+                                  [b (hashtable-cell ids/gensyms x #f)])
+                              (or (and (eq? (cdr a) x) (eq? (cdr b) y))
+                                  (and (and (not (cdr a)) (not (cdr b)))
+                                       (begin
+                                         (set-cdr! a x)
+                                         (set-cdr! b y)
+                                         #t))))))]
                   [(eqv? x y) #t]
                   [(string? x) (and (string? y) (string=? x y))]
                   [(bytevector? x) (and (bytevector? y) (bytevector=? x y))]
@@ -8312,7 +8319,7 @@ groups than for single tests.
       "export circuit bar(m: Field): Field { return foo(m); }"
       )
     (returns
-      (program ((bar %bar.0))
+      (program ((bar %bar.2))
         (circuit %foo.0 ([%n.1 (tfield)]) (tfield) %n.1)
         (circuit %bar.2 ([%m.3 (tfield)])
              (tfield)
@@ -33537,7 +33544,7 @@ groups than for single tests.
                                    (ttuple))
                                  (bar #t () (tbytes 32)))])
              (seq
-               (public-ledger %contract_c.2 (0) write %c.0)
+               (public-ledger %contract_c.1 (0) write %c.0)
                (tuple))))))
      ))
 
@@ -37343,7 +37350,7 @@ groups than for single tests.
                                 (%i.5)
                                 (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.6) (public-ledger 1 %field1.0 (0) lookup %ni.5))
+          (= (%t.6) (public-ledger 1 %field1.0 (0) lookup %i.5))
           (%t.6))))
     )
 
@@ -65817,13 +65824,13 @@ groups than for single tests.
              (tboolean)
           (seq
             (const [%x.12 (tboolean)]
-              (!= %n.11 (safe-cast (tfield) (tunsigned 1) 1)))
+              (!= %n.12 (safe-cast (tfield) (tunsigned 1) 1)))
             (seq
               (const [%x.13 (tboolean)] (not %x.12))
-              (and %x.13 (== %n.11 (safe-cast (tfield) (tunsigned 0) 0))))))
+              (and %x.13 (== %n.12 (safe-cast (tfield) (tunsigned 0) 0))))))
         (circuit %bar.14 ([%n.15 (tfield)])
              (tfield)
-          (if (call %foo.10 (+ #f %n.15 (safe-cast (tfield) (tunsigned 1) 1)))
+          (if (call %foo.11 (+ #f %n.15 (safe-cast (tfield) (tunsigned 1) 1)))
               (- #f %n.15 (safe-cast (tfield) (tunsigned 1) 1))
               (+ #f %n.15 (safe-cast (tfield) (tunsigned 1) 1))))))
     (output-file "compiler/testdir/contract/index.d.ts"
@@ -65894,10 +65901,10 @@ groups than for single tests.
              (tboolean)
           (seq
             (const [%x.19 (tboolean)]
-              (<= %n.18 (safe-cast (tunsigned 64) (tunsigned 1) 1)))
+              (<= %n.19 (safe-cast (tunsigned 64) (tunsigned 1) 1)))
             (seq
               (const [%x.20 (tboolean)] (not %x.19))
-              (and %x.20 (<= %n.18 (safe-cast (tunsigned 64) (tunsigned 0) 0))))))
+              (and %x.20 (<= %n.19 (safe-cast (tunsigned 64) (tunsigned 0) 0))))))
         (circuit %bar.21 ([%n.22 (tunsigned 64)])
              (tunsigned 64)
           (if (call %foo.18
@@ -65979,7 +65986,7 @@ groups than for single tests.
           (%descriptor.13 (tunsigned
                             340282366920938463463374607431768211455)))
         (public-ledger-declaration () (constructor () (tuple)))
-        (circuit %foo.17 ([%n.18 (tunsigned 18446744073709551615)])
+        (circuit %foo.17 ([%n.17 (tunsigned 18446744073709551615)])
              (tboolean)
           (seq
             (const [%x.18 (tboolean)]
@@ -67535,7 +67542,7 @@ groups than for single tests.
              (tfield)
           (safe-cast (tfield)
                      (tunsigned 18446744073709551615)
-            (public-ledger %field1.8 (0) read)))))
+            (public-ledger %field1.9 (0) read)))))
     (stage-javascript
       `(
         "test('check 1', () => {"
@@ -67659,8 +67666,8 @@ groups than for single tests.
           (safe-cast (tfield)
                      (tunsigned 18446744073709551615)
             (seq
-              (public-ledger %kernel.8 () claimZswapNullifier %x.12)
-              (public-ledger %field1.9 (0) read))))))
+              (public-ledger %kernel.9 () claimZswapNullifier %x.13)
+              (public-ledger %field1.10 (0) read))))))
     (stage-javascript
       `(
         "test('check 1', () => {"
@@ -72156,8 +72163,8 @@ groups than for single tests.
         (circuit %bar.13 ([%x.14 (tfield)])
              (tfield)
           (seq
-            (assert (!= %x.9 (safe-cast (tfield) (tunsigned 2) 2)) "oops")
-            %x.9))
+            (assert (!= %x.14 (safe-cast (tfield) (tunsigned 2) 2)) "oops")
+            %x.14))
         (circuit %foo.14 ([%x.15 (tfield)])
              (tfield)
           (seq
@@ -72202,9 +72209,9 @@ groups than for single tests.
         (circuit %foo.7 ([%x.8 (tfield)])
              (tfield)
           (seq
-            (call %bar.4 %x.7)
-            (call %bar.4 (- #f %x.7 (safe-cast (tfield) (tunsigned 1) 1)))
-            (call %bar.4 (- #f %x.7 (safe-cast (tfield) (tunsigned 2) 2)))))))
+            (call %bar.5 %x.8)
+            (call %bar.5 (- #f %x.8 (safe-cast (tfield) (tunsigned 1) 1)))
+            (call %bar.5 (- #f %x.8 (safe-cast (tfield) (tunsigned 2) 2)))))))
     (stage-javascript
       `(
         "test('check 1', () => {"
@@ -72240,9 +72247,9 @@ groups than for single tests.
              (ttuple)
           (seq
             (seq
-              (call %bar.4 %x.7)
-              (call %bar.4 (- #f %x.7 (safe-cast (tfield) (tunsigned 1) 1)))
-              (call %bar.4 (- #f %x.7 (safe-cast (tfield) (tunsigned 2) 2))))
+              (call %bar.5 %x.8)
+              (call %bar.5 (- #f %x.8 (safe-cast (tfield) (tunsigned 1) 1)))
+              (call %bar.5 (- #f %x.8 (safe-cast (tfield) (tunsigned 2) 2))))
             (tuple)))))
     (stage-javascript
       '(
@@ -72353,9 +72360,9 @@ groups than for single tests.
             (circuit ([%x.13 (tfield)])
                  (tfield)
               (seq
-                (assert (!= %x.18 (safe-cast (tfield) (tunsigned 2) 2)) "oops")
-                %x.18))
-            %v.17))))
+                (assert (!= %x.13 (safe-cast (tfield) (tunsigned 2) 2)) "oops")
+                %x.13))
+            %v.12))))
     (stage-javascript
       '(
         "test('check 1', () => {"
@@ -73292,10 +73299,10 @@ groups than for single tests.
               (call %bar.13 %x.17 %y.18))
             (seq
               (const [%b.19 (tboolean)]
-                (elt-ref %__compact_pattern_tmp1.18 b 1))
+                (elt-ref %__compact_pattern_tmp1.19 b 1))
               (if %b.19
-                  %y.17
-                  (* #f (safe-cast (tfield) (tunsigned 2) 2) %y.17)))))))
+                  %y.18
+                  (* #f (safe-cast (tfield) (tunsigned 2) 2) %y.18)))))))
     )
 
   (test
@@ -79671,12 +79678,11 @@ groups than for single tests.
                  (safe-cast (tunsigned 510)
                             (talias #t Q (tunsigned 255))
                    %y.11)))
-            (downcast-unsigned 255
-              (seq
-                (assert
-                  (>= %x.10 %y.11)
-                  "result of subtraction would be negative")
-                (- 8 %x.10 %y.11)))
+            (seq
+              (assert
+                (>= %x.10 %y.11)
+                "result of subtraction would be negative")
+              (- 8 %x.10 %y.11))
             (downcast-unsigned 255
               (* 16
                  (safe-cast (tunsigned 65025)

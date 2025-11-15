@@ -651,7 +651,7 @@
       type)
     (Argument (arg)
       (var-name type) => (bracket var-name type))
-    (Local (local)
+    (Local (local) ; same as Argument, but used for const bindings and treated a bit differently
       (var-name type) => (bracket var-name type))
     (Expression (expr index)
       (quote src datum)                       => datum
