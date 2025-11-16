@@ -104,10 +104,10 @@
              (+ 9 (combine (map symbol-hash (cons struct-name elt-name*))))]
             [(tenum ,src ,enum-name ,elt-name ,elt-name* ...)
              (+ 10 (combine (map symbol-hash (cons* enum-name elt-name elt-name*))))]
-            [(talias ,src ,nominal? ,type-name ,type)
-             (+ 11 (combine (list (symbol-hash type-name) (type-hash type))))]
             [(tadt ,src ,adt-name ([,adt-formal* ,generic-value*] ...) ,vm-expr (,adt-op* ...) (,adt-rt-op* ...))
-             (+ 12 (combine (cons (symbol-hash adt-name) (map gv-hash generic-value*))))]
+             (+ 11 (combine (cons (symbol-hash adt-name) (map gv-hash generic-value*))))]
+            [(talias ,src ,nominal? ,type-name ,type)
+             (+ 12 (combine (list (symbol-hash type-name) (type-hash type))))]
             [else (internal-errorf 'type-hash "unrecognized type ~s" type)]))
         (define (targ-info-hash info*)
           (combine
@@ -277,12 +277,6 @@
                 type-param*
                 info*)
               p)))
-      (define (public-adt? type)
-        (let again ([type type])
-          (nanopass-case (Lexpanded Type) type
-            [(tadt ,src ,adt-name ([,adt-formal* ,generic-value*] ...) ,vm-expr (,adt-op* ...) (,adt-rt-op* ...)) #t]
-            [(talias ,src ,nominal? ,type-name ,type) (again type)]
-            [else #f])))
       (module (sametype?)
         (define-syntax T
           (syntax-rules ()
@@ -915,6 +909,15 @@
                          what
                          len
                          (max-bytes/vector-length))))
+      (define (de-alias type)
+        (nanopass-case (Lexpanded Type) type
+          [(talias ,src ,nominal? ,type-name ,type)
+           (de-alias type)]
+          [else type]))
+      (define (public-adt? type)
+        (nanopass-case (Lexpanded Type) (de-alias type)
+          [(tadt ,src ,adt-name ([,adt-formal* ,generic-value*] ...) ,vm-expr (,adt-op* ...) (,adt-rt-op* ...)) #t]
+          [else #f]))
       )
     (Program : Program (ir) -> Program ()
       (definitions
@@ -1131,18 +1134,16 @@
                 [(Info-enum src^ enum-name elt-name elt-name*)
                  `(enum-ref ,src (tenum ,src ,enum-name ,elt-name ,elt-name* ...) ,elt-name^)]
                 [(Info-type src type)
-                 (nanopass-case (Lexpanded Type) type
+                 (nanopass-case (Lexpanded Type) (de-alias type)
                    [(tenum ,src ,enum-name ,elt-name ,elt-name* ...)
                     `(enum-ref ,src ,type ,elt-name^)]
                    [else #f])]
                 [(Info-type-alias src nominal? type-name type-param* type p)
                  (let ([type (apply-type-alias src src^ nominal? type-name type-param* type p '())])
-                   (and (let f ([type type])
-                          (nanopass-case (Lexpanded Type) type
-                            [(tenum ,src ,enum-name ,elt-name ,elt-name* ...) #t]
-                            [(talias ,src ,nominal? ,type-name ,type) (f type)]
-                            [else #f]))
-                        `(enum-ref ,src ,type ,elt-name^)))]
+                   (nanopass-case (Lexpanded Type) (de-alias type)
+                     [(tenum ,src ,enum-name ,elt-name ,elt-name* ...)
+                      `(enum-ref ,src ,type ,elt-name^)]
+                     [else #f]))]
                 [else #f])]
              [else #f])
            `(elt-ref ,src ,(Expression expr p) ,elt-name^))]
@@ -3047,10 +3048,11 @@
          (with-output-language (Ltypes Type) `(ttuple ,src)))]
       [(cast ,src ,type (quote ,src^ ,datum))
        (guard
-         (let tfield? ([type type])
+         ; NB: guards are run before automatic recursion, so type is an Lexpanded Type, not an Ltypes Type
+         (let f ([type type])
            (nanopass-case (Lexpanded Type) type
              [(tfield ,src) #t]
-             [(talias ,src ,nominal? ,type-name ,type) (tfield? type)]
+             [(talias ,src ,nominal? ,type-name ,type) (f type)]
              [else #f]))
          (field? datum)
          (> datum (max-unsigned)))

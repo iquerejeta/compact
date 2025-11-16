@@ -80506,6 +80506,27 @@ groups than for single tests.
         "});"
         ))
     )
+
+  (test
+    '(
+      "enum E { a, b, c};"
+      "type ET = E;"
+      "type Q<A> = A;"
+      "circuit foo<A, B>(): [E, E, E] {"
+      "  return [ET.a, A.b, B.c];"
+      "}"
+      "export circuit bar(): [E, E, E] {"
+      "  return foo<E, ET>();"
+      "}"
+      )
+    (stage-javascript
+      '(
+        "test('check 1', () => {"
+        "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
+        "  expect(C.circuits.bar(Ctxt).result).toEqual([0, 1, 2]);"
+        "});"
+        ))
+    )
 )
 
 (run-javascript)
