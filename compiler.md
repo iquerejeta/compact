@@ -223,7 +223,7 @@ earlier languages.  In particular:
 
 * module, import, and export declarations are no longer present
 * type parameters are no longer present, and
-* some defining forms are no longer present but instead exists as types:
+* some defining forms are no longer present but instead exist as types:
   type definitions (as talias),
   structure definitions (tstruct),
   enum-definitions (tenum),

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased compiler version 0.26.122 language version 0.18.104]
+## [Unreleased compiler version 0.27.100 language version 0.19.100]
 
 ### Added
 
@@ -85,6 +85,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   context.
 
 - internal-errorf now also includes the source location in the error message.
+
+## [Compiler version 0.27.0, language version 0.19.0] - Branched 2025-11-19
+
+This release includes all changes for compiler versions in the range 0.26.100
+(inclusive) and 0.27.0 (exclusive); and language versions in the range 0.18.100
+(inclusive) and 0.19.0.
 
 ## [Unreleased compiler version 0.26.121 language version 0.18.103]
 
