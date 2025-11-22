@@ -982,23 +982,24 @@
            (let ([reachable* (process-frob-worklist seqno.pelt*)])
              ; process uninstantiated modules to catch any errors therein, skipping those
              ; with generic parameters since we have no generic values to supply
-             (for-each
-               (lambda (info name)
-                 (Info-case info
-                   [(Info-module type-param* pelt* p seqno dirname instance-table)
-                    (when (and (null? type-param*) (eqv? (hashtable-size instance-table) 0))
-                      (with-module-cycle-check src info name
-                        (lambda ()
-                          ; presently dirname should never be non-false for an unreachable module:
-                          ; the only way a module has a non-false dirname is via a reachable import
-                          (parameterize ([relative-path (if dirname dirname (relative-path))])
-                            (process-pelts #f
-                              pelt*
-                              (map (lambda (i) (cons i seqno)) (enumerate pelt*))
-                              p)))))]
-                   [else (assert cannot-happen)]))
-               (map car all-Info-modules)
-               (map cdr all-Info-modules))
+             (let loop ()
+               (unless (null? all-Info-modules)
+                 (let-values ([(info name) (let ([a (car all-Info-modules)]) (values (car a) (cdr a)))])
+                   (set! all-Info-modules (cdr all-Info-modules))
+                   (Info-case info
+                     [(Info-module type-param* pelt* p seqno dirname instance-table)
+                      (when (and (null? type-param*) (eqv? (hashtable-size instance-table) 0))
+                        (with-module-cycle-check src info name
+                          (lambda ()
+                            ; presently dirname should never be non-false for an unreachable module:
+                            ; the only way a module has a non-false dirname is via a reachable import
+                            (parameterize ([relative-path (if dirname dirname (relative-path))])
+                              (process-pelts #f
+                                pelt*
+                                (map (lambda (i) (cons i seqno)) (enumerate pelt*))
+                                p)))))]
+                     [else (assert cannot-happen)])
+                   (loop))))
              (for-each
                (lambda (info-fun name)
                  (when (and (null? (info-fun-type-param* info-fun))
@@ -1644,7 +1645,7 @@
                                                     generic-kind**))])
                        (and (not (null? generic-kind**))
                             (format "\n    \
-                                     ~a incomptable with the supplied generic values\n      \
+                                     ~a incompatible with the supplied generic values\n      \
                                      supplied generic values:\n        <~{~a~^, ~}>\
                                      ~{\n      ~a~}"
                               (functions-are generic-failure*)
@@ -2565,7 +2566,9 @@
                                (- (max-bytes/vector-length) 1)
                                (nanopass-case (Ltypes Type) expr-type
                                  [(ttuple ,src^ ,type* ...) "tuple"]
-                                 [(tvector ,src^ ,len^ ,type^) "vector"])))
+                                 [(tvector ,src^ ,len^ ,type^) "vector"]
+                                 [else (source-errorf src "expected a tuple, Vector, or Bytes type, received ~a"
+                                                      (format-type expr-type))])))
              (and (field? datum) datum)]
             [else #f]) =>
           (lambda (kindex)
@@ -2612,7 +2615,7 @@
             (unless (<= len input-len)
               (source-errorf src "slice length ~d exceeds the length ~d of the input Bytes" len input-len))
             (values
-              `(bytes-slice ,src ,expr-type,expr ,index ,len)
+              `(bytes-slice ,src ,expr-type ,expr ,index ,len)
               (with-output-language (Ltypes Type) `(tbytes ,src ,len))))]
          [(nanopass-case (Ltypes Expression) index
             [(quote ,src ,datum)
@@ -2622,7 +2625,9 @@
                                (- (max-bytes/vector-length) 1)
                                (nanopass-case (Ltypes Type) expr-type
                                  [(ttuple ,src^ ,type* ...) "tuple"]
-                                 [(tvector ,src^ ,len^ ,type^) "vector"])))
+                                 [(tvector ,src^ ,len^ ,type^) "vector"]
+                                 [else (source-errorf src "expected a tuple, Vector, or Bytes type, received ~a"
+                                                      (format-type expr-type))])))
              (and (field? datum) datum)]
             [else #f]) =>
           (lambda (kindex)
@@ -2945,6 +2950,7 @@
                 [(tfield ,src1)
                  (T type^
                     [(tbytes ,src2 ,len2)
+                     (guard (not (= len2 0)))
                      `(cast-from-bytes ,src ,type ,len2 ,expr)]
                     [(tenum ,src2 ,enum-name ,elt-name ,elt-name* ...)
                      `(cast-from-enum ,src ,type ,type^ ,expr)]
@@ -2955,8 +2961,10 @@
                 [(tbytes ,src1 ,len1)
                  (T type^
                     [(tfield ,src2)
+                     (guard (not (= len1 0)))
                      `(field->bytes ,src ,len1 ,expr)]
                     [(tunsigned ,src2 ,nat2)
+                     (guard (not (= len1 0)))
                      `(field->bytes ,src ,len1 (safe-cast ,src (tfield ,src2) ,type^ ,expr))]
                     [(ttuple ,src2 (tunsigned ,src2* ,nat2*) ...)
                      (guard
@@ -2990,6 +2998,7 @@
                      (assert (> nat2 nat1))
                      `(downcast-unsigned ,src ,nat1 ,expr)]
                     [(tbytes ,src2 ,len2)
+                     (guard (not (= len2 0)))
                      `(cast-from-bytes ,src ,type ,len2 ,expr)]
                     [(tenum ,src2 ,enum-name ,elt-name ,elt-name* ...)
                      `(cast-from-enum ,src ,type ,type^ ,expr)]
@@ -3943,6 +3952,7 @@
        type]
       [(field->bytes ,src ,len ,[Care : expr -> * type])
        (check-tfield src "argument to field->bytes" type)
+       (when (= len 0) (source-errorf src "invalid cast from field to Bytes<0>"))
        (with-output-language (Lnodca Type) `(tbytes ,src ,len))]
       [(bytes->vector ,src ,len ,[Care : expr -> * type])
        (unless (nanopass-case (Lnodca Type) type

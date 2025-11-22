@@ -5,6 +5,79 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased compiler version 0.27.100, language version 0.19.0]
+
+### Fixed
+
+- Use of `return` statements among the statements comprising the body of a `for`
+  loop are not supported.  Previously, such uses resulted in strange run-time
+  behavior or confusing compile-time error messages.  The compiler now explicitly
+  flags such uses as static errors with an appropriate error message.
+
+## [Compiler version 0.27.0, language version 0.19.0] - Branched 2025-11-19
+
+This release includes all changes for compiler versions in the range 0.26.100
+(inclusive) and 0.27.0 (exclusive); and language versions in the range 0.18.100
+(inclusive) and 0.19.0.
+
+## [Unreleased compiler version 0.26.121 language version 0.18.103]
+
+### Changed
+
+- Changed the intermediate languages leading up to Lexpr to reflect that circuit
+  and constructor bodies must be blocks rather than arbitrary statements.  reworked
+  hoist-local-variables to avoid a dependency on a fluid variable.  These are not
+  user-visible changes.
+
+## [Unreleased compiler version 0.26.120 language version 0.18.103]
+
+### Changed
+
+- Changed the (experimental, not yet announced) ZKIR v3 format to use symbolic
+  names instead of indexes for instruction inputs and ouputs.
+
+## [Unreleased compiler version 0.26.119 language version 0.18.103]
+
+### Fixed
+
+- The type checker was not raising an exception for casts from Bytes<0> values
+  to Field or Uint values and vice versa, which led to confusing downstream errors
+  in some cases.
+
+## [Unreleased compiler version 0.26.118 language version 0.18.103]
+
+### Added
+
+- Four new kernel operations, `mintUnshielded`, `claimUnshieldedCoinSpend`, `incUnshieldedOutputs`, and
+  `incUnshieldedInputs`.
+- Eight new standard library functions, `mintUnshieldedToken`, `sendUnshielded`, `receiveUnshielded`,
+  `unshieldedBalance`, `unshieldedBalanceLt`, `unshieldedBalanceGte`, `unshieldedBalanceGt`, `unshieldedBalanceLte`.
+
+### Changed
+
+- Updates the repository to use ledger `6.1.0-alpha.5`, i.e., `@midnight-ntwrk/onchain-runtime-v1` version `1.0.0-alpha.5`.
+- Changes names like `QualifiedCoinInfo` and `CoinInfo` to be `QualifiedShieldedCoinInfo` and `ShieldedCoinInfo` to
+  match the names in the new on-chain runtime.
+- Renames standard library functions to distinguish between shielded and unshielded token utilities.
+
+## [Unreleased compiler version 0.26.117 language version 0.18.102]
+
+### Fixed
+
+- A bug in which types other than tuple, vector, and bytes do not result in an internal
+  error when checking the bounds of an index.  This was an unreleased bug, that is,
+  the bug was created in an unreleased version of the compiler.
+
+## [Unreleased compiler version 0.26.116 language version 0.18.102]
+
+### Fixed
+
+- A bug in which unimported modules enclosed in unimported modules are not processed
+  to detect and report certain errors, including type errors.  While it is
+  essentially harmless not to process unimported modules since code in unimported
+  modules is never run, this fix potentially allows some issues to be detected
+  earlier in the application development process.
+
 ## [Unreleased compiler version 0.26.115 language version 0.18.102]
 
 ### Fixed
