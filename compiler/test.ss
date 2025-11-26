@@ -36364,59 +36364,76 @@ groups than for single tests.
 (run-tests reduce-to-circuit
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  return true;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%b.1 (tboolean)] [%x.2 (tfield)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%b.3 (tboolean)] [%x.4 (tfield)])
              (tboolean)
+          (= %t.5 (public-ledger #t %forceField.1 (0) write 7))
           #t)))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  assert(x == 3, 'oops 1');"
       "  return b;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%b.1 (tboolean)] [%x.2 (tfield)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%b.3 (tboolean)] [%x.4 (tfield)])
              (tboolean)
-          (= %t.3 (== %x.2 3))
-          (= %t.4 (select #t %t.3 #t))
-          (assert %t.4 "oops 1")
-          (= %t.5 (tuple))
-          %b.1)))
+          (= %t.5 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.6 (== %x.4 3))
+          (= %t.7 (select #t %t.6 #t))
+          (assert %t.7 "oops 1")
+          (= %t.8 (tuple))
+          %b.3)))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Uint<16>): Boolean {"
+      "  forceProof();"
       "  assert(x < 3, 'oops 1');"
       "  return b;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%b.1 (tboolean)] [%x.2 (tunsigned 65535)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%b.3 (tboolean)] [%x.4 (tunsigned 65535)])
              (tboolean)
-          (= %t.3 (< 16 %x.2 3))
-          (= %t.4 (select #t %t.3 #t))
-          (assert %t.4 "oops 1")
-          (= %t.5 (tuple))
-          %b.1)))
+          (= %t.5 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.6 (< 16 %x.4 3))
+          (= %t.7 (select #t %t.6 #t))
+          (assert %t.7 "oops 1")
+          (= %t.8 (tuple))
+          %b.3)))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  if (b)"
       "     assert(b, 'oops 1');"
       "  else"
@@ -36426,75 +36443,93 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%b.1 (tboolean)] [%x.2 (tfield)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%b.3 (tboolean)] [%x.4 (tfield)])
              (tboolean)
-          (= %t.3 (select %b.1 #t #f))
-          (= %t.4 (select %b.1 #f #t))
-          (= %t.5 (tuple))
-          (= %t.6 (== %x.2 3))
-          (= %t.7 (select %t.4 %t.6 #t))
-          (assert %t.7 "oops 2")
+          (= %t.5 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.6 (select %b.3 #t #f))
+          (= %t.7 (select %b.3 #f #t))
           (= %t.8 (tuple))
-          (= %t.9 (select %b.1 #t #f))
-          (= %t.10 (select %b.1 #f #t))
-          (= %t.11 (== %x.2 3))
-          (= %t.12 (select %b.1 %t.11 #f))
-          %t.12)))
+          (= %t.9 (== %x.4 3))
+          (= %t.10 (select %t.7 %t.9 #t))
+          (assert %t.10 "oops 2")
+          (= %t.11 (tuple))
+          (= %t.12 (select %b.3 #t #f))
+          (= %t.13 (select %b.3 #f #t))
+          (= %t.14 (== %x.4 3))
+          (= %t.15 (select %b.3 %t.14 #f))
+          %t.15)))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Vector<3, Vector<2, Field>> {"
+      "  forceProof();"
       "  return [[1, 2], [3, 4], [5, 6]];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ()
              (tvector 3 (tvector 2 (tfield)))
-          (= %t.1 (tuple 1 2))
-          (= %t.2 (tuple 3 4))
-          (= %t.3 (tuple 5 6))
-          (= %t.4 (tuple %t.1 %t.2 %t.3))
-          %t.4)))
+          (= %t.3 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.4 (tuple 1 2))
+          (= %t.5 (tuple 3 4))
+          (= %t.6 (tuple 5 6))
+          (= %t.7 (tuple %t.4 %t.5 %t.6))
+          %t.7)))
     )
 
   (test
     '(
-       "export circuit baz(arg: Bytes<20>) : Field { return arg as Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Bytes<20>) : Field { forceProof(); return arg as Field; }"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.0 ([%arg.1 (tbytes 20)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %baz.2 ([%arg.3 (tbytes 20)])
              (tfield)
-          (= %t.2 (bytes->field #t 20 %arg.1))
-          %t.2))))
+          (= %t.4 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.5 (bytes->field #t 20 %arg.3))
+          %t.5))))
 
   (test
     '(
-       "export circuit foo(arg: Field) : Bytes<20> { return arg as Bytes<20>; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(arg: Field) : Bytes<20> { forceProof(); return arg as Bytes<20>; }"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%arg.1 (tfield)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%arg.3 (tfield)])
              (tbytes 20)
-          (= %t.2 (field->bytes #t 20 %arg.1))
-          %t.2))))
+          (= %t.4 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.5 (field->bytes #t 20 %arg.3))
+          %t.5))))
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module A<#n, t> {"
       "  export circuit foo(v : Vector<n, t>, b : Bytes<n>): Field {"
+      "    forceProof();"
       "    return 17;"
       "  }"
       "}"
       "module B {"
-      "  circuit foo(x : Field): Field { return x + 1; }"
-      "  circuit bar(x : Field): Field { return x - 1; }"
+      "  circuit foo(x : Field): Field { forceProof(); return x + 1; }"
+      "  circuit bar(x : Field): Field { forceProof(); return x - 1; }"
       "  import A<7, Field> prefix AA;"
       "  import A<30, Boolean> prefix AAA;"
       "  export {foo, AAfoo, AAAfoo, bar}"
@@ -36506,23 +36541,29 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%v.1 (tvector 7 (tfield))]
-                         [%b.2 (tbytes 7)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%v.3 (tvector 7 (tfield))]
+                         [%b.4 (tbytes 7)])
              (tfield)
+          (= %t.5 (public-ledger #t %forceField.1 (0) write 7))
           17)
-        (circuit %foo.3 ([%v.4 (tvector 30 (tboolean))]
-                         [%b.5 (tbytes 30)])
+        (circuit %foo.6 ([%v.7 (tvector 30 (tboolean))]
+                         [%b.8 (tbytes 30)])
              (tfield)
+          (= %t.9 (public-ledger #t %forceField.1 (0) write 7))
           17)
-        (circuit %foo.6 ([%x.7 (tfield)])
+        (circuit %foo.10 ([%x.11 (tfield)])
              (tfield)
-          (= %t.8 (+ #f %x.7 1))
-          %t.8)
-        (circuit %bar.9 ([%x.10 (tfield)])
+          (= %t.12 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.13 (+ #f %x.11 1))
+          %t.13)
+        (circuit %bar.14 ([%x.15 (tfield)])
              (tfield)
-          (= %t.11 (- #f %x.10 1))
-          %t.11)))
+          (= %t.16 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.17 (- #f %x.15 1))
+          %t.17)))
     )
 
   (test
@@ -36793,26 +36834,32 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "import CompactStandardLibrary;"
       "export circuit foo(x: Field): Uint<16> {"
+      "  forceProof();"
       "  return x as Uint<16>;"
       "}"
       "export circuit bar(x: Uint<32>): Uint<16> {"
+      "  forceProof();"
       "  return x as Uint<16>;"
       "}"
       )
     (returns
       (program
         (kernel-declaration (%kernel.0 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%x.1 (tfield)])
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%x.3 (tfield)])
              (tunsigned 65535)
-          (= %t.2 (downcast-unsigned #t 65535 %x.1))
-          %t.2)
-        (circuit %bar.3 ([%x.4 (tunsigned 4294967295)])
+          (= %t.4 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.5 (downcast-unsigned #t 65535 %x.3))
+          %t.5)
+        (circuit %bar.6 ([%x.7 (tunsigned 4294967295)])
              (tunsigned 65535)
-          (= %t.5 (downcast-unsigned #t 65535 %x.4))
-          %t.5)))
+          (= %t.8 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.9 (downcast-unsigned #t 65535 %x.7))
+          %t.9)))
     )
 
   (test
@@ -37000,17 +37047,22 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Boolean, y: Boolean): [] {"
+      "  forceProof();"
       "  if (x) if (!y) 3;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ([%x.1 (tboolean)] [%y.2 (tboolean)])
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%x.3 (tboolean)] [%y.4 (tboolean)])
              (ttuple)
-          (= %t.3 (tuple))
-          %t.3)))
+          (= %t.5 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.6 (tuple))
+          %t.6)))
     )
 
   (test
@@ -37028,19 +37080,17 @@ groups than for single tests.
       )
     (returns
       (program
-        (kernel-declaration (%kernel.4 () (Kernel)))
+        (kernel-declaration (%kernel.0 () (Kernel)))
         (public-ledger-declaration
-          ((%a.3 (0) (__compact_Cell (tfield)))))
-        (circuit %foo.5 ([%x0.0 (tboolean)])
-             (ttuple)
-          (= %t.6 (tuple))
-          %t.6)))
+          ((%a.1 (0) (__compact_Cell (tfield)))))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "circuit bar(b: Boolean): [] {"
+      "  forceProof();"
       "  assert(b, 'oops');"
       "}"
       "export circuit foo(x: Boolean): [] {"
@@ -37050,31 +37100,38 @@ groups than for single tests.
     (returns
       (program
         (kernel-declaration (%kernel.0 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.1 ([%x.2 (tboolean)])
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (circuit %foo.2 ([%x.3 (tboolean)])
              (ttuple)
-          (= %t.3 (select #t %x.2 #t))
-          (assert %t.3 "oops")
-          (= %t.4 (tuple))
-          (= %t.5 (tuple))
-          %t.5)))
+          (= %t.4 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.5 (select #t %x.3 #t))
+          (assert %t.5 "oops")
+          (= %t.6 (tuple))
+          (= %t.7 (tuple))
+          %t.7)))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness W(): Uint<16>;"
       "export circuit foo(): Uint<16> {"
+      "  forceProof();"
       "  return disclose(W());"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.0 () (tunsigned 65535))
-        (circuit %foo.1 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1 (0) (__compact_Cell (tfield)))))
+        (witness %W.2 () (tunsigned 65535))
+        (circuit %foo.3 ()
              (tunsigned 65535)
-          (= %t.2 (call #t %W.0))
-          %t.2)))
+          (= %t.4 (public-ledger #t %forceField.1 (0) write 7))
+          (= %t.5 (call #t %W.2))
+          %t.5)))
     )
 )
 
@@ -37255,8 +37312,7 @@ groups than for single tests.
       (program
         (kernel-declaration (%kernel.0 () (Kernel)))
         (public-ledger-declaration
-          ((%ledger_counter.1 (0) (Counter))))
-        (circuit %minimal_error_circuit.2 () (ty () ()) ())))
+          ((%ledger_counter.1 (0) (Counter))))))
     )
 
   (test
@@ -37701,37 +37757,46 @@ groups than for single tests.
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  assert(x == 3, 'oops 1');"
       "  return b;"
       "}"
-      "export circuit call_foo(b: Boolean, x: Field): Boolean { return foo(b, x);}"
+      "export circuit call_foo(b: Boolean, x: Field): Boolean { forceProof(); return foo(b, x);}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
-                           (%b.2)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.3) (ty ((afield)) ((tfield)))))
+                         (argument (%x.4) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.4 (== %x.3 3))
-          (= %t.0 (select 1 %t.4 0))
-          (= %t.5 %t.0)
-          (= %t.6 (select 1 %t.0 1))
-          (assert %t.6 "oops 1")
-          (%b.2))
-        (circuit %call_foo.7 ((argument
-                                (%b.8)
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (== %x.4 3))
+          (= %t.6 (select 1 %t.5 0))
+          (= %t.7 %t.6)
+          (= %t.8 (select 1 %t.6 1))
+          (assert %t.8 "oops 1")
+          (%b.3))
+        (circuit %call_foo.9 ((argument
+                                (%b.10)
                                 (ty ((abytes 1)) ((tfield 1))))
-                              (argument (%x.9) (ty ((afield)) ((tfield)))))
+                              (argument (%x.11) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.10 (== %x.9 3))
-          (= %t.11 (select 1 %t.10 0))
-          (= %t.12 %t.11)
-          (= %t.13 (select 1 %t.11 1))
-          (assert %t.13 "oops 1")
-          (%b.8))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.12 (== %x.11 3))
+          (= %t.13 (select 1 %t.12 0))
+          (= %t.14 %t.13)
+          (= %t.15 (select 1 %t.13 1))
+          (assert %t.15 "oops 1")
+          (%b.10))))
     )
 
   (test
@@ -37742,65 +37807,75 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%b.1)
-                           (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.2) (ty ((afield)) ((tfield)))))
-             (ty ((abytes 1)) ((tfield 1)))
-          (1))))
+        (public-ledger-declaration ())))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  assert(x == 3, 'oops 1');"
       "  return b;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
-                           (%b.2)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.3) (ty ((afield)) ((tfield)))))
+                         (argument (%x.4) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.4 (== %x.3 3))
-          (= %t.0 (select 1 %t.4 0))
-          (= %t.5 %t.0)
-          (= %t.6 (select 1 %t.0 1))
-          (assert %t.6 "oops 1")
-          (%b.2))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (== %x.4 3))
+          (= %t.6 (select 1 %t.5 0))
+          (= %t.7 %t.6)
+          (= %t.8 (select 1 %t.6 1))
+          (assert %t.8 "oops 1")
+          (%b.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Uint<16>): Boolean {"
+      "  forceProof();"
       "  assert(x <= 3, 'oops 1');"
       "  return b;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
-                           (%b.2)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.3) (ty ((abytes 2)) ((tfield 65535)))))
+                         (argument (%x.4) (ty ((abytes 2)) ((tfield 65535)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.4 (< 16 3 %x.3))
-          (= %t.5 (select %t.4 1 0))
-          (= %t.6 (select %t.4 0 1))
-          (= %t.0 (select %t.4 0 1))
-          (= %t.7 (select 1 %t.0 1))
-          (assert %t.7 "oops 1")
-          (%b.2))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (< 16 3 %x.4))
+          (= %t.6 (select %t.5 1 0))
+          (= %t.7 (select %t.5 0 1))
+          (= %t.8 (select %t.5 0 1))
+          (= %t.9 (select 1 %t.8 1))
+          (assert %t.9 "oops 1")
+          (%b.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  if (b)"
       "     assert(b, 'oops 1');"
       "  else"
@@ -37810,40 +37885,52 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%b.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.2) (ty ((afield)) ((tfield)))))
+                         (argument (%x.4) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.3 (select %b.1 1 0))
-          (= %t.4 (select %b.1 0 1))
-          (= %t.5 (== %x.2 3))
-          (= %t.6 (select 1 %t.5 0))
-          (= %t.7 %t.6)
-          (= %t.8 (select %t.4 %t.6 1))
-          (assert %t.8 "oops 2")
-          (= %t.9 (select %b.1 1 0))
-          (= %t.10 (select %b.1 0 1))
-          (= %t.11 (== %x.2 3))
-          (= %t.12 (select 1 %t.11 0))
-          (= %t.13 %t.12)
-          (= %t.14 (select %b.1 %t.12 0))
-          (%t.14))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (select %b.3 1 0))
+          (= %t.6 (select %b.3 0 1))
+          (= %t.7 (== %x.4 3))
+          (= %t.8 (select 1 %t.7 0))
+          (= %t.9 %t.8)
+          (= %t.10 (select %t.6 %t.8 1))
+          (assert %t.10 "oops 2")
+          (= %t.11 (select %b.3 1 0))
+          (= %t.12 (select %b.3 0 1))
+          (= %t.13 (== %x.4 3))
+          (= %t.14 (select 1 %t.13 0))
+          (= %t.15 %t.14)
+          (= %t.16 (select %b.3 %t.14 0))
+          (%t.16))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Vector<3, Vector<2, Field>> {"
+      "  forceProof();"
       "  return [[1, 2], [3, 4], [5, 6]];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield) (afield) (afield) (afield) (afield) (afield))
                  ((tfield) (tfield) (tfield) (tfield) (tfield) (tfield)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (1 2 3 4 5 6))))
     )
 
@@ -37858,81 +37945,78 @@ groups than for single tests.
 
   (test
     '(
-       "export circuit baz(arg: Bytes<20>) : Field { return arg as Field; }"
-       )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Bytes<20>) : Field { forceProof(); return arg as Field; }"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.0 ((argument
-                           (%arg.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.2 ((argument
+                           (%arg.3)
                            (ty ((abytes 20))
                                ((tfield
                                   1461501637330902918203684832716283019655932542975)))))
              (ty ((afield)) ((tfield)))
-          (%arg.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (%arg.3))))
     )
 
   (test
     '(
        "export circuit baz(arg: Bytes<31>) : Field { return arg as Field; }"
        )
-    (returns
-      (program
-        (public-ledger-declaration ())
-        (circuit %baz.0 ((argument
-                           (%arg.1)
-                           (ty ((abytes 31))
-                               ((tfield
-                                  452312848583266388373324160190187140051835877600158453279131187530910662655)))))
-             (ty ((afield)) ((tfield)))
-          (%arg.1))))
+    (returns (program (public-ledger-declaration ())))
     )
 
   (test
     '(
-       "export circuit baz(arg: Bytes<32>) : Field { return arg as Field; }"
-       )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Bytes<32>) : Field { forceProof(); return arg as Field; }"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.1 ((argument
-                           (%arg.2 %arg.0)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.2 ((argument
+                           (%arg.3 %arg.4)
                            (ty ((abytes 32))
                                ((tfield 255)
                                  (tfield
                                    452312848583266388373324160190187140051835877600158453279131187530910662655)))))
              (ty ((afield)) ((tfield)))
-          (= %t.3 (bytes->field 1 32 %arg.2 %arg.0))
-          (%t.3))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (bytes->field 1 32 %arg.3 %arg.4))
+          (%t.5))))
     )
 
   (test
     '(
-       "export circuit baz(arg: Bytes<40>) : Field { return arg as Field; }"
-     )
-    (returns
-      (program
-        (public-ledger-declaration ())
-        (circuit %baz.1 ((argument
-                           (%arg.2 %arg.0)
-                           (ty ((abytes 40))
-                               ((tfield 4722366482869645213695)
-                                 (tfield
-                                   452312848583266388373324160190187140051835877600158453279131187530910662655)))))
-             (ty ((afield)) ((tfield)))
-          (= %t.3 (bytes->field 1 40 %arg.2 %arg.0))
-          (%t.3))))
+      "export circuit baz(arg: Bytes<40>) : Field { return arg as Field; }"
+      )
+    (returns (program (public-ledger-declaration ())))
     )
 
   (test
     '(
-       "export circuit baz(arg: Bytes<80>) : Field { return arg as Field; }"
-     )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Bytes<80>) : Field { forceProof(); return arg as Field; }"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.1 ((argument
-                           (%arg.2 %arg.3 %arg.0)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.2 ((argument
+                           (%arg.3 %arg.4 %arg.5)
                            (ty ((abytes 80))
                                ((tfield
                                   22300745198530623141535718272648361505980415)
@@ -37941,16 +38025,17 @@ groups than for single tests.
                                  (tfield
                                    452312848583266388373324160190187140051835877600158453279131187530910662655)))))
              (ty ((afield)) ((tfield)))
-          (= %t.4 (== %arg.2 0))
-          (assert %t.4 "bytes value is too big to fit in a field")
-          (= %t.5 (bytes->field 1 80 %arg.3 %arg.0))
-          (%t.5))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.6 (== %arg.3 0))
+          (assert %t.6 "bytes value is too big to fit in a field")
+          (= %t.7 (bytes->field 1 80 %arg.4 %arg.5))
+          (%t.7))))
     )
 
   (test
     '(
-       "export circuit foo(arg: Field) : Bytes<0> { return arg as Bytes<0>; }"
-       )
+      "export circuit foo(arg: Field) : Bytes<0> { return arg as Bytes<0>; }"
+      )
     (oops
       message: "~a:\n  ~?"
       irritants: '("testfile.compact line 1 char 52" "cannot cast from type ~a to type ~a" ("Field" "Bytes<0>")))
@@ -37958,48 +38043,48 @@ groups than for single tests.
 
   (test
     '(
-       "export circuit foo(arg: Field) : Bytes<20> { return arg as Bytes<20>; }"
-       )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(arg: Field) : Bytes<20> { forceProof(); return arg as Bytes<20>; }"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%arg.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%arg.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 20))
                  ((tfield
                     1461501637330902918203684832716283019655932542975)))
-          (= (%t.2 %t.3) (field->bytes 1 20 %arg.1))
-          (%t.3))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.4 %t.5) (field->bytes 1 20 %arg.3))
+          (%t.5))))
     )
 
   (test
     '(
-       "export circuit foo(arg: Field) : Bytes<40> { return arg as Bytes<40>; }"
-    )
-    (returns
-      (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%arg.1)
-                           (ty ((afield)) ((tfield)))))
-             (ty ((abytes 40))
-                 ((tfield 4722366482869645213695)
-                   (tfield
-                     452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%t.2 %t.3) (field->bytes 1 40 %arg.1))
-          (%t.2 %t.3))))
+      "export circuit foo(arg: Field) : Bytes<40> { return arg as Bytes<40>; }"
+      )
+    (returns (program (public-ledger-declaration ())))
     )
 
   (test
     '(
-       "export circuit foo(arg: Field) : Bytes<80> { return arg as Bytes<80>; }"
-    )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(arg: Field) : Bytes<80> { forceProof(); return arg as Bytes<80>; }"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%arg.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%arg.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 80))
                  ((tfield 22300745198530623141535718272648361505980415)
@@ -38007,25 +38092,32 @@ groups than for single tests.
                      452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%t.2 %t.3) (field->bytes 1 80 %arg.1))
-          (0 %t.2 %t.3))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.4 %t.5) (field->bytes 1 80 %arg.3))
+          (0 %t.4 %t.5))))
     )
 
   (test
     '(
-      "export circuit baz(arg: Boolean) : Field { return arg as Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Boolean) : Field { forceProof(); return arg as Field; }"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.0 ((argument
-                           (%arg.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.2 ((argument
+                           (%arg.3)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((afield)) ((tfield)))
-          (= %t.2 (select %arg.1 1 0))
-          (= %t.3 (select %arg.1 0 1))
-          (= %t.4 (select %arg.1 1 0))
-          (%t.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4 (select %arg.3 1 0))
+          (= %t.5 (select %arg.3 0 1))
+          (= %t.6 (select %arg.3 1 0))
+          (%t.6))))
     )
 
   (test
@@ -38033,46 +38125,47 @@ groups than for single tests.
       "enum E { a, b, c }"
       "export circuit baz(arg: E) : Field { return arg as Field; }"
       )
-    (returns
-      (program
-        (public-ledger-declaration ())
-        (circuit %baz.0 ((argument
-                           (%arg.1)
-                           (ty ((abytes 1)) ((tfield 2)))))
-             (ty ((afield)) ((tfield)))
-          (%arg.1))))
+    (returns (program (public-ledger-declaration ())))
     )
 
   (test
     '(
-      "export circuit baz(arg: Field) : Boolean { return arg as Boolean; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Field) : Boolean { forceProof(); return arg as Boolean; }"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.0 ((argument
-                           (%arg.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.2 ((argument
+                           (%arg.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.2 (== %arg.1 0))
-          (= %t.3 (select 1 %t.2 0))
-          (= %t.4 %t.3)
-          (= %t.5 (select %t.3 1 0))
-          (= %t.6 (select %t.3 0 1))
-          (= %t.7 (select %t.3 0 1))
-          (%t.7))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4 (== %arg.3 0))
+          (= %t.5 (select 1 %t.4 0))
+          (= %t.6 %t.5)
+          (= %t.7 (select %t.5 1 0))
+          (= %t.8 (select %t.5 0 1))
+          (= %t.9 (select %t.5 0 1))
+          (%t.9))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module A<#n, t> {"
       "  export circuit foo(v : Vector<n, t>, b : Bytes<n>): Field {"
+      "  forceProof();"
       "    return 17;"
       "  }"
       "}"
       "module B {"
-      "  circuit foo(x : Field): Field { return x + 1; }"
-      "  circuit bar(x : Field): Field { return x - 1; }"
+      "  circuit foo(x : Field): Field { forceProof(); return x + 1; }"
+      "  circuit bar(x : Field): Field { forceProof(); return x - 1; }"
       "  import A<7, Field> prefix AA;"
       "  import A<30, Boolean> prefix AAA;"
       "  export {foo, AAfoo, AAAfoo, bar}"
@@ -38084,23 +38177,28 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.23 ((argument
-                            (%v.24 %v.25 %v.26 %v.27 %v.28 %v.29 %v.30)
-                            (ty ((afield) (afield) (afield) (afield) (afield)
-                                  (afield) (afield))
-                                ((tfield) (tfield) (tfield) (tfield) (tfield)
-                                  (tfield) (tfield))))
-                          (argument
-                            (%b.31)
-                            (ty ((abytes 7)) ((tfield 72057594037927935)))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%v.3 %v.4 %v.5 %v.6 %v.7 %v.8 %v.9)
+                           (ty ((afield) (afield) (afield) (afield) (afield)
+                                 (afield) (afield))
+                               ((tfield) (tfield) (tfield) (tfield) (tfield)
+                                 (tfield) (tfield))))
+                         (argument
+                           (%b.10)
+                           (ty ((abytes 7)) ((tfield 72057594037927935)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (17))
-        (circuit %foo.32 ((argument
-                            (%v.33 %v.34 %v.35 %v.36 %v.37 %v.38 %v.39 %v.0
-                             %v.1 %v.2 %v.3 %v.4 %v.5 %v.6 %v.7 %v.8 %v.9 %v.10
-                             %v.11 %v.12 %v.13 %v.14 %v.15 %v.16 %v.17 %v.18
-                             %v.19 %v.20 %v.21 %v.22)
+        (circuit %foo.11 ((argument
+                            (%v.12 %v.13 %v.14 %v.15 %v.16 %v.17 %v.18 %v.19
+                             %v.20 %v.21 %v.22 %v.23 %v.24 %v.25 %v.26 %v.27
+                             %v.28 %v.29 %v.30 %v.31 %v.32 %v.33 %v.34 %v.35
+                             %v.36 %v.37 %v.38 %v.39 %v.40 %v.41)
                             (ty ((abytes 1) (abytes 1) (abytes 1) (abytes 1)
                                  (abytes 1) (abytes 1) (abytes 1) (abytes 1)
                                  (abytes 1) (abytes 1) (abytes 1) (abytes 1)
@@ -38118,139 +38216,185 @@ groups than for single tests.
                                  (tfield 1) (tfield 1) (tfield 1) (tfield 1)
                                  (tfield 1) (tfield 1))))
                           (argument
-                            (%b.40)
+                            (%b.42)
                             (ty ((abytes 30))
                                 ((tfield
                                    1766847064778384329583297500742918515827483896875618958121606201292619775)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (17))
-        (circuit %foo.41 ((argument
-                            (%x.42)
+        (circuit %foo.43 ((argument
+                            (%x.44)
                             (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
-          (= %t.43 (+ #f %x.42 1))
-          (%t.43))
-        (circuit %bar.44 ((argument
-                            (%x.45)
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.45 (+ #f %x.44 1))
+          (%t.45))
+        (circuit %bar.46 ((argument
+                            (%x.47)
                             (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
-          (= %t.46 (- #f %x.45 1))
-          (%t.46))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.48 (- #f %x.47 1))
+          (%t.48))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Vector<3, Field>): Boolean {"
+      "  forceProof();"
       "  return x == [3, 4, 5];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%x.1 %x.2 %x.3)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3 %x.4 %x.5)
                            (ty ((afield) (afield) (afield))
                                ((tfield) (tfield) (tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.4 (== %x.1 3))
-          (= %t.5 (select 1 %t.4 0))
-          (= %t.6 (== %x.2 4))
-          (= %t.7 (select %t.5 %t.6 0))
-          (= %t.8 (== %x.3 5))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.6 (== %x.3 3))
+          (= %t.7 (select 1 %t.6 0))
+          (= %t.8 (== %x.4 4))
           (= %t.9 (select %t.7 %t.8 0))
-          (= %t.10 %t.9)
-          (%t.9))))
+          (= %t.10 (== %x.5 5))
+          (= %t.11 (select %t.9 %t.10 0))
+          (= %t.12 %t.11)
+          (%t.11))))
     )
 
   (test
     '(
-       "export circuit foo(a: Bytes<0>): Bytes<0> {"
-       "  return a;"
-       "}"
-       )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(a: Bytes<0>): Bytes<0> {"
+      "  forceProof();"
+      "  return a;"
+      "}"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument () (ty ((abytes 0)) ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument () (ty ((abytes 0)) ())))
              (ty ((abytes 0)) ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Vector<2, Vector<0, Field>> {"
+      "  forceProof();"
       "  return [[], []];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 () (ty () ()) ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          ())))
     )
 
   (test
     '(
-       "export circuit foo(b: Bytes<31>) : Bytes<31> {"
-       "  return b;"
-       "}"
-       )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(b: Bytes<31>) : Bytes<31> {"
+      "  forceProof();"
+      "  return b;"
+      "}"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%b.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
                            (ty ((abytes 31))
                                ((tfield
                                   452312848583266388373324160190187140051835877600158453279131187530910662655)))))
              (ty ((abytes 31))
                  ((tfield
                     452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (%b.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (%b.3))))
     )
 
   (test
     '(
-       "export circuit foo() : Bytes<31> {"
-       "return 'abcdefghijklmnopqrstuvwxyz01234';"
-       "}"
-       )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo() : Bytes<31> {"
+      "  forceProof();"
+      "  return 'abcdefghijklmnopqrstuvwxyz01234';"
+      "}"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 31))
                  ((tfield
                     452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (92229389609740816795180269993859972877376305008880425034764490106789388897))))
     )
 
   (test
     '(
-       "export circuit foo(a: Bytes<30>, b: Bytes<31>, c : Bytes<32>, d : Bytes<33>) : Bytes<40> {"
-       "  return '1234567890123456789012345678901234567890';"
-       "}"
-       )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(a: Bytes<30>, b: Bytes<31>, c : Bytes<32>, d : Bytes<33>) : Bytes<40> {"
+      "  forceProof();"
+      "  return '1234567890123456789012345678901234567890';"
+      "}"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
-                           (%a.2)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%a.3)
                            (ty ((abytes 30))
                                ((tfield
                                   1766847064778384329583297500742918515827483896875618958121606201292619775))))
                          (argument
-                           (%b.3)
+                           (%b.4)
                            (ty ((abytes 31))
                                ((tfield
                                   452312848583266388373324160190187140051835877600158453279131187530910662655))))
                          (argument
-                           (%c.4 %c.0)
+                           (%c.5 %c.6)
                            (ty ((abytes 32))
                                ((tfield 255)
                                  (tfield
                                    452312848583266388373324160190187140051835877600158453279131187530910662655))))
                          (argument
-                           (%d.5 %d.6)
+                           (%d.7 %d.8)
                            (ty ((abytes 33))
                                ((tfield 65535)
                                  (tfield
@@ -38259,105 +38403,135 @@ groups than for single tests.
                  ((tfield 4722366482869645213695)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (889566821702876541746
             86908332635947936520937639616427602624961814622853568299663208045469708849))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Bytes<40> {"
+      "  forceProof();"
       "  return pad(40, 'hello!');"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 40))
                  ((tfield 4722366482869645213695)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (0 36762444129640))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness bar(x: Bytes<50>) : [];"
       "export circuit foo() : [] {"
+      "  forceProof();"
       "  bar(pad(50, 'hello!'));"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.1 ((argument
-                           (%x.2 %x.0)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 ((argument
+                           (%x.3 %x.4)
                            (ty ((abytes 50))
                                ((tfield
                                   5708990770823839524233143877797980545530986495)
                                  (tfield
                                    452312848583266388373324160190187140051835877600158453279131187530910662655)))))
              (ty () ()))
-        (circuit %foo.3 ()
+        (circuit %foo.5 ()
              (ty () ())
-          (= () (call 1 %bar.1 0 36762444129640))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (call 1 %bar.2 0 36762444129640))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness bar() : Bytes<50>;"
       "export circuit foo() : Bytes<50> {"
+      "  forceProof();"
       "  return disclose(bar());"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655))))
-        (circuit %foo.1 ()
+        (circuit %foo.3 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%t.2 %t.3) (call 1 %bar.0))
-          (%t.2 %t.3))))
-    )
-
-  (test
-    '(
-      "export circuit foo(b: Boolean) : Bytes<50> {"
-      "  return b ? pad(50, 'hello!') : pad(50, 'once upon a time in a galaxy far, far away');"
-      "}"
-      )
-    (returns
-      (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%b.1)
-                           (ty ((abytes 1)) ((tfield 1)))))
-             (ty ((abytes 50))
-                 ((tfield 5708990770823839524233143877797980545530986495)
-                   (tfield
-                     452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= %t.2 (select %b.1 1 0))
-          (= %t.3 (select %b.1 0 1))
-          (= %t.4 (select %b.1 0 146740295883472840746347634))
-          (= %t.5
-             (select
-               %b.1
-               36762444129640
-               172089018921478248217018581585884075052860504307373738624254165310312246895))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.4 %t.5) (call 1 %bar.2))
           (%t.4 %t.5))))
     )
 
   (test
     '(
-      "circuit bar() : Bytes<50> { return pad(50, 'hello!'); }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(b: Boolean) : Bytes<50> {"
+      "  forceProof();"
+      "  return b ? pad(50, 'hello!') : pad(50, 'once upon a time in a galaxy far, far away');"
+      "}"
+      )
+    (returns
+      (program
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
+                           (ty ((abytes 1)) ((tfield 1)))))
+             (ty ((abytes 50))
+                 ((tfield 5708990770823839524233143877797980545530986495)
+                   (tfield
+                     452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4 (select %b.3 1 0))
+          (= %t.5 (select %b.3 0 1))
+          (= %t.6 (select %b.3 0 146740295883472840746347634))
+          (= %t.7
+             (select
+               %b.3
+               36762444129640
+               172089018921478248217018581585884075052860504307373738624254165310312246895))
+          (%t.6 %t.7))))
+    )
+
+  (test
+    '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "circuit bar() : Bytes<50> { forceProof(); return pad(50, 'hello!'); }"
       "export circuit foo() : Bytes<50> {"
       "  const x : Bytes<50> = bar();"
       "  return x;"
@@ -38365,19 +38539,26 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (0 36762444129640))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness bar() : Bytes<50>;"
       "export circuit foo() : Bytes<50> {"
+      "  forceProof();"
       "  const x : Bytes<50> = disclose(bar());"
       "  assert(x == pad(50, 'hello!'), 'oops');"
       "  return x;"
@@ -38385,32 +38566,39 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.1 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655))))
-        (circuit %foo.2 ()
+        (circuit %foo.3 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%x.3 %x.4) (call 1 %bar.1))
-          (= %t.5 (== %x.3 0))
-          (= %t.6 (select 1 %t.5 0))
-          (= %t.7 (== %x.4 36762444129640))
-          (= %t.0 (select %t.6 %t.7 0))
-          (= %t.8 %t.0)
-          (= %t.9 (select 1 %t.0 1))
-          (assert %t.9 "oops")
-          (%x.3 %x.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%x.4 %x.5) (call 1 %bar.2))
+          (= %t.6 (== %x.4 0))
+          (= %t.7 (select 1 %t.6 0))
+          (= %t.8 (== %x.5 36762444129640))
+          (= %t.9 (select %t.7 %t.8 0))
+          (= %t.10 %t.9)
+          (= %t.11 (select 1 %t.9 1))
+          (assert %t.11 "oops")
+          (%x.4 %x.5))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness bar() : Bytes<50>;"
       "export circuit foo() : Bytes<50> {"
+      "  forceProof();"
       "  const x : Bytes<50> = disclose(bar());"
       "  assert(x == pad(50, 'once upon a time in a galaxy far, far away'), 'oops');"
       "  return x;"
@@ -38418,33 +38606,40 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.1 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655))))
-        (circuit %foo.2 ()
+        (circuit %foo.3 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%x.3 %x.4) (call 1 %bar.1))
-          (= %t.5 (== %x.3 146740295883472840746347634))
-          (= %t.6 (select 1 %t.5 0))
-          (= %t.7
-             (== %x.4
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%x.4 %x.5) (call 1 %bar.2))
+          (= %t.6 (== %x.4 146740295883472840746347634))
+          (= %t.7 (select 1 %t.6 0))
+          (= %t.8
+             (== %x.5
                  172089018921478248217018581585884075052860504307373738624254165310312246895))
-          (= %t.0 (select %t.6 %t.7 0))
-          (= %t.8 %t.0)
-          (= %t.9 (select 1 %t.0 1))
-          (assert %t.9 "oops")
-          (%x.3 %x.4))))
+          (= %t.9 (select %t.7 %t.8 0))
+          (= %t.10 %t.9)
+          (= %t.11 (select 1 %t.9 1))
+          (assert %t.11 "oops")
+          (%x.4 %x.5))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Vector<2, Bytes<80>> {"
+      "  forceProof();"
       "  const x = [pad(80, 'hello!'), pad(80, 'four score and seven years ago our fathers brought forth')];"
       "  const y = [pad(80, 'four score and seven years ago our fathers brought forth'), pad(80, 'hello!')];"
       "  assert(x == y, 'oops');"
@@ -38453,8 +38648,12 @@ groups than for single tests.
     )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 80) (abytes 80))
                  ((tfield 22300745198530623141535718272648361505980415)
                    (tfield
@@ -38466,29 +38665,30 @@ groups than for single tests.
                      452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= %t.2 (== 0 0))
-          (= %t.3 (select 1 %t.2 0))
-          (= %t.4
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.3 (== 0 0))
+          (= %t.4 (select 1 %t.3 0))
+          (= %t.5
              (== 0
                  655673852914079535706832728104650208561044890911829149250927))
-          (= %t.5 (select %t.3 %t.4 0))
-          (= %t.6
+          (= %t.6 (select %t.4 %t.5 0))
+          (= %t.7
              (== 36762444129640
                  57307987020550611804426281024220409105956829700898855016698443841058205542))
-          (= %t.7 (select %t.5 %t.6 0))
-          (= %t.8 (== 0 0))
-          (= %t.9 (select %t.7 %t.8 0))
-          (= %t.10
+          (= %t.8 (select %t.6 %t.7 0))
+          (= %t.9 (== 0 0))
+          (= %t.10 (select %t.8 %t.9 0))
+          (= %t.11
              (== 655673852914079535706832728104650208561044890911829149250927
                  0))
-          (= %t.11 (select %t.9 %t.10 0))
-          (= %t.12
+          (= %t.12 (select %t.10 %t.11 0))
+          (= %t.13
              (== 57307987020550611804426281024220409105956829700898855016698443841058205542
                  36762444129640))
-          (= %t.0 (select %t.11 %t.12 0))
-          (= %t.13 %t.0)
-          (= %t.14 (select 1 %t.0 1))
-          (assert %t.14 "oops")
+          (= %t.14 (select %t.12 %t.13 0))
+          (= %t.15 %t.14)
+          (= %t.16 (select 1 %t.14 1))
+          (assert %t.16 "oops")
           (0 0 36762444129640 0
              655673852914079535706832728104650208561044890911829149250927
              57307987020550611804426281024220409105956829700898855016698443841058205542))))
@@ -38518,58 +38718,85 @@ groups than for single tests.
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(n: Field): Boolean {"
+      "  forceProof();"
       ,(format "  return n == ~d;" (max-unsigned))
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%n.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%n.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.2
-             (== %n.1 ,(max-unsigned)))
-          (= %t.3 (select 1 %t.2 0))
-          (= %t.4 %t.3)
-          (%t.3))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4
+             (== %n.3
+                 452312848583266388373324160190187140051835877600158453279131187530910662655))
+          (= %t.5 (select 1 %t.4 0))
+          (= %t.6 %t.5)
+          (%t.5))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(n: Field): Boolean {"
+      "  forceProof();"
       ,(format "  return n == ~d as Field;" (max-field))
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%n.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%n.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.2
-             (== %n.1 ,(max-field)))
-          (= %t.3 (select 1 %t.2 0))
-          (= %t.4 %t.3)
-          (%t.3))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4
+             (== %n.3
+                 52435875175126190479447740508185965837690552500527637822603658699938581184512))
+          (= %t.5 (select 1 %t.4 0))
+          (= %t.6 %t.5)
+          (%t.5))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "enum Names { bill, sally, fred, george, }"
       "circuit foo<A>(): A {"
+      "  forceProof();"
       "  return A.sally;"
       "}"
       "export circuit bar(): Names {"
+      "  forceProof();"
       "  return foo<Names>();"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %bar.0 () (ty ((abytes 1)) ((tfield 3))) (1))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %bar.2 ()
+             (ty ((abytes 1)) ((tfield 3)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (1))))
     )
 
   (test
@@ -38643,86 +38870,109 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness foo(x: Uint<5>): [];"
       "export circuit bar(a: Uint<4>, b: Uint<4>): [] {"
-      "foo(a + b);"
+      "  forceProof();"
+      "  foo(a + b);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %foo.0 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %foo.2 ((argument
+                           (%x.3)
                            (ty ((abytes 1)) ((tfield 31)))))
              (ty () ()))
-        (circuit %bar.2 ((argument
-                           (%a.3)
+        (circuit %bar.4 ((argument
+                           (%a.5)
                            (ty ((abytes 1)) ((tfield 15))))
-                         (argument (%b.4) (ty ((abytes 1)) ((tfield 15)))))
+                         (argument (%b.6) (ty ((abytes 1)) ((tfield 15)))))
              (ty () ())
-          (= %t.5 (+ 5 %a.3 %b.4))
-          (= () (call 1 %foo.0 %t.5))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.7 (+ 5 %a.5 %b.6))
+          (= () (call 1 %foo.2 %t.7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(f: Field, x: Field):  [] {"
-      "    if (x == 0) {"
-      "        if (f as Uint<3> < 7) {"
-      "            for (const i of 0 .. 0) {"
-      "            }"
-      "        }"
+      "  forceProof();"
+      "  if (x == 0) {"
+      "    if (f as Uint<3> < 7) {"
+      "      for (const i of 0 .. 0) {"
+      "      }"
       "    }"
+      "  }"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%f.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%f.3)
                            (ty ((afield)) ((tfield))))
-                         (argument (%x.2) (ty ((afield)) ((tfield)))))
+                         (argument (%x.4) (ty ((afield)) ((tfield)))))
              (ty () ())
-          (= %t.3 (== %x.2 0))
-          (= %t.4 (select 1 %t.3 0))
-          (= %t.5 %t.4)
-          (= %t.6 (select %t.4 1 0))
-          (= %t.7 (select %t.4 0 1))
-          (= %t.8 (downcast-unsigned %t.6 7 %f.1))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (== %x.4 0))
+          (= %t.6 (select 1 %t.5 0))
+          (= %t.7 %t.6)
+          (= %t.8 (select %t.6 1 0))
+          (= %t.9 (select %t.6 0 1))
+          (= %t.10 (downcast-unsigned %t.8 7 %f.3))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(f: Field, x: Field):  [] {"
-      "    if (x == 0) {"
-      "        if (f as Uint<3> < 7) {"
-      "            fold((a, x) => a, 7, [0]);"
-      "        }"
+      "  forceProof();"
+      "  if (x == 0) {"
+      "    if (f as Uint<3> < 7) {"
+      "      fold((a, x) => a, 7, [0]);"
       "    }"
+      "  }"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%f.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%f.3)
                            (ty ((afield)) ((tfield))))
-                         (argument (%x.2) (ty ((afield)) ((tfield)))))
+                         (argument (%x.4) (ty ((afield)) ((tfield)))))
              (ty () ())
-          (= %t.3 (== %x.2 0))
-          (= %t.4 (select 1 %t.3 0))
-          (= %t.5 %t.4)
-          (= %t.6 (select %t.4 1 0))
-          (= %t.7 (select %t.4 0 1))
-          (= %t.8 (downcast-unsigned %t.6 7 %f.1))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (== %x.4 0))
+          (= %t.6 (select 1 %t.5 0))
+          (= %t.7 %t.6)
+          (= %t.8 (select %t.6 1 0))
+          (= %t.9 (select %t.6 0 1))
+          (= %t.10 (downcast-unsigned %t.8 7 %f.3))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(f: Field, x: Field):  [] {"
+      "  forceProof();"
       "  if (x == 0) {"
       "    if (f as Uint<3> < 7) {"
       "      3;"
@@ -38732,24 +38982,31 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%f.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%f.3)
                            (ty ((afield)) ((tfield))))
-                         (argument (%x.2) (ty ((afield)) ((tfield)))))
+                         (argument (%x.4) (ty ((afield)) ((tfield)))))
              (ty () ())
-          (= %t.3 (== %x.2 0))
-          (= %t.4 (select 1 %t.3 0))
-          (= %t.5 %t.4)
-          (= %t.6 (select %t.4 1 0))
-          (= %t.7 (select %t.4 0 1))
-          (= %t.8 (downcast-unsigned %t.6 7 %f.1))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (== %x.4 0))
+          (= %t.6 (select 1 %t.5 0))
+          (= %t.7 %t.6)
+          (= %t.8 (select %t.6 1 0))
+          (= %t.9 (select %t.6 0 1))
+          (= %t.10 (downcast-unsigned %t.8 7 %f.3))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<8>):  [] {"
+      "  forceProof();"
       "  if (x != 0) {"
       "    if (x < 7) {"
       "      assert(false, 'oops');"
@@ -38759,30 +39016,37 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3)
                            (ty ((abytes 1)) ((tfield 255)))))
              (ty () ())
-          (= %t.2 (== %x.1 0))
-          (= %t.3 (select 1 %t.2 0))
-          (= %t.4 %t.3)
-          (= %t.5 (select %t.3 1 0))
-          (= %t.6 (select %t.3 0 1))
-          (= %t.7 (select %t.3 0 1))
-          (= %t.8 (select %t.7 1 0))
-          (= %t.9 (select %t.7 0 1))
-          (= %t.10 (< 8 %x.1 7))
-          (= %t.11 (select %t.10 %t.8 0))
-          (= %t.12 (select %t.10 0 %t.8))
-          (= %t.13 (select %t.11 0 1))
-          (assert %t.13 "oops")
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4 (== %x.3 0))
+          (= %t.5 (select 1 %t.4 0))
+          (= %t.6 %t.5)
+          (= %t.7 (select %t.5 1 0))
+          (= %t.8 (select %t.5 0 1))
+          (= %t.9 (select %t.5 0 1))
+          (= %t.10 (select %t.9 1 0))
+          (= %t.11 (select %t.9 0 1))
+          (= %t.12 (< 8 %x.3 7))
+          (= %t.13 (select %t.12 %t.10 0))
+          (= %t.14 (select %t.12 0 %t.10))
+          (= %t.15 (select %t.13 0 1))
+          (assert %t.15 "oops")
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Field):  [] {"
+      "  forceProof();"
       "  if (x != 0) {"
       "    if (x == 7) {"
       "      3;"
@@ -38792,17 +39056,24 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3)
                            (ty ((afield)) ((tfield)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Field):  [] {"
+      "  forceProof();"
       "  if (x != 0) {"
       "    if (x == 7) {"
       "      assert(false, 'oops');"
@@ -38812,69 +39083,88 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3)
                            (ty ((afield)) ((tfield)))))
              (ty () ())
-          (= %t.2 (== %x.1 0))
-          (= %t.3 (select 1 %t.2 0))
-          (= %t.4 %t.3)
-          (= %t.5 (select %t.3 1 0))
-          (= %t.6 (select %t.3 0 1))
-          (= %t.7 (select %t.3 0 1))
-          (= %t.8 (select %t.7 1 0))
-          (= %t.9 (select %t.7 0 1))
-          (= %t.10 (== %x.1 7))
-          (= %t.11 (select 1 %t.10 0))
-          (= %t.12 %t.11)
-          (= %t.13 (select %t.11 %t.8 0))
-          (= %t.14 (select %t.11 0 %t.8))
-          (= %t.15 (select %t.13 0 1))
-          (assert %t.15 "oops")
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4 (== %x.3 0))
+          (= %t.5 (select 1 %t.4 0))
+          (= %t.6 %t.5)
+          (= %t.7 (select %t.5 1 0))
+          (= %t.8 (select %t.5 0 1))
+          (= %t.9 (select %t.5 0 1))
+          (= %t.10 (select %t.9 1 0))
+          (= %t.11 (select %t.9 0 1))
+          (= %t.12 (== %x.3 7))
+          (= %t.13 (select 1 %t.12 0))
+          (= %t.14 %t.13)
+          (= %t.15 (select %t.13 %t.10 0))
+          (= %t.16 (select %t.13 0 %t.10))
+          (= %t.17 (select %t.15 0 1))
+          (assert %t.17 "oops")
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Boolean, y: Boolean): [] {"
+      "  forceProof();"
       "  if (x) if (!y) 3;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%y.2) (ty ((abytes 1)) ((tfield 1)))))
+                         (argument (%y.4) (ty ((abytes 1)) ((tfield 1)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Boolean, y: Boolean): [] {"
+      "  forceProof();"
       "  if (x) if (!y) assert(false, 'oops');"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%y.2) (ty ((abytes 1)) ((tfield 1)))))
+                         (argument (%y.4) (ty ((abytes 1)) ((tfield 1)))))
              (ty () ())
-          (= %t.3 (select %x.1 1 0))
-          (= %t.4 (select %x.1 0 1))
-          (= %t.5 (select %y.2 %t.3 0))
-          (= %t.6 (select %y.2 0 %t.3))
-          (= %t.7 (select %y.2 0 1))
-          (= %t.8 (select %t.7 %t.3 0))
-          (= %t.9 (select %t.7 0 %t.3))
-          (= %t.10 (select %t.8 0 1))
-          (assert %t.10 "oops")
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.5 (select %x.3 1 0))
+          (= %t.6 (select %x.3 0 1))
+          (= %t.7 (select %y.4 %t.5 0))
+          (= %t.8 (select %y.4 0 %t.5))
+          (= %t.9 (select %y.4 0 1))
+          (= %t.10 (select %t.9 %t.5 0))
+          (= %t.11 (select %t.9 0 %t.5))
+          (= %t.12 (select %t.10 0 1))
+          (assert %t.12 "oops")
           ())))
     )
 
@@ -38895,18 +39185,15 @@ groups than for single tests.
       (program
         (kernel-declaration (%kernel.4 () (Kernel)))
         (public-ledger-declaration
-          ((%a.3 (0) (__compact_Cell (ty ((afield)) ((tfield)))))))
-        (circuit %foo.5 ((argument
-                           (%x0.6)
-                           (ty ((abytes 1)) ((tfield 1)))))
-             (ty () ())
-          ())))
+          ((%a.3 (0) (__compact_Cell (ty ((afield)) ((tfield)))))))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "circuit bar(x: [Field, Boolean]): Boolean {"
+      "  forceProof();"
       "  return x[0] == 0 && x[1] == false;"
       "}"
       "export circuit foo(): Boolean {"
@@ -38916,14 +39203,22 @@ groups than for single tests.
     (returns
       (program
         (kernel-declaration (%kernel.0 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.1 () (ty ((abytes 1)) ((tfield 1))) (1))))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
+             (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (1))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "circuit bar(x: [Field, Boolean]): Boolean {"
+      "  forceProof();"
       "  return x[0] == 0 && x[1] == false;"
       "}"
       "export circuit foo(x: Field): Boolean {"
@@ -38932,19 +39227,23 @@ groups than for single tests.
       )
     (returns
       (program
-        (kernel-declaration (%kernel.1 () (Kernel)))
-        (public-ledger-declaration ())
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
         (circuit %foo.2 ((argument
-                           (%x.0)
+                           (%x.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.3 (== %x.0 0))
-          (= %t.4 (select 1 %t.3 0))
-          (= %t.5 %t.4)
-          (= %t.6 (select %t.4 1 0))
-          (= %t.7 (select %t.4 0 1))
-          (= %t.8 (select %t.4 1 0))
-          (%t.8))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t.4 (== %x.3 0))
+          (= %t.5 (select 1 %t.4 0))
+          (= %t.6 %t.5)
+          (= %t.7 (select %t.5 1 0))
+          (= %t.8 (select %t.5 0 1))
+          (= %t.9 (select %t.5 1 0))
+          (%t.9))))
     )
 
   (test-group
@@ -39006,96 +39305,131 @@ groups than for single tests.
 (run-tests optimize-circuit
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  return true;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%b.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.2) (ty ((afield)) ((tfield)))))
+                         (argument (%x.4) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (1))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  assert(x == 3, 'oops 1');"
       "  return b;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.2 ((argument
-                           (%b.3)
+        (kernel-declaration (%kernel.2 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.3
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.4 ((argument
+                           (%b.5)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%x.0) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
           (= %t.1 (== %x.0 3))
           (assert %t.1 "oops 1")
-          (%b.3))))
+          (%b.5))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Uint<16>): Boolean {"
+      "  forceProof();"
       "  assert(x <= 3, 'oops 1');"
       "  return b;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.3 ((argument
-                           (%b.4)
+        (kernel-declaration (%kernel.3 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.4
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.5 ((argument
+                           (%b.6)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%x.0) (ty ((abytes 2)) ((tfield 65535)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.4 (0) write 7))
           (= %t.1 (< 16 3 %x.0))
           (= %t.2 (select %t.1 0 1))
           (assert %t.2 "oops 1")
-          (%b.4))))
+          (%b.6))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Uint<16>): Boolean {"
+      "  forceProof();"
       "  assert(x < x, 'oops 1');"
       "  return (3 < 2 || b);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%b.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%b.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.2) (ty ((abytes 2)) ((tfield 65535)))))
+                         (argument (%x.4) (ty ((abytes 2)) ((tfield 65535)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (assert 0 "oops 1")
-          (%b.1))))
+          (%b.3))))
 
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<16>): Boolean {"
+      "  forceProof();"
       "  assert(x < 100, 'oops 1');"
       "  return (x < 100);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.2 ((argument
+        (kernel-declaration (%kernel.2 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.3
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.4 ((argument
                            (%x.0)
                            (ty ((abytes 2)) ((tfield 65535)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
           (= %t.1 (< 16 %x.0 100))
           (assert %t.1 "oops 1")
           (%t.1))))
@@ -39103,90 +39437,127 @@ groups than for single tests.
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean): Boolean {"
+      "  forceProof();"
       "  return b && 2 < 3;"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (%b.0))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean): Boolean {"
+      "  forceProof();"
       "  return b && 4 < 3;"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (0))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean): Boolean {"
+      "  forceProof();"
       "  const x  : Uint<16> = 4;"
       "  return b && x < 3;"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (0))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean): Boolean {"
+      "  forceProof();"
       "  const x  : Uint<16> = 2;"
       "  return b && 4 > 3 && x != 3 && x <= 5 && 5 >= 5;"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (%b.0))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean): Boolean {"
+      "  forceProof();"
       "  const x  : Uint<16> = 2;"
       "  return b || 3 > 4 || x != 2 || 5 <= x || 5 >= 6;"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (%b.0))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  if (b)"
       "     assert(b, 'oops 1');"
       "  else"
@@ -39196,65 +39567,93 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.4 ((argument
+        (kernel-declaration (%kernel.4 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.5
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.6 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%x.1) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.5 (0) write 7))
           (= %t.2 (== %x.1 3))
           (= %t.3 (select %b.0 1 %t.2))
           (assert %t.3 "oops 2")
-          (= %t.6 (select %b.0 %t.2 0))
-          (%t.6))))
+          (= %t.7 (select %b.0 %t.2 0))
+          (%t.7))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Vector<3, Vector<2, Field>> {"
+      "  forceProof();"
       "  return [[1, 2], [3, 4], [5, 6]];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield) (afield) (afield) (afield) (afield) (afield))
                  ((tfield) (tfield) (tfield) (tfield) (tfield) (tfield)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (1 2 3 4 5 6))))
     )
 
   (test
     `(
       "witness W() : Field;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  W();"
       "  return true;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.0 () (ty ((afield)) ((tfield))))
-        (circuit %foo.1 ((argument
-                           (%b.2)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.2 () (ty ((afield)) ((tfield))))
+        (circuit %foo.3 ((argument
+                           (%b.4)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.3) (ty ((afield)) ((tfield)))))
+                         (argument (%x.5) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.4) (call 1 %W.0))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.6) (call 1 %W.2))
           (1))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): [] {"
+      "  forceProof();"
       "  return;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 () (ty () ()) ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          ())))
     )
 
   (test
@@ -39262,34 +39661,41 @@ groups than for single tests.
       "struct pr { a: Boolean; d: Field; }"
       "witness W(a: Vector<3, pr>) : pr;"
       "witness S() : Vector<3, pr>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  return disclose(W(S()).a);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.0 ((argument
-                         (%a.1 %a.2 %a.3 %a.4 %a.5 %a.6)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.2 ((argument
+                         (%a.3 %a.4 %a.5 %a.6 %a.7 %a.8)
                          (ty ((abytes 1) (afield) (abytes 1) (afield)
                                (abytes 1) (afield))
                              ((tfield 1) (tfield) (tfield 1) (tfield)
                                (tfield 1) (tfield)))))
              (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))
-        (witness %S.7 ()
+        (witness %S.9 ()
              (ty ((abytes 1) (afield) (abytes 1) (afield) (abytes 1)
                    (afield))
                  ((tfield 1) (tfield) (tfield 1) (tfield) (tfield 1)
                    (tfield))))
-        (circuit %foo.8 ((argument
-                           (%b.9)
-                           (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.10) (ty ((afield)) ((tfield)))))
+        (circuit %foo.10 ((argument
+                            (%b.11)
+                            (ty ((abytes 1)) ((tfield 1))))
+                          (argument (%x.12) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.11 %t.12 %t.13 %t.14 %t.15 %t.16) (call 1 %S.7))
-          (= (%t.17 %t.18)
-             (call 1 %W.0 %t.11 %t.12 %t.13 %t.14 %t.15 %t.16))
-          (%t.17))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.13 %t.14 %t.15 %t.16 %t.17 %t.18) (call 1 %S.9))
+          (= (%t.19 %t.20)
+             (call 1 %W.2 %t.13 %t.14 %t.15 %t.16 %t.17 %t.18))
+          (%t.19))))
     )
 
   (test
@@ -39297,37 +39703,44 @@ groups than for single tests.
       "struct pr { a: Boolean; d: Field; }"
       "witness W(a: Vector<3, pr>) : pr;"
       "witness S() : Vector<3, pr>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  const p = disclose(W(S()));"
       "  return p.d == 19 ? p.a : b;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.4 ((argument
-                         (%a.5 %a.6 %a.7 %a.8 %a.9 %a.10)
+        (kernel-declaration (%kernel.4 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.5
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.6 ((argument
+                         (%a.7 %a.8 %a.9 %a.10 %a.11 %a.12)
                          (ty ((abytes 1) (afield) (abytes 1) (afield)
                                (abytes 1) (afield))
                              ((tfield 1) (tfield) (tfield 1) (tfield)
                                (tfield 1) (tfield)))))
              (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))
-        (witness %S.11 ()
+        (witness %S.13 ()
              (ty ((abytes 1) (afield) (abytes 1) (afield) (abytes 1)
                    (afield))
                  ((tfield 1) (tfield) (tfield 1) (tfield) (tfield 1)
                    (tfield))))
-        (circuit %foo.12 ((argument
+        (circuit %foo.14 ((argument
                             (%b.2)
                             (ty ((abytes 1)) ((tfield 1))))
-                          (argument (%x.13) (ty ((afield)) ((tfield)))))
+                          (argument (%x.15) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.14 %t.15 %t.16 %t.17 %t.18 %t.19) (call 1 %S.11))
+          (= () (public-ledger 1 %forceField.5 (0) write 7))
+          (= (%t.16 %t.17 %t.18 %t.19 %t.20 %t.21) (call 1 %S.13))
           (= (%p.3 %p.0)
-             (call 1 %W.4 %t.14 %t.15 %t.16 %t.17 %t.18 %t.19))
+             (call 1 %W.6 %t.16 %t.17 %t.18 %t.19 %t.20 %t.21))
           (= %t.1 (== %p.0 19))
-          (= %t.20 (select %t.1 %p.3 %b.2))
-          (%t.20))))
+          (= %t.22 (select %t.1 %p.3 %b.2))
+          (%t.22))))
     )
 
   (test
@@ -39336,57 +39749,66 @@ groups than for single tests.
       "witness W1(a: Vector<3, pr>) : pr;"
       "witness W2(a: Vector<3, pr>) : pr;"
       "witness S() : Vector<3, pr>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Boolean {"
+      "  forceProof();"
       "  const p = b ? W1(S()) : W2(S());"
       "  return disclose(p.d == 19 ? p.a : b);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W1.8 ((argument
-                          (%a.9 %a.10 %a.11 %a.12 %a.13 %a.14)
-                          (ty ((abytes 1) (afield) (abytes 1) (afield)
-                                (abytes 1) (afield))
-                              ((tfield 1) (tfield) (tfield 1) (tfield)
-                                (tfield 1) (tfield)))))
-             (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))
-        (witness %W2.15 ((argument
-                           (%a.16 %a.17 %a.18 %a.19 %a.20 %a.21)
+        (kernel-declaration (%kernel.8 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.9
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W1.10 ((argument
+                           (%a.11 %a.12 %a.13 %a.14 %a.15 %a.16)
                            (ty ((abytes 1) (afield) (abytes 1) (afield)
                                  (abytes 1) (afield))
                                ((tfield 1) (tfield) (tfield 1) (tfield)
                                  (tfield 1) (tfield)))))
              (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))
-        (witness %S.22 ()
+        (witness %W2.17 ((argument
+                           (%a.18 %a.19 %a.20 %a.21 %a.22 %a.23)
+                           (ty ((abytes 1) (afield) (abytes 1) (afield)
+                                 (abytes 1) (afield))
+                               ((tfield 1) (tfield) (tfield 1) (tfield)
+                                 (tfield 1) (tfield)))))
+             (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))
+        (witness %S.24 ()
              (ty ((abytes 1) (afield) (abytes 1) (afield) (abytes 1)
                    (afield))
                  ((tfield 1) (tfield) (tfield 1) (tfield) (tfield 1)
                    (tfield))))
-        (circuit %foo.23 ((argument
+        (circuit %foo.25 ((argument
                             (%b.0)
                             (ty ((abytes 1)) ((tfield 1))))
-                          (argument (%x.24) (ty ((afield)) ((tfield)))))
+                          (argument (%x.26) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.25 (select %b.0 0 1))
-          (= (%t.26 %t.27 %t.28 %t.29 %t.30 %t.31) (call %b.0 %S.22))
+          (= () (public-ledger 1 %forceField.9 (0) write 7))
+          (= %t.27 (select %b.0 0 1))
+          (= (%t.28 %t.29 %t.30 %t.31 %t.32 %t.33) (call %b.0 %S.24))
           (= (%t.2 %t.4)
-             (call %b.0 %W1.8 %t.26 %t.27 %t.28 %t.29 %t.30 %t.31))
-          (= (%t.32 %t.33 %t.34 %t.35 %t.36 %t.37) (call %t.25 %S.22))
+             (call %b.0 %W1.10 %t.28 %t.29 %t.30 %t.31 %t.32 %t.33))
+          (= (%t.34 %t.35 %t.36 %t.37 %t.38 %t.39) (call %t.27 %S.24))
           (= (%t.1 %t.3)
-             (call %t.25 %W2.15 %t.32 %t.33 %t.34 %t.35 %t.36 %t.37))
+             (call %t.27 %W2.17 %t.34 %t.35 %t.36 %t.37 %t.38 %t.39))
           (= %p.7 (select %b.0 %t.2 %t.1))
           (= %p.5 (select %b.0 %t.4 %t.3))
           (= %t.6 (== %p.5 19))
-          (= %t.38 (select %t.6 %p.7 %b.0))
-          (%t.38))))
+          (= %t.40 (select %t.6 %p.7 %b.0))
+          (%t.40))))
     )
 
   (test
     `(
       "witness foo(b: Boolean, x: Field): Boolean;"
       "module M<#n> {"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "  export circuit C(v: Vector<n, Field>): Boolean {"
+      "  forceProof();"
       "    return fold((x, y) => disclose(foo(x, y)), true, v);"
       "  }"
       "}"
@@ -39397,34 +39819,47 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %foo.0 ((argument
-                           (%b.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))
+           (%forceField.2
+             (1)
+             (__compact_Cell (ty ((afield)) ((tfield)))))
+           (%forceField.3
+             (2)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %foo.4 ((argument
+                           (%b.5)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%x.2) (ty ((afield)) ((tfield)))))
+                         (argument (%x.6) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1))))
-        (circuit %X$C.3 ((argument () (ty () ())))
+        (circuit %C.7 ((argument () (ty () ())))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (1))
-        (circuit %Y$C.4 ((argument
-                           (%v.5)
-                           (ty ((afield)) ((tfield)))))
+        (circuit %C.8 ((argument (%v.9) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.6) (call 1 %foo.0 1 %v.5))
-          (%t.6))
-        (circuit %Z$C.7 ((argument
-                           (%v.8 %v.9)
-                           (ty ((afield) (afield)) ((tfield) (tfield)))))
+          (= () (public-ledger 1 %forceField.2 (1) write 7))
+          (= (%t.10) (call 1 %foo.4 1 %v.9))
+          (%t.10))
+        (circuit %C.11 ((argument
+                          (%v.12 %v.13)
+                          (ty ((afield) (afield)) ((tfield) (tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.10) (call 1 %foo.0 1 %v.8))
-          (= (%t.11) (call 1 %foo.0 %t.10 %v.9))
-          (%t.11))))
+          (= () (public-ledger 1 %forceField.3 (2) write 7))
+          (= (%x.14) (call 1 %foo.4 1 %v.12))
+          (= (%t.15) (call 1 %foo.4 %x.14 %v.13))
+          (%t.15))))
     )
 
   (test
     `(
       "module M<#n> {"
+      "  ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "  export circuit C(v: Vector<n, Field>): Boolean {"
+      "    forceProof();"
       "    return fold((b, x) => b && x == 0,"
       "                true,"
       "                v);"
@@ -39441,10 +39876,23 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %bar1.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))
+           (%forceField.2
+             (1)
+             (__compact_Cell (ty ((afield)) ((tfield)))))
+           (%forceField.3
+             (2)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %bar1.4 ()
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (public-ledger 1 %forceField.2 (1) write 7))
           (assert 0 "oops 1")
+          (= () (public-ledger 1 %forceField.3 (2) write 7))
           (assert 0 "oops 2")
           ())))
     )
@@ -39458,36 +39906,45 @@ groups than for single tests.
       "  }"
       "}"
       "import M<2>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit bar(b: Boolean, n: Field) : Vector<2, Boolean> {"
+      "  forceProof();"
       "  if (!b) assert(n == 0, 'oops');"
       "  return disclose(C([3, 7]));"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %foo.4 ((argument
-                           (%n.5)
+        (kernel-declaration (%kernel.4 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.5
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %foo.6 ((argument
+                           (%n.7)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1))))
-        (circuit %bar.6 ((argument
+        (circuit %bar.8 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%n.1) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1) (abytes 1)) ((tfield 1) (tfield 1)))
+          (= () (public-ledger 1 %forceField.5 (0) write 7))
           (= %t.2 (== %n.1 0))
           (= %t.3 (select %b.0 1 %t.2))
           (assert %t.3 "oops")
-          (= (%t.8) (call 1 %foo.4 3))
-          (= (%t.9) (call 1 %foo.4 7))
-          (%t.8 %t.9))))
+          (= (%t.9) (call 1 %foo.6 3))
+          (= (%t.10) (call 1 %foo.6 7))
+          (%t.9 %t.10))))
     )
 
   (test
     `(
       "witness foo(n: Field) : Boolean;"
       "struct pr { a: Boolean; d: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C(v: Vector<1, Field>, b: Boolean): Vector<1, Boolean> {"
+      "  forceProof();"
       "  return map((x) => {"
       "               const q = pr{ a: b, d: x};"
       "               return q.a || q.a;"
@@ -39497,45 +39954,57 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %C.1 ((argument (%v.2) (ty ((afield)) ((tfield))))
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %C.3 ((argument (%v.4) (ty ((afield)) ((tfield))))
                        (argument (%b.0) (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (%b.0))))
     )
 
   (test
     `(
       "witness foo(n: Field) : Boolean;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C(v: Vector<3, Field>, b: Boolean): Vector<3, Boolean> {"
+      "  forceProof();"
       "  return map((x) => b && disclose(foo(x + 1)),"
       "             v);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %foo.7 ((argument
-                           (%n.8)
+        (kernel-declaration (%kernel.7 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.8
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %foo.9 ((argument
+                           (%n.10)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1))))
-        (circuit %C.9 ((argument
-                         (%v.1 %v.3 %v.5)
-                         (ty ((afield) (afield) (afield))
-                             ((tfield) (tfield) (tfield))))
-                       (argument (%b.0) (ty ((abytes 1)) ((tfield 1)))))
+        (circuit %C.11 ((argument
+                          (%v.1 %v.3 %v.5)
+                          (ty ((afield) (afield) (afield))
+                              ((tfield) (tfield) (tfield))))
+                        (argument (%b.0) (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1) (abytes 1) (abytes 1))
                  ((tfield 1) (tfield 1) (tfield 1)))
-          (= %t.10 (+ #f %v.1 1))
-          (= (%t.2) (call %b.0 %foo.7 %t.10))
-          (= %t.11 (select %b.0 %t.2 0))
-          (= %t.12 (+ #f %v.3 1))
-          (= (%t.4) (call %b.0 %foo.7 %t.12))
-          (= %t.13 (select %b.0 %t.4 0))
-          (= %t.14 (+ #f %v.5 1))
-          (= (%t.6) (call %b.0 %foo.7 %t.14))
-          (= %t.15 (select %b.0 %t.6 0))
-          (%t.11 %t.13 %t.15))))
+          (= () (public-ledger 1 %forceField.8 (0) write 7))
+          (= %t.12 (+ #f %v.1 1))
+          (= (%t.2) (call %b.0 %foo.9 %t.12))
+          (= %t.13 (select %b.0 %t.2 0))
+          (= %t.14 (+ #f %v.3 1))
+          (= (%t.4) (call %b.0 %foo.9 %t.14))
+          (= %t.15 (select %b.0 %t.4 0))
+          (= %t.16 (+ #f %v.5 1))
+          (= (%t.6) (call %b.0 %foo.9 %t.16))
+          (= %t.17 (select %b.0 %t.6 0))
+          (%t.13 %t.15 %t.17))))
     )
 
   (test
@@ -39549,7 +40018,9 @@ groups than for single tests.
       "import M<0>;"
       "import M<1>;"
       "import M<2>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit bar(v0: Vector<0, Field>, v1: Vector<1, Field>, v2: Vector<2, Field>) : [] {"
+      "  forceProof();"
       "  assert(C(v0), 'oops 0');"
       "  assert(C(v1), 'oops 1');"
       "  assert(C(v2), 'oops 2');"
@@ -39557,18 +40028,23 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %bar.7 ((argument () (ty () ()))
+        (kernel-declaration (%kernel.7 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.8
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %bar.9 ((argument () (ty () ()))
                          (argument (%v1.0) (ty ((afield)) ((tfield))))
                          (argument
                            (%v2.2 %v2.4)
                            (ty ((afield) (afield)) ((tfield) (tfield)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.8 (0) write 7))
           (= %t.1 (== %v1.0 0))
           (assert %t.1 "oops 1")
-          (= %t.3 (== %v2.2 0))
+          (= %b.3 (== %v2.2 0))
           (= %t.5 (== %v2.4 0))
-          (= %t.6 (select %t.3 %t.5 0))
+          (= %t.6 (select %b.3 %t.5 0))
           (assert %t.6 "oops 2")
           ())))
     )
@@ -39576,7 +40052,9 @@ groups than for single tests.
   (test
     '(
       "struct pr { a: Boolean; d: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit F(b: Boolean, n: Field): Field {"
+      "  forceProof();"
       "  const x = pr{ a: b, d: n};"
       "  const m = x.d * 2;"
       "  return x.a ? m + 1 : m + 2;"
@@ -39584,17 +40062,22 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %F.5 ((argument
+        (kernel-declaration (%kernel.5 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.6
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %F.7 ((argument
                          (%b.1)
                          (ty ((abytes 1)) ((tfield 1))))
                        (argument (%n.0) (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.6 (0) write 7))
           (= %m.2 (* #f %n.0 2))
           (= %t.4 (+ #f %m.2 1))
           (= %t.3 (+ #f %m.2 2))
-          (= %t.7 (select %b.1 %t.4 %t.3))
-          (%t.7))))
+          (= %t.8 (select %b.1 %t.4 %t.3))
+          (%t.8))))
     )
 
   (test
@@ -39605,40 +40088,55 @@ groups than for single tests.
       "  const m = x.d * 2;"
       "  return b ? m + 1 : m - 2;"
       "}"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C() : Field {"
+      "  forceProof();"
       "  return F(false, 17);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %C.0 () (ty ((afield)) ((tfield))) (32))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %C.2 ()
+             (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (32))))
     )
 
   (test
     '(
       "struct pr { a: Boolean; d: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C(u: Vector<2, Field>, v: Vector<2, Boolean>): Vector<2, Field> {"
+      "  forceProof();"
       "  return map((a, b) => b ? 2 * a : 0,"
       "             u, v);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %C.6 ((argument
+        (kernel-declaration (%kernel.6 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.7
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %C.8 ((argument
                          (%u.1 %u.4)
                          (ty ((afield) (afield)) ((tfield) (tfield))))
                        (argument
                          (%v.0 %v.3)
-                         (ty ((abytes 1) (abytes 1))
-                             ((tfield 1) (tfield 1)))))
+                         (ty ((abytes 1) (abytes 1)) ((tfield 1) (tfield 1)))))
              (ty ((afield) (afield)) ((tfield) (tfield)))
+          (= () (public-ledger 1 %forceField.7 (0) write 7))
           (= %t.2 (* #f 2 %u.1))
-          (= %t.7 (select %v.0 %t.2 0))
+          (= %t.9 (select %v.0 %t.2 0))
           (= %t.5 (* #f 2 %u.4))
-          (= %t.8 (select %v.3 %t.5 0))
-          (%t.7 %t.8))))
+          (= %t.10 (select %v.3 %t.5 0))
+          (%t.9 %t.10))))
     )
 
   (test
@@ -39648,7 +40146,9 @@ groups than for single tests.
       "  return map((a, b) => b ? 2 * a : 0,"
       "             u, v);"
       "}"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit D() : [] {"
+      "  forceProof();"
       "  assert(C([7, 11], [false, false])[1] == 1, 'oops 1');"
       "  assert(C([7, 11], [false, true])[0] == 0, 'oops 2');"
       "  assert(C([7, 11], [true, false])[0] == 14, 'oops 3');"
@@ -39657,44 +40157,66 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %D.0 () (ty () ()) (assert 0 "oops 1") ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %D.2 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (assert 0 "oops 1")
+          ())))
     )
 
   (test
     '(
       "struct pr { a: Boolean; d: Field; }"
       "witness foo() : pr;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C(): Field {"
+      "  forceProof();"
       "  return disclose(foo().d);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %foo.2 ()
              (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))
-        (circuit %C.1 ()
+        (circuit %C.3 ()
              (ty ((afield)) ((tfield)))
-          (= (%t.2 %t.3) (call 1 %foo.0))
-          (%t.3))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.4 %t.5) (call 1 %foo.2))
+          (%t.5))))
     )
 
   (test
     '(
       "struct pr { a: Boolean; d: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C(p: pr): Field {"
+      "  forceProof();"
       "  return p.d;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %C.0 ((argument
-                         (%p.1 %p.2)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %C.2 ((argument
+                         (%p.3 %p.4)
                          (ty ((abytes 1) (afield)) ((tfield 1) (tfield)))))
              (ty ((afield)) ((tfield)))
-          (%p.2))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (%p.4))))
     )
 
   (test
@@ -39710,17 +40232,15 @@ groups than for single tests.
       (program
         (public-ledger-declaration ())
         (witness %foo.0 ()
-             (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))
-        (circuit %C.1 ()
-             (ty ((afield)) ((tfield)))
-          (= (%p.2 %p.3) (call 1 %foo.0))
-          (%p.3))))
+             (ty ((abytes 1) (afield)) ((tfield 1) (tfield))))))
     )
 
   (test
     '(
       "struct pr { a: Boolean; d: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C(n: Field): Boolean {"
+      "  forceProof();"
       "  const p = pr{a:true,d:n};"
       "  assert(!(p.d == 0), 'oops');"
       "  return p.a;"
@@ -39728,9 +40248,14 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %C.3 ((argument (%n.0) (ty ((afield)) ((tfield)))))
+        (kernel-declaration (%kernel.3 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.4
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %C.5 ((argument (%n.0) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.4 (0) write 7))
           (= %t.1 (== %n.0 0))
           (= %t.2 (select %t.1 0 1))
           (assert %t.2 "oops")
@@ -39739,46 +40264,64 @@ groups than for single tests.
 
   (test
     '(
-      "export circuit foo(n: Field) : [] { return; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(n: Field) : [] { forceProof(); return; }"
       "export circuit C(v: Vector<3, Field>): Vector<3, []> {"
       "  return map(foo, v);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%n.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%n.3)
                            (ty ((afield)) ((tfield)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())
-        (circuit %C.2 ((argument
-                         (%v.3 %v.4 %v.5)
+        (circuit %C.4 ((argument
+                         (%v.5 %v.6 %v.7)
                          (ty ((afield) (afield) (afield))
                              ((tfield) (tfield) (tfield)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
   (test
     '(
-      "export circuit foo(x: [], n: Field) : [] { return; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(x: [], n: Field) : [] { forceProof(); return; }"
       "export circuit C(v: Vector<3, Field>): [] {"
       "  return fold(foo, [], v);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument () (ty () ()))
-                         (argument (%n.1) (ty ((afield)) ((tfield)))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument () (ty () ()))
+                         (argument (%n.3) (ty ((afield)) ((tfield)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())
-        (circuit %C.2 ((argument
-                         (%v.3 %v.4 %v.5)
+        (circuit %C.4 ((argument
+                         (%v.5 %v.6 %v.7)
                          (ty ((afield) (afield) (afield))
                              ((tfield) (tfield) (tfield)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
@@ -39786,19 +40329,26 @@ groups than for single tests.
     '(
       "circuit foo(n: Field) : [] { return; }"
       "circuit bar(n: Field) : [] { return; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit C(b: Boolean, n: Field, m: Field): [] {"
+      "  forceProof();"
       "  return b ? foo(n) : bar(m);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %C.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %C.3 ((argument
                          (%b.0)
                          (ty ((abytes 1)) ((tfield 1))))
-                       (argument (%n.2) (ty ((afield)) ((tfield))))
-                       (argument (%m.3) (ty ((afield)) ((tfield)))))
+                       (argument (%n.4) (ty ((afield)) ((tfield))))
+                       (argument (%m.5) (ty ((afield)) ((tfield)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           ())))
     )
 
@@ -39816,34 +40366,43 @@ groups than for single tests.
       "  }"
       "}"
       "import M<2>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit bar() : Vector<2, Boolean> {"
+      "  forceProof();"
       "  return C([3, 7]);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %foo.0 ((argument
-                           (%n.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %foo.2 ((argument
+                           (%n.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1))))
-        (circuit %bar.2 ()
+        (circuit %bar.4 ()
              (ty ((abytes 1) (abytes 1)) ((tfield 1) (tfield 1)))
-          (= (%t.3) (call 1 %foo.0 4))
-          (= (%t.4) (call 1 %foo.0 8))
-          (%t.3 %t.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.5) (call 1 %foo.2 4))
+          (= (%t.6) (call 1 %foo.2 8))
+          (%t.5 %t.6))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module A<#n, t> {"
       "  export circuit foo(v : Vector<n, t>, b : Bytes<n>): Field {"
+      "    forceProof();"
       "    return 17;"
       "  }"
       "}"
       "module B {"
-      "  circuit foo(x : Field): Field { return x + 1; }"
-      "  circuit bar(x : Field): Field { return x - 1; }"
+      "  circuit foo(x : Field): Field { forceProof(); return x + 1; }"
+      "  circuit bar(x : Field): Field { forceProof(); return x - 1; }"
       "  import A<7, Field> prefix AA;"
       "  import A<30, Boolean> prefix AAA;"
       "  export {foo, AAfoo, AAAfoo, bar}"
@@ -39855,23 +40414,28 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.33 ((argument
-                            (%v.34 %v.35 %v.36 %v.37 %v.38 %v.39 %v.40)
-                            (ty ((afield) (afield) (afield) (afield) (afield)
-                                  (afield) (afield))
-                                ((tfield) (tfield) (tfield) (tfield) (tfield)
-                                  (tfield) (tfield))))
-                          (argument
-                            (%b.41)
-                            (ty ((abytes 7)) ((tfield 72057594037927935)))))
+        (kernel-declaration (%kernel.2 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.3
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.4 ((argument
+                           (%v.5 %v.6 %v.7 %v.8 %v.9 %v.10 %v.11)
+                           (ty ((afield) (afield) (afield) (afield) (afield)
+                                 (afield) (afield))
+                               ((tfield) (tfield) (tfield) (tfield) (tfield)
+                                 (tfield) (tfield))))
+                         (argument
+                           (%b.12)
+                           (ty ((abytes 7)) ((tfield 72057594037927935)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
           (17))
-        (circuit %foo.42 ((argument
-                            (%v.2 %v.3 %v.4 %v.5 %v.6 %v.7 %v.8 %v.9 %v.10
-                             %v.11 %v.12 %v.13 %v.14 %v.15 %v.16 %v.17 %v.18
-                             %v.19 %v.20 %v.21 %v.22 %v.23 %v.24 %v.25 %v.26
-                             %v.27 %v.28 %v.29 %v.30 %v.31)
+        (circuit %foo.13 ((argument
+                            (%v.14 %v.15 %v.16 %v.17 %v.18 %v.19 %v.20 %v.21
+                             %v.22 %v.23 %v.24 %v.25 %v.26 %v.27 %v.28 %v.29
+                             %v.30 %v.31 %v.32 %v.33 %v.34 %v.35 %v.36 %v.37
+                             %v.38 %v.39 %v.40 %v.41 %v.42 %v.43)
                             (ty ((abytes 1) (abytes 1) (abytes 1) (abytes 1)
                                  (abytes 1) (abytes 1) (abytes 1) (abytes 1)
                                  (abytes 1) (abytes 1) (abytes 1) (abytes 1)
@@ -39889,42 +40453,52 @@ groups than for single tests.
                                  (tfield 1) (tfield 1) (tfield 1) (tfield 1)
                                  (tfield 1) (tfield 1))))
                           (argument
-                            (%b.32)
+                            (%b.44)
                             (ty ((abytes 30))
                                 ((tfield
                                    1766847064778384329583297500742918515827483896875618958121606201292619775)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
           (17))
-        (circuit %foo.43 ((argument
-                            (%x.1)
-                            (ty ((afield)) ((tfield)))))
-             (ty ((afield)) ((tfield)))
-          (= %t.44 (+ #f %x.1 1))
-          (%t.44))
-        (circuit %bar.45 ((argument
+        (circuit %foo.45 ((argument
                             (%x.0)
                             (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
-          (= %t.46 (- #f %x.0 1))
-          (%t.46))))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
+          (= %t.46 (+ #f %x.0 1))
+          (%t.46))
+        (circuit %bar.47 ((argument
+                            (%x.1)
+                            (ty ((afield)) ((tfield)))))
+             (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
+          (= %t.48 (- #f %x.1 1))
+          (%t.48))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit bar(x : Field): Bytes<20> {"
+      "  forceProof();"
       "  assert(!(x == 0), 'oops');"
       "  return x == 0 || !(x == 0) ? pad(20, 'goof') : pad(20, 'ball');"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %bar.3 ((argument
+        (kernel-declaration (%kernel.3 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.4
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %bar.5 ((argument
                            (%x.0)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 20))
                  ((tfield
                     1461501637330902918203684832716283019655932542975)))
+          (= () (public-ledger 1 %forceField.4 (0) write 7))
           (= %t.1 (== %x.0 0))
           (= %t.2 (select %t.1 0 1))
           (assert %t.2 "oops")
@@ -39933,7 +40507,9 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit bar(x : Field): Field {"
+      "  forceProof();"
       "  assert(!(x - x == 0), 'oops');"
       "  if (x == 17) assert(!(x == 17), 'oops 1');"
       "  if (!(x == x)) assert(!(x == 17), 'oops 2');"
@@ -39947,11 +40523,16 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %bar.13 ((argument
+        (kernel-declaration (%kernel.13 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.14
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %bar.15 ((argument
                             (%x.0)
                             (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.14 (0) write 7))
           (assert 0 "oops")
           (= %t.1 (== %x.0 17))
           (= %t.2 (select %t.1 0 1))
@@ -39974,55 +40555,71 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x : Field, y: Field): Field {"
+      "  forceProof();"
       "  assert(x * 5 + 99999999999999999999999999999999999999999999999999 == y, 'oops 2');"
       "  return x * 5 + 99999999999999999999999999999999999999999999999999;"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.5 ((argument
+        (kernel-declaration (%kernel.5 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.6
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.7 ((argument
                            (%x.0)
                            (ty ((afield)) ((tfield))))
-                         (argument (%y.2) (ty ((afield)) ((tfield)))))
+                         (argument (%y.3) (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.6 (0) write 7))
           (= %t.1 (* #f %x.0 5))
-          (= %t.3
+          (= %t.2
              (+ #f
                 %t.1
                 99999999999999999999999999999999999999999999999999))
-          (= %t.4 (== %t.3 %y.2))
+          (= %t.4 (== %t.2 %y.3))
           (assert %t.4 "oops 2")
-          (%t.3))))
+          (%t.2))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x : Field, y: Field): Field {"
+      "  forceProof();"
       "  assert(x == y ? x == 0 : true, 'oops');"
       "  return (x == y ? x == 0 : true) ? x : y;"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.5 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.5 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.6
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.7 ((argument
+                           (%x.0)
                            (ty ((afield)) ((tfield))))
-                         (argument (%y.0) (ty ((afield)) ((tfield)))))
+                         (argument (%y.1) (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
-          (= %t.2 (== %x.1 %y.0))
-          (= %t.3 (== %x.1 0))
+          (= () (public-ledger 1 %forceField.6 (0) write 7))
+          (= %t.2 (== %x.0 %y.1))
+          (= %t.3 (== %x.0 0))
           (= %t.4 (select %t.2 %t.3 1))
           (assert %t.4 "oops")
-          (= %t.6 (select %t.4 %x.1 %y.0))
-          (%t.6))))
+          (= %t.8 (select %t.4 %x.0 %y.1))
+          (%t.8))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(a : Boolean, b: Boolean): [] {"
+      "  forceProof();"
       "  if (b) assert(b, 'oops 1');"
       "  if (a) if (b) assert(a, 'oops 2');"
       "  if (a) if (b) assert(b, 'oops 3');"
@@ -40030,36 +40627,50 @@ groups than for single tests.
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.3 ((argument
-                           (%a.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%a.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%b.0) (ty ((abytes 1)) ((tfield 1)))))
+                         (argument (%b.4) (ty ((abytes 1)) ((tfield 1)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(a : Boolean, b: Boolean): [] {"
+      "  forceProof();"
       "  if (b) assert(b, 'oops 1'); else assert(b, 'oops 2');"
       "}"
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
-                           (%a.2)
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
+                           (%a.4)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%b.0) (ty ((abytes 1)) ((tfield 1)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (assert %b.0 "oops 2")
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(a : Boolean, b: Boolean): [] {"
+      "  forceProof();"
       "  if (a) {"
       "    return;"
       "  } else {"
@@ -40069,12 +40680,17 @@ groups than for single tests.
      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.5 ((argument
+        (kernel-declaration (%kernel.5 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.6
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.7 ((argument
                            (%a.0)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%b.2) (ty ((abytes 1)) ((tfield 1)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.6 (0) write 7))
           (= %t.1 (select %a.0 0 1))
           (= %t.3 (select %b.2 %t.1 0))
           (= %t.4 (select %t.3 0 1))
@@ -40084,33 +40700,41 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Vector<3, Field>): Boolean {"
+      "  forceProof();"
       "  return x == [3, 4, 5];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.7 ((argument
+        (kernel-declaration (%kernel.7 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.8
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.9 ((argument
                            (%x.0 %x.1 %x.4)
                            (ty ((afield) (afield) (afield))
                                ((tfield) (tfield) (tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.8 (0) write 7))
           (= %t.3 (== %x.0 3))
           (= %t.2 (== %x.1 4))
           (= %t.6 (select %t.3 %t.2 0))
           (= %t.5 (== %x.4 5))
-          (= %t.8 (select %t.6 %t.5 0))
-          (%t.8))))
+          (= %t.10 (select %t.6 %t.5 0))
+          (%t.10))))
     )
 
   (test
     '(
       "struct S { x: Field; y: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module M<A> {"
       "  witness W<C>(x: A): C;"
       "  circuit S(q: A): A { return q; }"
-      "  export circuit T<B>(q: A): B { return disclose(W<B>(S(q))); }"
+      "  export circuit T<B>(q: A): B { forceProof(); return disclose(W<B>(S(q))); }"
       "}"
       "import M<Field>;"
       "import M<Boolean>;"
@@ -40121,24 +40745,30 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.0 ((argument (%x.1) (ty ((afield)) ((tfield)))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.2 ((argument (%x.3) (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1))))
-        (circuit %foo1.2 ((argument
-                            (%x.3)
+        (circuit %foo1.4 ((argument
+                            (%x.5)
                             (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.4) (call 1 %W.0 %x.3))
-          (%t.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.6) (call 1 %W.2 %x.5))
+          (%t.6))))
     )
 
   (test
     '(
       "struct S { x: Field; y: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module M<A> {"
       "  witness W<C>(x: A): C;"
       "  circuit S(q: A): A { return q; }"
-      "  export circuit T<B>(q: A): B { return disclose(W<B>(S(q))); }"
+      "  export circuit T<B>(q: A): B { forceProof(); return disclose(W<B>(S(q))); }"
       "}"
       "import M<Field>;"
       "import M<Boolean>;"
@@ -40149,24 +40779,30 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.0 ((argument (%x.1) (ty ((afield)) ((tfield)))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.2 ((argument (%x.3) (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield))))
-        (circuit %foo2.2 ((argument
-                            (%x.3)
+        (circuit %foo2.4 ((argument
+                            (%x.5)
                             (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
-          (= (%t.4) (call 1 %W.0 %x.3))
-          (%t.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.6) (call 1 %W.2 %x.5))
+          (%t.6))))
     )
 
   (test
     '(
       "struct S { x: Field; y: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module M<A> {"
       "  witness W<C>(x: A): C;"
       "  circuit S(q: A): A { return q; }"
-      "  export circuit T<B>(q: A): B { return disclose(W<B>(S(q))); }"
+      "  export circuit T<B>(q: A): B { forceProof(); return disclose(W<B>(S(q))); }"
       "}"
       "import M<Field>;"
       "import M<Boolean>;"
@@ -40177,26 +40813,32 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.0 ((argument
-                         (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.2 ((argument
+                         (%x.3)
                          (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1))))
-        (circuit %foo3.2 ((argument
-                            (%x.3)
+        (circuit %foo3.4 ((argument
+                            (%x.5)
                             (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= (%t.4) (call 1 %W.0 %x.3))
-          (%t.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.6) (call 1 %W.2 %x.5))
+          (%t.6))))
     )
 
   (test
     '(
       "struct S { x: Field; y: Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module M<A> {"
       "  witness W<C>(x: A): C;"
       "  circuit S(q: A): A { return q; }"
-      "  export circuit T<B>(q: A): B { return disclose(W<B>(S(q))); }"
+      "  export circuit T<B>(q: A): B { forceProof(); return disclose(W<B>(S(q))); }"
       "}"
       "import M<Field>;"
       "import M<Boolean>;"
@@ -40207,22 +40849,29 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.0 ((argument
-                         (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.2 ((argument
+                         (%x.3)
                          (ty ((abytes 1)) ((tfield 1)))))
              (ty ((afield)) ((tfield))))
-        (circuit %foo4.2 ((argument
-                            (%x.3)
+        (circuit %foo4.4 ((argument
+                            (%x.5)
                             (ty ((abytes 1)) ((tfield 1)))))
              (ty ((afield)) ((tfield)))
-          (= (%t.4) (call 1 %W.0 %x.3))
-          (%t.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.6) (call 1 %W.2 %x.5))
+          (%t.6))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, c: Boolean): Bytes<10> {"
+      "  forceProof();"
       "  const x = 'abcdefghij';"
       "  const y = 'abcdefghij';"
       "  const z = b ? x : y;"
@@ -40232,12 +40881,17 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.2 ((argument
-                           (%b.0)
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
+                           (%b.4)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%c.1) (ty ((abytes 1)) ((tfield 1)))))
+                         (argument (%c.0) (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 10)) ((tfield 1208925819614629174706175)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (502515278406210103239265))))
     )
 
@@ -40254,35 +40908,22 @@ groups than for single tests.
     (returns
       (program
         (public-ledger-declaration ())
-        (witness %bar.2 ((argument
-                           (%s1.3)
+        (witness %bar.0 ((argument
+                           (%s1.1)
                            (ty ((abytes 10))
                                ((tfield 1208925819614629174706175))))
                          (argument
-                           (%s2.4)
+                           (%s2.2)
                            (ty ((abytes 10))
                                ((tfield 1208925819614629174706175)))))
-             (ty ((abytes 1)) ((tfield 1))))
-        (circuit %foo.5 ((argument
-                           (%b.6)
-                           (ty ((abytes 1)) ((tfield 1)))))
-             (ty () ())
-          (= (%t.0)
-             (call 1 %bar.2
-               502515278406210103239265
-               502515278406210103239265))
-          (assert %t.0 "abcdefghij")
-          (= (%t.1)
-             (call 1 %bar.2
-               502515278406210103239265
-               502515278406210103239265))
-          (assert %t.1 "abcdefghij")
-          ())))
+             (ty ((abytes 1)) ((tfield 1))))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, c: Boolean, d: Bytes<10>): Bytes<10> {"
+      "  forceProof();"
       "  const x = 'abcdefghij';"
       "  const y = 'abcdefghij';"
       "  const z = b ? x : d;"
@@ -40292,8 +40933,12 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.5 ((argument
+        (kernel-declaration (%kernel.5 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.6
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.7 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%c.2) (ty ((abytes 1)) ((tfield 1))))
@@ -40302,30 +40947,42 @@ groups than for single tests.
                            (ty ((abytes 10))
                                ((tfield 1208925819614629174706175)))))
              (ty ((abytes 10)) ((tfield 1208925819614629174706175)))
+          (= () (public-ledger 1 %forceField.6 (0) write 7))
           (= %z.4 (select %b.0 502515278406210103239265 %d.1))
           (= %w.3 (select %b.0 %d.1 502515278406210103239265))
-          (= %t.6 (select %c.2 %z.4 %w.3))
-          (%t.6))))
+          (= %t.8 (select %c.2 %z.4 %w.3))
+          (%t.8))))
     )
 
   (test
     '(
       "witness bar() : [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): [] {"
+      "  forceProof();"
       "  if (false) bar();"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.0 () (ty () ()))
-        (circuit %foo.1 () (ty () ()) ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 () (ty () ()))
+        (circuit %foo.3 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          ())))
     )
 
   (test
     '(
       "witness bar() : Vector<3, Field>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): [] {"
+      "  forceProof();"
       "  if (false) {"
       "     const x = bar();"
       "  }"
@@ -40333,106 +40990,143 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 ()
              (ty ((afield) (afield) (afield))
                  ((tfield) (tfield) (tfield))))
-        (circuit %foo.1 () (ty () ()) ())))
+        (circuit %foo.3 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Bytes<40> {"
+      "  forceProof();"
       "  return pad(40, 'hello!');"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 40))
                  ((tfield 4722366482869645213695)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (0 36762444129640))))
     )
 
   (test
     '(
       "witness bar(x: Bytes<50>) : [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : [] {"
+      "  forceProof();"
       "  bar(pad(50, 'hello!'));"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.1 ((argument
-                           (%x.2 %x.0)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 ((argument
+                           (%x.3 %x.4)
                            (ty ((abytes 50))
                                ((tfield
                                   5708990770823839524233143877797980545530986495)
                                  (tfield
                                    452312848583266388373324160190187140051835877600158453279131187530910662655)))))
              (ty () ()))
-        (circuit %foo.3 ()
+        (circuit %foo.5 ()
              (ty () ())
-          (= () (call 1 %bar.1 0 36762444129640))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (call 1 %bar.2 0 36762444129640))
           ())))
     )
 
   (test
     '(
       "witness bar() : Bytes<50>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Bytes<50> {"
+      "  forceProof();"
       "  return disclose(bar());"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655))))
-        (circuit %foo.1 ()
+        (circuit %foo.3 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%t.2 %t.3) (call 1 %bar.0))
-          (%t.2 %t.3))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= (%t.4 %t.5) (call 1 %bar.2))
+          (%t.4 %t.5))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean) : Bytes<50> {"
+      "  forceProof();"
       "  return b ? pad(50, 'hello!') : pad(50, 'once upon a time in a galaxy far, far away');"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= %t.2 (select %b.0 0 146740295883472840746347634))
-          (= %t.3
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
+          (= %t.4 (select %b.0 0 146740295883472840746347634))
+          (= %t.5
              (select
                %b.0
                36762444129640
                172089018921478248217018581585884075052860504307373738624254165310312246895))
-          (%t.2 %t.3))))
+          (%t.4 %t.5))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Vector<2, Bytes<80>> {"
+      "  forceProof();"
       "  const x = [pad(80, 'hello!'), pad(80, 'four score and seven years ago our fathers brought forth')];"
       "  const y = [pad(80, 'four score and seven years ago our fathers brought forth'), pad(80, 'hello!')];"
       "  assert(x == y, 'oops');"
@@ -40441,8 +41135,12 @@ groups than for single tests.
     )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 80) (abytes 80))
                  ((tfield 22300745198530623141535718272648361505980415)
                    (tfield
@@ -40454,6 +41152,7 @@ groups than for single tests.
                      452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (assert 0 "oops")
           (0 0 36762444129640 0
              655673852914079535706832728104650208561044890911829149250927
@@ -40463,25 +41162,35 @@ groups than for single tests.
   (test
     '(
       "circuit bar() : Bytes<50> { return pad(50, 'hello!'); }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Bytes<50> {"
+      "  forceProof();"
       "  const x : Bytes<50> = bar();"
       "  return x;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ()) (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (0 36762444129640))))
     )
 
   (test
     '(
       "circuit bar() : Bytes<50> { return pad(50, 'hello!'); }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Bytes<50> {"
+      "  forceProof();"
       "  const x : Bytes<50> = bar();"
       "  assert(x == pad(50, 'hello!'), 'oops');"
       "  return x;"
@@ -40489,19 +41198,26 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (0 36762444129640))))
     )
 
   (test
     '(
       "circuit bar() : Bytes<50> { return pad(50, 'hello!'); }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo() : Bytes<50> {"
+      "  forceProof();"
       "  const x : Bytes<50> = bar();"
       "  assert(x == pad(50, 'once upon a time in a galaxy far, far away'), 'oops');"
       "  return x;"
@@ -40509,70 +41225,94 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 50))
                  ((tfield 5708990770823839524233143877797980545530986495)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (assert 0 "oops")
           (0 36762444129640))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Field {"
+      "  forceProof();"
       "  return 1 + ((b: Field, x: Boolean): Field => x ? b - 1 : b + 1)(x + 1, !b);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.7 ((argument
+        (kernel-declaration (%kernel.6 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.7
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.8 ((argument
                            (%b.1)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%x.0) (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.7 (0) write 7))
           (= %b.2 (+ #f %x.0 1))
           (= %t.3 (- #f %b.2 1))
           (= %t.4 (+ #f %b.2 1))
           (= %t.5 (select %b.1 %t.4 %t.3))
-          (= %t.6 (+ #f 1 %t.5))
-          (%t.6))))
+          (= %t.9 (+ #f 1 %t.5))
+          (%t.9))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean, x: Field): Field {"
+      "  forceProof();"
       "  return 1 + ((b, x) => x ? b - 1 : b + 1)(x + 1, !b);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.7 ((argument
+        (kernel-declaration (%kernel.6 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.7
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.8 ((argument
                            (%b.1)
                            (ty ((abytes 1)) ((tfield 1))))
                          (argument (%x.0) (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.7 (0) write 7))
           (= %b.2 (+ #f %x.0 1))
           (= %t.3 (- #f %b.2 1))
           (= %t.4 (+ #f %b.2 1))
           (= %t.5 (select %b.1 %t.4 %t.3))
-          (= %t.6 (+ #f 1 %t.5))
-          (%t.6))))
+          (= %t.9 (+ #f 1 %t.5))
+          (%t.9))))
     )
 
   (test
     '(
-       "witness bar(bv1: Bytes<80>, bv2: Bytes<80>): Bytes<160>;"
-       "export circuit foo(arg: Field) : Bytes<160> { return disclose(bar(arg as Bytes<80>, arg as Bytes<80>)); }"
-    )
+      "witness bar(bv1: Bytes<80>, bv2: Bytes<80>): Bytes<160>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(arg: Field) : Bytes<160> { forceProof(); return disclose(bar(arg as Bytes<80>, arg as Bytes<80>)); }"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %bar.2 ((argument
-                           (%bv1.3 %bv1.4 %bv1.1)
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %bar.3 ((argument
+                           (%bv1.4 %bv1.5 %bv1.6)
                            (ty ((abytes 80))
                                ((tfield
                                   22300745198530623141535718272648361505980415)
@@ -40581,7 +41321,7 @@ groups than for single tests.
                                  (tfield
                                    452312848583266388373324160190187140051835877600158453279131187530910662655))))
                          (argument
-                           (%bv2.5 %bv2.6 %bv2.7)
+                           (%bv2.7 %bv2.8 %bv2.9)
                            (ty ((abytes 80))
                                ((tfield
                                   22300745198530623141535718272648361505980415)
@@ -40601,9 +41341,9 @@ groups than for single tests.
                      452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655))))
-        (circuit %foo.8 ((argument
-                           (%arg.0)
-                           (ty ((afield)) ((tfield)))))
+        (circuit %foo.10 ((argument
+                            (%arg.0)
+                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 160))
                  ((tfield 1099511627775)
                    (tfield
@@ -40616,20 +41356,26 @@ groups than for single tests.
                      452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%t.9 %t.10) (field->bytes 1 80 %arg.0))
-          (= (%t.11 %t.12 %t.13 %t.14 %t.15 %t.16)
-             (call 1 %bar.2 0 %t.9 %t.10 0 %t.9 %t.10))
-          (%t.11 %t.12 %t.13 %t.14 %t.15 %t.16))))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
+          (= (%t.11 %t.12) (field->bytes 1 80 %arg.0))
+          (= (%t.13 %t.14 %t.15 %t.16 %t.17 %t.18)
+             (call 1 %bar.3 0 %t.11 %t.12 0 %t.11 %t.12))
+          (%t.13 %t.14 %t.15 %t.16 %t.17 %t.18))))
     )
 
   (test
     '(
-       "export circuit baz(arg: Bytes<80>) : Field { return (arg as Field) + (arg as Field); }"
-     )
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Bytes<80>) : Field { forceProof(); return (arg as Field) + (arg as Field); }"
+      )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.5 ((argument
+        (kernel-declaration (%kernel.5 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.6
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.7 ((argument
                            (%arg.0 %arg.3 %arg.2)
                            (ty ((abytes 80))
                                ((tfield
@@ -40639,56 +41385,75 @@ groups than for single tests.
                                  (tfield
                                    452312848583266388373324160190187140051835877600158453279131187530910662655)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.6 (0) write 7))
           (= %t.1 (== %arg.0 0))
           (assert %t.1 "bytes value is too big to fit in a field")
           (= %t.4 (bytes->field 1 80 %arg.3 %arg.2))
-          (= %t.6 (+ #f %t.4 %t.4))
-          (%t.6))))
+          (= %t.8 (+ #f %t.4 %t.4))
+          (%t.8))))
     )
 
   (test
     '(
-      "export circuit baz(arg: Boolean) : Field { return arg as Field; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Boolean) : Field { forceProof(); return arg as Field; }"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.3 ((argument
                            (%arg.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (%arg.0))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "enum E { a, b, c }"
-      "export circuit baz(arg: E) : Field { return arg as Field; }"
+      "export circuit baz(arg: E) : Field { forceProof(); return arg as Field; }"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.0 ((argument
-                           (%arg.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.2 ((argument
+                           (%arg.3)
                            (ty ((abytes 1)) ((tfield 2)))))
              (ty ((afield)) ((tfield)))
-          (%arg.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (%arg.3))))
     )
 
   (test
     '(
-      "export circuit baz(arg: Field) : Boolean { return arg as Boolean; }"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit baz(arg: Field) : Boolean { forceProof(); return arg as Boolean; }"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %baz.2 ((argument
+        (kernel-declaration (%kernel.2 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.3
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %baz.4 ((argument
                            (%arg.0)
                            (ty ((afield)) ((tfield)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
           (= %t.1 (== %arg.0 0))
-          (= %t.3 (select %t.1 0 1))
-          (%t.3))))
+          (= %t.5 (select %t.1 0 1))
+          (%t.5))))
     )
 
   (test
@@ -40797,21 +41562,21 @@ groups than for single tests.
     "test-center/compact/test.compact"
     (returns
       (program
-        (kernel-declaration (%kernel.13 () (Kernel)))
+        (kernel-declaration (%kernel.12 () (Kernel)))
         (public-ledger-declaration
-          (((%x0.14 (0 0) (__compact_Cell (ty ((afield)) ((tfield)))))
-             (%x1.15 (0 1) (Set (ty ((afield)) ((tfield)))))
-             (%x2.16 (0 2) (Counter)))
-           ((%x3.17 (1 0) (List (ty ((afield)) ((tfield)))))
-             (%x4.18
+          (((%x0.13 (0 0) (__compact_Cell (ty ((afield)) ((tfield)))))
+             (%x1.14 (0 1) (Set (ty ((afield)) ((tfield)))))
+             (%x2.15 (0 2) (Counter)))
+           ((%x3.16 (1 0) (List (ty ((afield)) ((tfield)))))
+             (%x4.17
                (1 1)
                (Map (ty ((afield)) ((tfield)))
                     (ty ((abytes 1)) ((tfield 1)))))
-             (%x5.19 (1 2) (MerkleTree 32 (ty ((afield)) ((tfield)))))
-             (%x6.20
+             (%x5.18 (1 2) (MerkleTree 32 (ty ((afield)) ((tfield)))))
+             (%x6.19
                (1 3)
                (HistoricMerkleTree 10 (ty ((afield)) ((tfield)))))
-             (%x7.21
+             (%x7.20
                (1 4)
                (__compact_Cell
                  (ty ((abytes 32) (abytes 32) (abytes 16))
@@ -40822,8 +41587,8 @@ groups than for single tests.
                        (tfield
                          452312848583266388373324160190187140051835877600158453279131187530910662655)
                        (tfield 340282366920938463463374607431768211455)))))
-             (%x10.22 (1 5) (__compact_Cell (ty ((afield)) ((tfield)))))
-             (%x11.23
+             (%x10.21 (1 5) (__compact_Cell (ty ((afield)) ((tfield)))))
+             (%x11.22
                (1 6)
                (__compact_Cell
                  (ty ((abytes 32) (abytes 32) (abytes 16) (abytes 8))
@@ -40835,30 +41600,30 @@ groups than for single tests.
                          452312848583266388373324160190187140051835877600158453279131187530910662655)
                        (tfield 340282366920938463463374607431768211455)
                        (tfield 18446744073709551615)))))
-             (%x13.24
+             (%x13.23
                (1 7)
                (__compact_Cell
                  (ty ((abytes 32))
                      ((tfield 255)
                        (tfield
                          452312848583266388373324160190187140051835877600158453279131187530910662655)))))
-             (%authority.25
+             (%authority.24
                (1 8)
                (__compact_Cell
                  (ty ((abytes 32))
                      ((tfield 255)
                        (tfield
                          452312848583266388373324160190187140051835877600158453279131187530910662655)))))
-             (%state.26
+             (%state.25
                (1 9)
                (__compact_Cell (ty ((abytes 1)) ((tfield 3)))))
-             (%topic.27
+             (%topic.26
                (1 10)
                (__compact_Cell
                  (ty ((abytes 1) (acompress))
                      ((tfield 1) (topaque "string")))))
-             (%tally_yes.28 (1 11) (Counter))
-             (%committed_votes.29
+             (%tally_yes.27 (1 11) (Counter))
+             (%committed_votes.28
                (1 12)
                (MerkleTree
                  10
@@ -40866,45 +41631,33 @@ groups than for single tests.
                      ((tfield 255)
                        (tfield
                          452312848583266388373324160190187140051835877600158453279131187530910662655)))))
-             (%committed.30
+             (%committed.29
                (1 13)
                (Set (ty ((abytes 32))
                         ((tfield 255)
                           (tfield
                             452312848583266388373324160190187140051835877600158453279131187530910662655)))))
-             (%ciphertexts.31
+             (%ciphertexts.30
                (1 14)
                (__compact_Cell
                  (ty ((acompress)) ((topaque "Uint8Array"))))))))
-        (circuit %foo.32 ((argument
-                            (%a.33)
-                            (ty ((abytes 1)) ((tfield 1))))
-                          (argument (%b.34) (ty ((afield)) ((tfield)))))
-             (ty ((abytes 1)) ((tfield 1)))
-          (0))
-        (circuit %bar.35 ((argument
-                            (%a.1)
+        (circuit %bar.31 ((argument
+                            (%a.0)
                             (ty ((abytes 1)) ((tfield 1))))
                           (argument (%b.2) (ty ((abytes 1)) ((tfield 1)))))
              (ty ((afield)) ((tfield)))
-          (= %t.3 (select %a.1 0 1))
-          (= %t.4 (select %b.2 %t.3 0))
-          (= %t.5 (select %t.4 0 1))
-          (assert %t.5 "a should be false")
-          (= (%t.6 %t.8) (public-ledger 1 %kernel.13 () self))
-          (= (%t.7 %t.9) (public-ledger 1 %kernel.13 () self))
-          (= %t.11 (== %t.6 %t.7))
-          (= %t.10 (== %t.8 %t.9))
-          (= %t.12 (select %t.11 %t.10 0))
-          (assert %t.12 "oops")
-          (= (%t.36) (public-ledger 1 %x0.14 (0 0) read))
-          (%t.36))
-        (circuit %baz.37 ((argument
-                            (%b.0)
-                            (ty ((abytes 1)) ((tfield 1)))))
-             (ty ((abytes 2)) ((tfield 1023)))
-          (%b.0))
-        (circuit %nullX.38 () (ty ((abytes 1)) ((tfield 1))) (0))))
+          (= %t.1 (select %a.0 0 1))
+          (= %t.3 (select %b.2 %t.1 0))
+          (= %t.4 (select %t.3 0 1))
+          (assert %t.4 "a should be false")
+          (= (%t.5 %t.7) (public-ledger 1 %kernel.12 () self))
+          (= (%t.6 %t.8) (public-ledger 1 %kernel.12 () self))
+          (= %t.10 (== %t.5 %t.6))
+          (= %t.9 (== %t.7 %t.8))
+          (= %t.11 (select %t.10 %t.9 0))
+          (assert %t.11 "oops")
+          (= (%t.32) (public-ledger 1 %x0.13 (0 0) read))
+          (%t.32))))
     )
 
   (test
@@ -40992,24 +41745,7 @@ groups than for single tests.
           (= () (public-ledger 1 %authority.15 (0) write 0 0))
           (= () (public-ledger 1 %value.16 (1) write 0))
           (= () (public-ledger 1 %state.17 (2) write 0))
-          ())
-        (circuit %public_key.35 ((argument
-                                   (%sk.36 %sk.37)
-                                   (ty ((abytes 32))
-                                       ((tfield 255)
-                                         (tfield
-                                           452312848583266388373324160190187140051835877600158453279131187530910662655)))))
-             (ty ((abytes 32))
-                 ((tfield 255)
-                   (tfield
-                     452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= (%t.38 %t.39)
-             (call 1 %persistentHash.18
-               0
-               1184891903413063782045712785760620
-               %sk.36
-               %sk.37))
-          (%t.38 %t.39))))
+          ())))
     )
 
   (test ; just see if it succeeds
@@ -41034,114 +41770,132 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Boolean {"
+      "  forceProof();"
       "  return 5 as Boolean;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 () (ty ((abytes 1)) ((tfield 1))) (1))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
+             (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (1))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<8>): Boolean {"
+      "  forceProof();"
       "  return (x + x - x) == (x - x + x);"
       "}"
       )
     (returns
       (program
         (kernel-declaration (%kernel.5 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.6 ((argument
+        (public-ledger-declaration
+          ((%forceField.6
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.7 ((argument
                            (%x.0)
                            (ty ((abytes 1)) ((tfield 255)))))
              (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.6 (0) write 7))
           (= %t.1 (+ 9 %x.0 %x.0))
           (= %t.2 (< 9 %t.1 %x.0))
           (= %t.3 (select %t.2 0 1))
           (assert %t.3 "result of subtraction would be negative")
           (= %t.4 (- 9 %t.1 %x.0))
-          (= %t.7 (== %t.4 %x.0))
-          (%t.7))))
+          (= %t.8 (== %t.4 %x.0))
+          (%t.8))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<8>, y: Uint<8>): Boolean {"
       "  return x - y == x - y;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.4 ((argument
-                           (%x.1)
-                           (ty ((abytes 1)) ((tfield 255))))
-                         (argument (%y.0) (ty ((abytes 1)) ((tfield 255)))))
-             (ty ((abytes 1)) ((tfield 1)))
-          (= %t.2 (< 8 %x.1 %y.0))
-          (= %t.3 (select %t.2 0 1))
-          (assert %t.3 "result of subtraction would be negative")
-          (1))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<8>): Boolean {"
       "  return (x + x - x as Uint<7>) == (x + x - x as Uint<7>);"
       "}"
       )
     (returns
       (program
-        (kernel-declaration (%kernel.5 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.6 ((argument
-                           (%x.0)
-                           (ty ((abytes 1)) ((tfield 255)))))
-             (ty ((abytes 1)) ((tfield 1)))
-          (= %t.1 (+ 9 %x.0 %x.0))
-          (= %t.2 (< 9 %t.1 %x.0))
-          (= %t.3 (select %t.2 0 1))
-          (assert %t.3 "result of subtraction would be negative")
-          (= %t.4 (- 9 %t.1 %x.0))
-          (= %t.7 (downcast-unsigned 1 127 %t.4))
-          (1))))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Uint<8> {"
+      "  forceProof();"
       "  return 12 - (3 * (1 + 3));"
       "}"
       )
     (returns
       (program
         (kernel-declaration (%kernel.0 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.1 () (ty ((abytes 1)) ((tfield 255))) (0))))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
+             (ty ((abytes 1)) ((tfield 255)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (0))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Uint<8> {"
+      "  forceProof();"
       "  return 12 - 13;"
       "}"
       )
     (returns
       (program
-        (kernel-declaration (%kernel.1 () (Kernel)))
-        (public-ledger-declaration ())
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
         (circuit %foo.2 ()
              (ty ((abytes 1)) ((tfield 255)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (assert 0 "result of subtraction would be negative")
-          (= %t.0 (- 4 12 13))
-          (%t.0))))
+          (= %t.3 (- 4 12 13))
+          (%t.3))))
     )
 
   (test
@@ -41242,7 +41996,9 @@ groups than for single tests.
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 = ~d as Field;" (max-field))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41252,18 +42008,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(max-field)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               52435875175126190479447740508185965837690552500527637822603658699938581184512))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 = ~d as Field;" (max-field))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41273,18 +42038,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(max-field)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               52435875175126190479447740508185965837690552500527637822603658699938581184512))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 : Field = ~d as Field;" (max-field))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41294,13 +42068,20 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(max-field)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               52435875175126190479447740508185965837690552500527637822603658699938581184512))
+          (%t4.3))))
     )
 
   (test
@@ -41321,7 +42102,9 @@ groups than for single tests.
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(let* ([n1 123456789123456789] [n2 (- (max-field) n1)])
          (format "  const t1 : Field = ~d + (~d as Field);" n1 n2))
       "  const t2 = t1 as Bytes<256>;"
@@ -41332,18 +42115,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(max-field)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               52435875175126190479447740508185965837690552500527637822603658699938581184512))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 = ~d as Field;" (+ (max-unsigned) 1))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41353,18 +42145,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(+ (max-unsigned) 1)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               452312848583266388373324160190187140051835877600158453279131187530910662656))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 = ~d as Field;" (+ (max-unsigned) 1))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41374,18 +42175,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(+ (max-unsigned) 1)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               452312848583266388373324160190187140051835877600158453279131187530910662656))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 : Field = ~d as Field;" (+ (max-unsigned) 1))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41395,18 +42205,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(+ (max-unsigned) 1)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               452312848583266388373324160190187140051835877600158453279131187530910662656))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(let* ([n1 123456789123456789] [n2 (- (+ (max-unsigned) 1) n1)])
          (format "  const t1 : Field = (~d as Field) + (~d as Field);" n1 n2))
       "  const t2 = t1 as Bytes<256>;"
@@ -41417,18 +42236,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(+ (max-unsigned) 1)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               452312848583266388373324160190187140051835877600158453279131187530910662656))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 = ~d as Field;" (max-unsigned))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41438,18 +42266,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(max-unsigned)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               452312848583266388373324160190187140051835877600158453279131187530910662655))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 : Field = ~d;" (max-unsigned))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41459,18 +42296,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(max-unsigned)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               452312848583266388373324160190187140051835877600158453279131187530910662655))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(let* ([n1 123456789123456789] [n2 (- (max-unsigned) n1)])
          (format "  const t1 : Field = (~d as Field) + (~d as Field);" n1 n2))
       "  const t2 = t1 as Bytes<256>;"
@@ -41481,18 +42327,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1 123456789123456789
-               ,(max-unsigned)))
-          (%t4.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
+               123456789123456789
+               452312848583266388373324160190187140051835877600158453279131187530910662655))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       "  const t1 : Field = 123456789000000000 + 123456789;"
       "  const t2 = t1 as Bytes<4>;"
       "  // the assignment of t3 should turn into t3 = t2 because Bytes<4> fits in one Field value"
@@ -41504,17 +42359,24 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ()
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ()
              (ty ((afield)) ((tfield)))
-          (= (%t2.2 %t2.0) (field->bytes 1 4 123456789123456789))
-          (= %t4.3 (downcast-unsigned 1 123456789123456789 %t2.0))
-          (%t4.3))))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
+          (= (%t2.4 %t2.0) (field->bytes 1 4 123456789123456789))
+          (= %t4.5 (downcast-unsigned 1 123456789123456789 %t2.0))
+          (%t4.5))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       ,(format "  const t1 : Field = (~d as Field) + (~:*~d as Field);" (max-field))
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41524,19 +42386,27 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
-             (downcast-unsigned 1
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
+             (downcast-unsigned
+               1
                123456789123456788
-               ,(modulo (* (max-field) 2) (+ (max-field) 1))))
-          (%t4.1))))
+               52435875175126190479447740508185965837690552500527637822603658699938581184511))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       "  const t1 : Field = 123456789000000000 + 123456789;"
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41546,17 +42416,24 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
-          (= %t4.1
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= %t4.3
              (downcast-unsigned 1 123456789123456788 123456789123456789))
-          (%t4.1))))
+          (%t4.3))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       "  const t1 : Field = 123456789000000000 + 123456789;"
       "  const t2 = t1 as Bytes<256>;"
       "  const t3 = t2 as Field;"
@@ -41566,15 +42443,22 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (123456789123456789))))
     )
 
   (test
     `(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Field {"
+      "  forceProof();"
       "  const t2 : Bytes<256> = '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$';"
       "  const t3 = t2 as Field;"
       "  const t4 = t3 as Uint<0..123456789123456789>;"
@@ -41583,16 +42467,21 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ()
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ()
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (assert 0 "bytes value is too big to fit in a field")
           (= %t3.0
              (bytes->field 1 256
                63855931564696431299763410850379360948494476837669428698230285298481505316
                63855931564696431299763410850379360948494476837669428698230285298481505316))
-          (= %t4.2 (downcast-unsigned 1 123456789123456788 %t3.0))
-          (%t4.2))))
+          (= %t4.4 (downcast-unsigned 1 123456789123456788 %t3.0))
+          (%t4.4))))
     )
 
   (test
@@ -42059,14 +42948,19 @@ groups than for single tests.
       "    return disclose(W()) as Bytes<32>;"
       "  }"
       "}"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit bar(x: Field): Bytes<32> {"
+      "  forceProof();"
       "  return foo(x, x);"
       "}"
       )
     (returns
       (program
-        (kernel-declaration (%kernel.2 () (Kernel)))
-        (public-ledger-declaration ())
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
         (witness %W.3 () (ty ((afield)) ((tfield))))
         (circuit %bar.4 ((argument
                            (%x.0)
@@ -42075,13 +42969,16 @@ groups than for single tests.
                  ((tfield 255)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (= (%t.5 %t.6) (field->bytes 1 32 %x.0))
           (%t.5 %t.6))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<32>): Uint<8> {"
+      "  forceProof();"
       "  if (x < 256) {"
       "    return x as Uint<8>;"
       "  } else {"
@@ -42091,53 +42988,72 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.4 ((argument
+        (kernel-declaration (%kernel.3 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.4
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.5 ((argument
                            (%x.0)
                            (ty ((abytes 4)) ((tfield 4294967295)))))
              (ty ((abytes 1)) ((tfield 255)))
+          (= () (public-ledger 1 %forceField.4 (0) write 7))
           (= %t.1 (< 32 %x.0 256))
           (= %t.2 (downcast-unsigned %t.1 255 %x.0))
-          (= %t.5 (select %t.1 %t.2 0))
-          (%t.5))))
+          (= %t.6 (select %t.1 %t.2 0))
+          (%t.6))))
     )
 
   (test
     '(
       "witness W(): Uint<8>;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(b: Boolean): Uint<16> {"
+      "  forceProof();"
       "  return b ? disclose(W() * W()) : 0;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %W.4 () (ty ((abytes 1)) ((tfield 255))))
-        (circuit %foo.5 ((argument
+        (kernel-declaration (%kernel.4 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.5
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %W.6 () (ty ((abytes 1)) ((tfield 255))))
+        (circuit %foo.7 ((argument
                            (%b.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty ((abytes 2)) ((tfield 65535)))
-          (= (%t.2) (call %b.0 %W.4))
-          (= (%t.1) (call %b.0 %W.4))
-          (= %t.3 (* 16 %t.2 %t.1))
-          (= %t.7 (select %b.0 %t.3 0))
-          (%t.7))))
+          (= () (public-ledger 1 %forceField.5 (0) write 7))
+          (= (%t.1) (call %b.0 %W.6))
+          (= (%t.2) (call %b.0 %W.6))
+          (= %t.3 (* 16 %t.1 %t.2))
+          (= %t.8 (select %b.0 %t.3 0))
+          (%t.8))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Boolean, y: Boolean): [] {"
+      "  forceProof();"
       "  if (x) if (!y) 3;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
         (circuit %foo.2 ((argument
-                           (%x.0)
+                           (%x.3)
                            (ty ((abytes 1)) ((tfield 1))))
-                         (argument (%y.1) (ty ((abytes 1)) ((tfield 1)))))
+                         (argument (%y.4) (ty ((abytes 1)) ((tfield 1)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
@@ -42147,40 +43063,56 @@ groups than for single tests.
       "circuit bar(x: [Field, Boolean]): Boolean {"
       "  return x[0] == 0 && x[1] == false;"
       "}"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): Boolean {"
+      "  forceProof();"
       "  return bar(default<[Field, Boolean]>);"
       "}"
       )
     (returns
       (program
         (kernel-declaration (%kernel.0 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.1 () (ty ((abytes 1)) ((tfield 1))) (1))))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
+             (ty ((abytes 1)) ((tfield 1)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (1))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Opaque<'string'>): Boolean {"
+      "  forceProof();"
       "  return x == default<Opaque<'string'>> && default<Opaque<'string'>> == x;"
       "}"
       )
     (returns
       (program
-        (kernel-declaration (%kernel.1 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.2 ((argument
+        (kernel-declaration (%kernel.2 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.3
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.4 ((argument
                            (%x.0)
                            (ty ((acompress)) ((topaque "string")))))
              (ty ((abytes 1)) ((tfield 1)))
-          (= %t.3 (== %x.0 0))
-          (%t.3))))
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
+          (= %t.1 (== %x.0 0))
+          (%t.1))))
     )
 
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "circuit bar(b: Boolean): [] {"
+      "  forceProof();"
       "  assert(b, 'oops');"
       "}"
       "export circuit foo(x: Boolean): [] {"
@@ -42190,35 +43122,48 @@ groups than for single tests.
     (returns
       (program
         (kernel-declaration (%kernel.1 () (Kernel)))
-        (public-ledger-declaration ())
-        (circuit %foo.2 ((argument
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%x.0)
                            (ty ((abytes 1)) ((tfield 1)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           (assert %x.0 "oops")
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Field): [Field] {"
+      "  forceProof();"
       "  return [x];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%x.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3)
                            (ty ((afield)) ((tfield)))))
              (ty ((afield)) ((tfield)))
-          (%x.1))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (%x.3))))
     )
 
   (test
     '(
       "// regression test for common-subexpression elimination in the case where the first occurrence is dropped"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Field): [] {"
+      "  forceProof();"
       "  if (false) {"
       "    assert((x != 0), 'oops1');"
       "  }"
@@ -42228,14 +43173,19 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.4 ((argument
+        (kernel-declaration (%kernel.3 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.4
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.5 ((argument
                            (%x.0)
                            (ty ((afield)) ((tfield)))))
              (ty () ())
-          (= %t.2 (== %x.0 0))
-          (= %t.3 (select %t.2 0 1))
-          (assert %t.3 "oops2")
+          (= () (public-ledger 1 %forceField.4 (0) write 7))
+          (= %t.1 (== %x.0 0))
+          (= %t.2 (select %t.1 0 1))
+          (assert %t.2 "oops2")
           ())))
     )
 
@@ -42356,26 +43306,35 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<16>, y: Uint<16>): Uint<32> {"
+      "  forceProof();"
       "  const k = x == y ? x : x < y ? x + x : y + y;"
       "  return 7;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.8 ((argument
-                           (%x.0)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%x.3)
                            (ty ((abytes 2)) ((tfield 65535))))
-                         (argument (%y.1) (ty ((abytes 2)) ((tfield 65535)))))
+                         (argument (%y.4) (ty ((abytes 2)) ((tfield 65535)))))
              (ty ((abytes 4)) ((tfield 4294967295)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (7))))
     )
 
   (test
     '(
       "witness w(n: Uint<8>): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): [] {"
+      "  forceProof();"
       "  for (const i of 3..15) {"
       "    w(i + 1);"
       "  }"
@@ -42383,78 +43342,114 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %w.0 ((argument
-                         (%n.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %w.2 ((argument
+                         (%n.3)
                          (ty ((abytes 1)) ((tfield 255)))))
              (ty () ()))
-        (circuit %foo.2 ()
+        (circuit %foo.4 ()
              (ty () ())
-          (= () (call 1 %w.0 4))
-          (= () (call 1 %w.0 5))
-          (= () (call 1 %w.0 6))
-          (= () (call 1 %w.0 7))
-          (= () (call 1 %w.0 8))
-          (= () (call 1 %w.0 9))
-          (= () (call 1 %w.0 10))
-          (= () (call 1 %w.0 11))
-          (= () (call 1 %w.0 12))
-          (= () (call 1 %w.0 13))
-          (= () (call 1 %w.0 14))
-          (= () (call 1 %w.0 15))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (call 1 %w.2 4))
+          (= () (call 1 %w.2 5))
+          (= () (call 1 %w.2 6))
+          (= () (call 1 %w.2 7))
+          (= () (call 1 %w.2 8))
+          (= () (call 1 %w.2 9))
+          (= () (call 1 %w.2 10))
+          (= () (call 1 %w.2 11))
+          (= () (call 1 %w.2 12))
+          (= () (call 1 %w.2 13))
+          (= () (call 1 %w.2 14))
+          (= () (call 1 %w.2 15))
           ())))
     )
 
   (test
     '(
       "witness w(n: Uint<8>): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): [] {"
+      "  forceProof();"
       "  w(fold((a: Uint<8>, i: Uint<8>): Uint<8> => a + i as Uint<8>, 0, default<Vector<4, Uint<1>>>));"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %w.0 ((argument
-                         (%n.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %w.2 ((argument
+                         (%n.3)
                          (ty ((abytes 1)) ((tfield 255)))))
              (ty () ()))
-        (circuit %foo.2 () (ty () ()) (= () (call 1 %w.0 0)) ())))
+        (circuit %foo.4 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (call 1 %w.2 0))
+          ())))
     )
 
   (test
     '(
       "witness w(n: Uint<8>): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(): [] {"
+      "  forceProof();"
       "  w(fold((a: Uint<8>, i: Uint<8>): Uint<8> => a + i as Uint<8>, 0, [0, 1, 2, 3]));"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (witness %w.0 ((argument
-                         (%n.1)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (witness %w.2 ((argument
+                         (%n.3)
                          (ty ((abytes 1)) ((tfield 255)))))
              (ty () ()))
-        (circuit %foo.2 () (ty () ()) (= () (call 1 %w.0 6)) ())))
+        (circuit %foo.4 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (= () (call 1 %w.2 6))
+          ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test6(): [] {"
+      "  forceProof();"
       "  const variable1 = default<Vector<10, Uint<8>>>;"
       "  const variable2 = variable1 as Bytes<10>;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test6.0 () (ty () ()) ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test6.2 ()
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test8(param1: Bytes<10>): [] {"
+      "  forceProof();"
       "  for(const i of param1 as Vector<10, Uint<8>>) {"
       ""
       "  }"
@@ -42462,25 +43457,36 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test8.1 ((argument
-                             (%param1.0)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test8.2 ((argument
+                             (%param1.3)
                              (ty ((abytes 10))
                                  ((tfield 1208925819614629174706175)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test13(param1: Bytes<5>): Vector<5, Uint<8>> {"
+      "  forceProof();"
       "  return param1 as Vector<5, Uint<8>> as Bytes<5> as Vector<5, Uint<8>>;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test13.7 ((argument
+        (kernel-declaration (%kernel.7 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.8
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test13.9 ((argument
                               (%param1.0)
                               (ty ((abytes 5)) ((tfield 1099511627775)))))
              (ty ((abytes 1) (abytes 1) (abytes 1) (abytes 1) (abytes 1))
@@ -42489,10 +43495,11 @@ groups than for single tests.
                    (tfield 255)
                    (tfield 255)
                    (tfield 255)))
+          (= () (public-ledger 1 %forceField.8 (0) write 7))
           (= (%t.1 %t.2 %t.3 %t.4 %t.5) (bytes->vector %param1.0))
           (= %t.6 (vector->bytes %t.1 %t.2 %t.3 %t.4 %t.5))
-          (= (%t.8 %t.9 %t.10 %t.11 %t.12) (bytes->vector %t.6))
-          (%t.8 %t.9 %t.10 %t.11 %t.12))))
+          (= (%t.10 %t.11 %t.12 %t.13 %t.14) (bytes->vector %t.6))
+          (%t.10 %t.11 %t.12 %t.13 %t.14))))
     )
 
   (test
@@ -42583,7 +43590,9 @@ groups than for single tests.
   (test
     (let ([n (* (field-bytes) 2)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit foo(): Bytes<~d> {" n)
+        "  forceProof();"
         ,(format "  return [~{~d~^, ~}] as Bytes<~d>;"
            (map (let ([s "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"])
                   (lambda (i) (char->integer (string-ref s (mod i (string-length s))))))
@@ -42593,15 +43602,20 @@ groups than for single tests.
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 62))
                  ((tfield
                     452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (#x393837363534333231305A595857565554535251504F4E4D4C4B4A49484746
-           #x45444342417A797877767574737271706F6E6D6C6B6A696867666564636261))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (101098268993605439271324835781587634707437295801802011347542947705699977030
+            122383579515264484277446527239169866061122741007141276322279342944460956257))))
     )
 
   (test
@@ -42672,14 +43686,20 @@ groups than for single tests.
   (test
     (let ([n (+ (field-bytes) 5)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit test13(param1: Bytes<~d>): Vector<~:*~d, Uint<8>> {" n)
+        "  forceProof();"
         ,(format "  return param1 as Vector<~d, Uint<8>> as Bytes<~:*~d> as Vector<~:*~d, Uint<8>>;" n)
         "}"
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test13.40 ((argument
+        (kernel-declaration (%kernel.40 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.41
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test13.42 ((argument
                                (%param1.0 %param1.1)
                                (ty ((abytes 36))
                                    ((tfield 1099511627775)
@@ -42702,6 +43722,7 @@ groups than for single tests.
                   (tfield 255) (tfield 255) (tfield 255) (tfield 255)
                   (tfield 255) (tfield 255) (tfield 255) (tfield 255)
                   (tfield 255) (tfield 255) (tfield 255) (tfield 255)))
+          (= () (public-ledger 1 %forceField.41 (0) write 7))
           (= (%t.2 %t.3 %t.4 %t.5 %t.6) (bytes->vector %param1.0))
           (= (%t.7 %t.8 %t.9 %t.10 %t.11 %t.12 %t.13 %t.14 %t.15 %t.16
               %t.17 %t.18 %t.19 %t.20 %t.21 %t.22 %t.23 %t.24 %t.25 %t.26
@@ -42714,35 +43735,42 @@ groups than for single tests.
               %t.15 %t.16 %t.17 %t.18 %t.19 %t.20 %t.21 %t.22 %t.23 %t.24
               %t.25 %t.26 %t.27 %t.28 %t.29 %t.30 %t.31 %t.32 %t.33 %t.34
               %t.35 %t.36 %t.37))
-          (= (%t.41 %t.42 %t.43 %t.44 %t.45) (bytes->vector %t.38))
-          (= (%t.46 %t.47 %t.48 %t.49 %t.50 %t.51 %t.52 %t.53 %t.54 %t.55
-              %t.56 %t.57 %t.58 %t.59 %t.60 %t.61 %t.62 %t.63 %t.64 %t.65
-              %t.66 %t.67 %t.68 %t.69 %t.70 %t.71 %t.72 %t.73 %t.74 %t.75
-              %t.76)
+          (= (%t.43 %t.44 %t.45 %t.46 %t.47) (bytes->vector %t.38))
+          (= (%t.48 %t.49 %t.50 %t.51 %t.52 %t.53 %t.54 %t.55 %t.56 %t.57
+              %t.58 %t.59 %t.60 %t.61 %t.62 %t.63 %t.64 %t.65 %t.66 %t.67
+              %t.68 %t.69 %t.70 %t.71 %t.72 %t.73 %t.74 %t.75 %t.76 %t.77
+              %t.78)
              (bytes->vector %t.39))
-          (%t.46 %t.47 %t.48 %t.49 %t.50 %t.51 %t.52 %t.53 %t.54 %t.55
-           %t.56 %t.57 %t.58 %t.59 %t.60 %t.61 %t.62 %t.63 %t.64 %t.65
-           %t.66 %t.67 %t.68 %t.69 %t.70 %t.71 %t.72 %t.73 %t.74 %t.75
-           %t.76 %t.41 %t.42 %t.43 %t.44 %t.45))))
+          (%t.48 %t.49 %t.50 %t.51 %t.52 %t.53 %t.54 %t.55 %t.56 %t.57
+           %t.58 %t.59 %t.60 %t.61 %t.62 %t.63 %t.64 %t.65 %t.66 %t.67
+           %t.68 %t.69 %t.70 %t.71 %t.72 %t.73 %t.74 %t.75 %t.76 %t.77
+           %t.78 %t.43 %t.44 %t.45 %t.46 %t.47))))
     )
 
   (test
     (let ([n (+ (field-bytes) 5)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit test20(param1: Bytes<~d>) : Field {" n)
+        "  forceProof();"
         ,(format "  return fold((a: Field, x: Uint<8>): Field => a + x as Field, 0 as Uint<8>, param1 as Vector<~d, Uint<8>>);" n)
         "}"
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test20.72 ((argument
+        (kernel-declaration (%kernel.72 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.73
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test20.74 ((argument
                                (%param1.0 %param1.1)
                                (ty ((abytes 36))
                                    ((tfield 1099511627775)
                                      (tfield
                                        452312848583266388373324160190187140051835877600158453279131187530910662655)))))
              (ty ((afield)) ((tfield)))
+          (= () (public-ledger 1 %forceField.73 (0) write 7))
           (= (%t.63 %t.65 %t.67 %t.69 %t.71)
              (bytes->vector %param1.0))
           (= (%t.2 %t.3 %t.5 %t.7 %t.9 %t.11 %t.13 %t.15 %t.17 %t.19 %t.21
@@ -42783,45 +43811,61 @@ groups than for single tests.
           (= %a.66 (+ #f %a.64 %t.65))
           (= %a.68 (+ #f %a.66 %t.67))
           (= %a.70 (+ #f %a.68 %t.69))
-          (= %t.73 (+ #f %a.70 %t.71))
-          (%t.73))))
+          (= %t.75 (+ #f %a.70 %t.71))
+          (%t.75))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test25(param1: Uint<8>, param2: Vector<0, Uint<8>>) : Vector<0, Uint<8>> {"
+      "  forceProof();"
       "  return param1 == 0 ? param2 : default<Bytes<0>> as Vector<0, Uint<8>>;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test25.2 ((argument
+        (kernel-declaration (%kernel.2 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.3
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test25.4 ((argument
                               (%param1.0)
                               (ty ((abytes 1)) ((tfield 255))))
                             (argument () (ty () ())))
              (ty () ())
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test24(): Bytes<5> {"
+      "  forceProof();"
       "  return [1 as Uint<8>,2 as Uint<8>,3 as Uint<8>,4 as Uint<8>,5 as Uint<8>] as Bytes<5>;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test24.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test24.2 ()
              (ty ((abytes 5)) ((tfield 1099511627775)))
-          (#x504030201))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (21542142465))))
     )
 
   (test
     (let ([n (* (field-bytes) 2)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit test24(): Bytes<~d> {" n)
+        "  forceProof();"
         ,(format "  return [~{~a~^, ~}] as Bytes<~d>;"
            (map (lambda (i) (format "~d as Uint<8>" i)) (iota n))
            n)
@@ -42829,41 +43873,55 @@ groups than for single tests.
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test24.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test24.2 ()
              (ty ((abytes 62))
                  ((tfield
                     452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (#x3D3C3B3A393837363534333231302F2E2D2C2B2A292827262524232221201F
-           #x1E1D1C1B1A191817161514131211100F0E0D0C0B0A09080706050403020100))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (108193372500793931637965151673943418321664824916460816336849004088516485151
+            53206320320083115796502214552783413060461247639578808291150702859268522240))))
     )
 
   (test
     (let ([n (* (field-bytes) 2)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit test24(): Bytes<~d> {" n)
+        "  forceProof();"
         ,(format "  return [~{~d~^, ~}] as Bytes<~d>;" (iota n) n)
         "}"
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test24.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test24.2 ()
              (ty ((abytes 62))
                  ((tfield
                     452312848583266388373324160190187140051835877600158453279131187530910662655)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (#x3D3C3B3A393837363534333231302F2E2D2C2B2A292827262524232221201F
-           #x1E1D1C1B1A191817161514131211100F0E0D0C0B0A09080706050403020100))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (108193372500793931637965151673943418321664824916460816336849004088516485151
+            53206320320083115796502214552783413060461247639578808291150702859268522240))))
     )
 
   (test
     (let ([n (+ (field-bytes) 5)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit foo(): Bytes<~d> {" n)
+        "  forceProof();"
         ,(format "  return [~{~d~^, ~}] as Bytes<~d>;"
            (map (let ([s "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"])
                   (lambda (i) (char->integer (string-ref s (mod i (string-length s))))))
@@ -42873,20 +43931,27 @@ groups than for single tests.
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 36))
                  ((tfield 1099511627775)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (#x4A49484746
-           #x45444342417A797877767574737271706F6E6D6C6B6A696867666564636261))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (319057053510
+            122383579515264484277446527239169866061122741007141276322279342944460956257))))
     )
 
   (test
     (let ([n (+ (field-bytes) 5)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit foo(): Bytes<~d> {" (+ n 3))
+        "  forceProof();"
         ,(format "  return [~{~d, ~}0, 0, 0] as Bytes<~d>;"
            (map (let ([s "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"])
                   (lambda (i) (char->integer (string-ref s (mod i (string-length s))))))
@@ -42896,20 +43961,27 @@ groups than for single tests.
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 39))
                  ((tfield 18446744073709551615)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (#x4A49484746
-           #x45444342417A797877767574737271706F6E6D6C6B6A696867666564636261))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (319057053510
+            122383579515264484277446527239169866061122741007141276322279342944460956257))))
     )
 
   (test
     (let ([n (+ (field-bytes) 5)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit foo(x: Uint<8>): Bytes<~d> {" (+ n 3))
+        "  forceProof();"
         ,(format "  return [~{~d, ~}x, 0, 0] as Bytes<~d>;"
            (map (let ([s "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"])
                   (lambda (i) (char->integer (string-ref s (mod i (string-length s))))))
@@ -42919,23 +43991,30 @@ groups than for single tests.
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%x.0)
                            (ty ((abytes 1)) ((tfield 255)))))
              (ty ((abytes 39))
                  ((tfield 18446744073709551615)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (= %t.2 (vector->bytes 70 71 72 73 74 %x.0))
-          (%t.2
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
+          (= %t.4 (vector->bytes 70 71 72 73 74 %x.0))
+          (%t.4
             122383579515264484277446527239169866061122741007141276322279342944460956257))))
     )
 
   (test
     (let ([n (+ (field-bytes) 5)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit foo(): Bytes<~d> {" n)
+        "  forceProof();"
         ,(format "  return '~a';"
            (let* ([s "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"]
                   [sn (string-length s)])
@@ -42947,20 +44026,27 @@ groups than for single tests.
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 36))
                  ((tfield 1099511627775)
                    (tfield
                      452312848583266388373324160190187140051835877600158453279131187530910662655)))
-          (#x4A49484746
-           #x45444342417A797877767574737271706F6E6D6C6B6A696867666564636261))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (319057053510
+            122383579515264484277446527239169866061122741007141276322279342944460956257))))
     )
 
   (test
     (let ([n (+ (field-bytes) 5)])
       `(
+        "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
         ,(format "export circuit foo(): Vector<~d, Uint<8>> {" n)
+        "  forceProof();"
         ,(format "  return '~a' as Vector<~d, Uint<8>>;"
            (let* ([s "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"]
                   [sn (string-length s)])
@@ -42973,8 +44059,12 @@ groups than for single tests.
         ))
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ()
              (ty ((abytes 1) (abytes 1) (abytes 1) (abytes 1) (abytes 1)
                   (abytes 1) (abytes 1) (abytes 1) (abytes 1) (abytes 1)
                   (abytes 1) (abytes 1) (abytes 1) (abytes 1) (abytes 1)
@@ -42992,6 +44082,7 @@ groups than for single tests.
                   (tfield 255) (tfield 255) (tfield 255) (tfield 255)
                   (tfield 255) (tfield 255) (tfield 255) (tfield 255)
                   (tfield 255) (tfield 255) (tfield 255) (tfield 255)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (97 98 99 100 101 102 103 104 105 106 107 108 109 110 111
            112 113 114 115 116 117 118 119 120 121 122 65 66 67 68 69
            70 71 72 73 74))))
@@ -42999,62 +44090,90 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test24(): Bytes<5> {"
+      "  forceProof();"
       "  return '12345';"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test24.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test24.2 ()
              (ty ((abytes 5)) ((tfield 1099511627775)))
-          (#x3534333231))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (228509037105))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test24(): Bytes<5> {"
+      "  forceProof();"
       "  return [ 0x31, 0x32, 0x33, 0x34, 0x35 ] as Bytes<5>;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test24.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test24.2 ()
              (ty ((abytes 5)) ((tfield 1099511627775)))
-          (#x3534333231))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (228509037105))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test24(): Bytes<5> {"
+      "  forceProof();"
       "  return [ 0x35, 0x34, 0x33, 0x32, 0x31 ] as Bytes<5>;"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test24.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test24.2 ()
              (ty ((abytes 5)) ((tfield 1099511627775)))
-          (#x3132333435))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (211295614005))))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test24(): Vector<5, Uint<8>> {"
+      "  forceProof();"
       "  return '12345' as [Uint<8>, Uint<8>, Uint<8>, Uint<8>, Uint<8>];"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %test24.0 ()
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %test24.2 ()
              (ty ((abytes 1) (abytes 1) (abytes 1) (abytes 1) (abytes 1))
                  ((tfield 255)
                    (tfield 255)
                    (tfield 255)
                    (tfield 255)
                    (tfield 255)))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
           (49 50 51 52 53))))
     )
 
@@ -43180,7 +44299,9 @@ groups than for single tests.
   ; ... but if bar is not exported, i does reduce to a constant at the only place where bar is called
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "circuit bar(v: Vector<5, Field>, i: Uint<0..6>): Field {"
+      "  forceProof();"
       "  return v[i];"
       "}"
       "export circuit foo(v: Vector<5, Field>): Field {"
@@ -43189,9 +44310,13 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%v.1 %v.2 %v.3 %v.4 %v.5)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%v.3 %v.4 %v.5 %v.6 %v.7)
                            (ty ((afield) (afield) (afield) (afield) (afield))
                                ((tfield)
                                  (tfield)
@@ -43199,7 +44324,8 @@ groups than for single tests.
                                  (tfield)
                                  (tfield)))))
              (ty ((afield)) ((tfield)))
-          (%v.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (%v.6))))
     )
 
   (test
@@ -43228,28 +44354,46 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(v: Vector<0, Field>): Vector<0, Field> {"
+      "  forceProof();"
       "  const k = 0;"
       "  return slice<0>(v, k);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument () (ty () ()))) (ty () ()) ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument () (ty () ())))
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(v: []): [] {"
+      "  forceProof();"
       "  const k = 0;"
       "  return slice<0>(v, k);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument () (ty () ()))) (ty () ()) ())))
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument () (ty () ())))
+             (ty () ())
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          ())))
     )
 
   (test
@@ -43450,23 +44594,32 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<16>): [] {"
+      "  forceProof();"
       "  if (x == 0) assert(x == 0, 'oops');"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.2 ((argument
+        (kernel-declaration (%kernel.2 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.3
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.4 ((argument
                            (%x.0)
                            (ty ((abytes 2)) ((tfield 65535)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.3 (0) write 7))
           ())))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Uint<16>): [] {"
+      "  forceProof();"
       "  if (x + 7 != x + 7) {"
       "    assert(x == 0, 'oops');"
       "  }"
@@ -43474,11 +44627,16 @@ groups than for single tests.
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.1 ((argument
+        (kernel-declaration (%kernel.1 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.2
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.3 ((argument
                            (%x.0)
                            (ty ((abytes 2)) ((tfield 65535)))))
              (ty () ())
+          (= () (public-ledger 1 %forceField.2 (0) write 7))
           ())))
     )
 
@@ -43626,10 +44784,10 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "module M {"
-      "  export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a == 0; }"
+      "  export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a == 0; }"
       "}"
       ""
       "import M prefix A;"
@@ -43644,9 +44802,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a == 0; }"
+      "export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a == 0; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -43658,8 +44816,27 @@ groups than for single tests.
         "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
         "    { \"op\": \"constrain_eq\", \"a\": 0, \"b\": 1 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 1 },"
         "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 1 },"
-        "    { \"op\": \"output\", \"var\": 3 }"
+        "    { \"op\": \"output\", \"var\": 8 }"
         "  ]"
         "}"))
     )
@@ -43668,9 +44845,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a != 0; }"
+      "export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a != 0; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -43682,9 +44859,28 @@ groups than for single tests.
         "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
         "    { \"op\": \"constrain_eq\", \"a\": 0, \"b\": 1 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 1 },"
         "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 1 },"
-        "    { \"op\": \"cond_select\", \"bit\": 3, \"a\": 1, \"b\": 2 },"
-        "    { \"op\": \"output\", \"var\": 4 }"
+        "    { \"op\": \"cond_select\", \"bit\": 8, \"a\": 1, \"b\": 2 },"
+        "    { \"op\": \"output\", \"var\": 9 }"
         "  ]"
         "}"))
     )
@@ -43693,9 +44889,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<16>): Boolean { forcenonpure(); return a < 5; }"
+      "export circuit foo(a : Uint<16>): Boolean { forceProof(); return a < 5; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -43706,9 +44902,29 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"constrain_bits\", \"var\": 0, \"bits\": 16 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
         "    { \"op\": \"load_imm\", \"imm\": \"05\" },"
-        "    { \"op\": \"less_than\", \"a\": 0, \"b\": 2, \"bits\": 16 },"
-        "    { \"op\": \"output\", \"var\": 3 }"
+        "    { \"op\": \"less_than\", \"a\": 0, \"b\": 8, \"bits\": 16 },"
+        "    { \"op\": \"output\", \"var\": 9 }"
         "  ]"
         "}"))
     )
@@ -43717,9 +44933,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<16>): Boolean { forcenonpure(); return a < a + 5; }"
+      "export circuit foo(a : Uint<16>): Boolean { forceProof(); return a < a + 5; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -43730,10 +44946,30 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"constrain_bits\", \"var\": 0, \"bits\": 16 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
         "    { \"op\": \"load_imm\", \"imm\": \"05\" },"
-        "    { \"op\": \"add\", \"a\": 0, \"b\": 2 },"
-        "    { \"op\": \"less_than\", \"a\": 0, \"b\": 3, \"bits\": 17 },"
-        "    { \"op\": \"output\", \"var\": 4 }"
+        "    { \"op\": \"add\", \"a\": 0, \"b\": 8 },"
+        "    { \"op\": \"less_than\", \"a\": 0, \"b\": 9, \"bits\": 17 },"
+        "    { \"op\": \"output\", \"var\": 10 }"
         "  ]"
         "}"))
     )
@@ -43742,9 +44978,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a <= 0; }"
+      "export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a <= 0; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -43756,9 +44992,28 @@ groups than for single tests.
         "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
         "    { \"op\": \"constrain_eq\", \"a\": 0, \"b\": 1 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 1 },"
         "    { \"op\": \"less_than\", \"a\": 1, \"b\": 0, \"bits\": 1 },"
-        "    { \"op\": \"cond_select\", \"bit\": 3, \"a\": 1, \"b\": 2 },"
-        "    { \"op\": \"output\", \"var\": 4 }"
+        "    { \"op\": \"cond_select\", \"bit\": 8, \"a\": 1, \"b\": 2 },"
+        "    { \"op\": \"output\", \"var\": 9 }"
         "  ]"
         "}"))
     )
@@ -43783,10 +45038,10 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "export circuit foo(a : Boolean): Boolean {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return a;
       }"
       ""
@@ -43803,6 +45058,26 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"constrain_to_boolean\", \"var\": 0 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
         "    { \"op\": \"output\", \"var\": 0 }"
         "  ]"
         "}"))
@@ -43815,6 +45090,26 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"constrain_to_boolean\", \"var\": 0 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
         "    { \"op\": \"output\", \"var\": 0 }"
         "  ]"
         "}"))
@@ -43824,14 +45119,14 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "export circuit foo(a : Boolean): Boolean {"
       "  return a;"
       "}"
       ""
       "export circuit bar(a: Boolean): Boolean {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return foo(a);"
       "}"
       )
@@ -43845,6 +45140,26 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"constrain_to_boolean\", \"var\": 0 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
         "    { \"op\": \"output\", \"var\": 0 }"
         "  ]"
         "}"))
@@ -43853,7 +45168,7 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "struct Foo {"
       "  a: Field;"
@@ -43866,11 +45181,11 @@ groups than for single tests.
       "  d: Opaque<'string'>;"
       "}"
       "export circuit foo(): Bar {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return default<Bar>;"
       "}"
       "export circuit bar(x: Opaque<'string'>): Bar {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return Bar{ a: [Foo{ a: 0, b: false }, Foo{ a: 0, b: false }], b: '', c: 0, d: x };"
       "}"
       )
@@ -43882,13 +45197,32 @@ groups than for single tests.
         "  \"num_inputs\": 0,"
         "  \"instructions\": ["
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
         "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
-        "    { \"op\": \"output\", \"var\": 1 },"
-        "    { \"op\": \"output\", \"var\": 1 },"
-        "    { \"op\": \"output\", \"var\": 1 },"
-        "    { \"op\": \"output\", \"var\": 1 },"
-        "    { \"op\": \"output\", \"var\": 1 },"
-        "    { \"op\": \"output\", \"var\": 1 }"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 0, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 0, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 0, \"count\": 1 },"
+        "    { \"op\": \"output\", \"var\": 3 },"
+        "    { \"op\": \"output\", \"var\": 3 },"
+        "    { \"op\": \"output\", \"var\": 3 },"
+        "    { \"op\": \"output\", \"var\": 3 },"
+        "    { \"op\": \"output\", \"var\": 3 },"
+        "    { \"op\": \"output\", \"var\": 3 }"
         "  ]"
         "}"))
     (output-file "compiler/testdir/zkir/bar.zkir"
@@ -43899,12 +45233,31 @@ groups than for single tests.
         "  \"num_inputs\": 1,"
         "  \"instructions\": ["
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
         "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
-        "    { \"op\": \"output\", \"var\": 2 },"
-        "    { \"op\": \"output\", \"var\": 2 },"
-        "    { \"op\": \"output\", \"var\": 2 },"
-        "    { \"op\": \"output\", \"var\": 2 },"
-        "    { \"op\": \"output\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
+        "    { \"op\": \"output\", \"var\": 4 },"
+        "    { \"op\": \"output\", \"var\": 4 },"
+        "    { \"op\": \"output\", \"var\": 4 },"
+        "    { \"op\": \"output\", \"var\": 4 },"
+        "    { \"op\": \"output\", \"var\": 4 },"
         "    { \"op\": \"output\", \"var\": 0 }"
         "  ]"
         "}"))
@@ -43913,10 +45266,10 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "export circuit bar(x: Bytes<32>, y: Uint<32>, z: Uint<16>): Field {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  const q = x as Field;"
       "  return q + y * z - q * (y - z);"
       "}"
@@ -43933,19 +45286,38 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"var\": 2, \"bits\": 32 },"
         "    { \"op\": \"constrain_bits\", \"var\": 3, \"bits\": 16 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 10 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 1 },"
         "    { \"op\": \"reconstitute_field\", \"divisor\": 0, \"modulus\": 1, \"bits\": 248 },"
         "    { \"op\": \"mul\", \"a\": 2, \"b\": 3 },"
-        "    { \"op\": \"add\", \"a\": 5, \"b\": 6 },"
+        "    { \"op\": \"add\", \"a\": 11, \"b\": 12 },"
         "    { \"op\": \"less_than\", \"a\": 2, \"b\": 3, \"bits\": 32 },"
-        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
-        "    { \"op\": \"cond_select\", \"bit\": 8, \"a\": 9, \"b\": 4 },"
-        "    { \"op\": \"assert\", \"cond\": 10 },"
+        "    { \"op\": \"cond_select\", \"bit\": 14, \"a\": 7, \"b\": 4 },"
+        "    { \"op\": \"assert\", \"cond\": 15 },"
         "    { \"op\": \"neg\", \"a\": 3 },"
-        "    { \"op\": \"add\", \"a\": 2, \"b\": 11 },"
-        "    { \"op\": \"mul\", \"a\": 5, \"b\": 12 },"
-        "    { \"op\": \"neg\", \"a\": 13 },"
-        "    { \"op\": \"add\", \"a\": 7, \"b\": 14 },"
-        "    { \"op\": \"output\", \"var\": 15 }"
+        "    { \"op\": \"add\", \"a\": 2, \"b\": 16 },"
+        "    { \"op\": \"mul\", \"a\": 11, \"b\": 17 },"
+        "    { \"op\": \"neg\", \"a\": 18 },"
+        "    { \"op\": \"add\", \"a\": 13, \"b\": 19 },"
+        "    { \"op\": \"output\", \"var\": 20 }"
         "  ]"
         "}"))
     )
@@ -43953,13 +45325,13 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Field): Uint<16> {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return x as Uint<16>;"
       "}"
       "export circuit bar(x: Uint<32>): Uint<16> {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return x as Uint<16>;"
       "}"
       )
@@ -43971,9 +45343,29 @@ groups than for single tests.
         "  \"num_inputs\": 1,"
         "  \"instructions\": ["
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
         "    { \"op\": \"constrain_bits\", \"var\": 0, \"bits\": 16 },"
         "    { \"op\": \"copy\", \"var\": 0 },"
-        "    { \"op\": \"output\", \"var\": 2 }"
+        "    { \"op\": \"output\", \"var\": 8 }"
         "  ]"
         "}"))
     (output-file "compiler/testdir/zkir/bar.zkir"
@@ -43985,9 +45377,29 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"constrain_bits\", \"var\": 0, \"bits\": 32 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 1, \"count\": 1 },"
         "    { \"op\": \"constrain_bits\", \"var\": 0, \"bits\": 16 },"
         "    { \"op\": \"copy\", \"var\": 0 },"
-        "    { \"op\": \"output\", \"var\": 2 }"
+        "    { \"op\": \"output\", \"var\": 8 }"
         "  ]"
         "}"))
     )
@@ -45173,8 +46585,10 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness spam(): Bytes<32>;"
       "export circuit foo(): Field {"
+      "  forceProof();"
       "  return disclose(spam()) as Field;"
       "}"
      )
@@ -45186,12 +46600,32 @@ groups than for single tests.
         "  \"num_inputs\": 0,"
         "  \"instructions\": ["
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 0, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 0 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 1 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 0, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 0, \"count\": 1 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"constrain_bits\", \"var\": 1, \"bits\": 8 },"
+        "    { \"op\": \"constrain_bits\", \"var\": 7, \"bits\": 8 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"constrain_bits\", \"var\": 2, \"bits\": 248 },"
-        "    { \"op\": \"reconstitute_field\", \"divisor\": 1, \"modulus\": 2, \"bits\": 248 },"
-        "    { \"op\": \"output\", \"var\": 3 }"
+        "    { \"op\": \"constrain_bits\", \"var\": 8, \"bits\": 248 },"
+        "    { \"op\": \"reconstitute_field\", \"divisor\": 7, \"modulus\": 8, \"bits\": 248 },"
+        "    { \"op\": \"output\", \"var\": 9 }"
         "  ]"
         "}"))
     )
@@ -45512,9 +46946,11 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "struct S { x: Field; y: Field; }"
       "witness W(x: S): S;"
       "export circuit foo(x : S): S {"
+      "  forceProof();"
       "  return disclose(W(x));"
       "}"
      )
@@ -45526,19 +46962,41 @@ groups than for single tests.
         "  \"num_inputs\": 2,"
         "  \"instructions\": ["
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 1 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"output\", \"var\": 3 },"
-        "    { \"op\": \"output\", \"var\": 4 }"
+        "    { \"op\": \"output\", \"var\": 9 },"
+        "    { \"op\": \"output\", \"var\": 10 }"
         "  ]"
         "}"))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "struct S { x: Field; y: Field; }"
       "witness state(x: S): S;"
       "export circuit foo(x : S): S {"
+      "  forceProof();"
       "  return disclose(state(x));"
       "}"
      )
@@ -45550,10 +47008,30 @@ groups than for single tests.
         "  \"num_inputs\": 2,"
         "  \"instructions\": ["
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 1 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"output\", \"var\": 3 },"
-        "    { \"op\": \"output\", \"var\": 4 }"
+        "    { \"op\": \"output\", \"var\": 9 },"
+        "    { \"op\": \"output\", \"var\": 10 }"
         "  ]"
         "}"))
     )
@@ -52071,6 +53549,7 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module M1 {"
       "  import CompactStandardLibrary;"
       "  export { QualifiedShieldedCoinInfo, ShieldedCoinInfo, ZswapCoinPublicKey, ContractAddress };"
@@ -52078,12 +53557,14 @@ groups than for single tests.
       "}"
       "import M1 prefix std$;"
       "circuit foo(qcoin: std$QualifiedShieldedCoinInfo, coin: std$ShieldedCoinInfo): [] {"
+      "  forceProof();"
       "  std$createZswapInput(qcoin);"
       "  std$createZswapOutput(coin, std$left<std$ZswapCoinPublicKey, std$ContractAddress>(std$ownPublicKey()));"
       "}"
       "module M2 {"
       "  import CompactStandardLibrary;"
       "  export circuit bar(qcoin: QualifiedShieldedCoinInfo, coin: ShieldedCoinInfo): [] {"
+      "    forceProof();"
       "    createZswapInput(qcoin);"
       "    createZswapOutput(coin, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()));"
       "  }"
@@ -52111,14 +53592,32 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"var\": 9, \"bits\": 248 },"
         "    { \"op\": \"constrain_bits\", \"var\": 10, \"bits\": 128 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 13 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 14 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 11, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 15 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 16 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 12 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 11, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 17 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 11, \"count\": 1 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"constrain_bits\", \"var\": 12, \"bits\": 8 },"
+        "    { \"op\": \"constrain_bits\", \"var\": 18, \"bits\": 8 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"constrain_bits\", \"var\": 13, \"bits\": 248 },"
-        "    { \"op\": \"load_imm\", \"imm\": \"00\" }"
+        "    { \"op\": \"constrain_bits\", \"var\": 19, \"bits\": 248 }"
         "  ]"
         "}"))
-
     (output-file "compiler/testdir/zkir/bar.zkir"
                  "compiler/testdir/zkir/foo.zkir")
     (output-file "compiler/testdir/zkir/M2$bar.zkir"
@@ -52127,15 +53626,17 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness W(): Field;"
       "module A<#n, t> {"
       "  export circuit foo(v : Vector<n, t>, b : Bytes<n>): Field {"
+      "    forceProof();"
       "    return disclose(W()) + 17;"
       "  }"
       "}"
       "module B {"
-      "  circuit foo(x : Field): Field { return x + disclose(W()); }"
-      "  circuit bar(x : Field): Field { return x - disclose(W()); }"
+      "  circuit foo(x : Field): Field { forceProof(); return x + disclose(W()); }"
+      "  circuit bar(x : Field): Field { forceProof(); return x - disclose(W()); }"
       "  import A<7, Field> prefix AA;"
       "  import A<30, Boolean> prefix AAA;"
       "  export {foo, AAfoo, AAAfoo, bar}"
@@ -52162,7 +53663,9 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(qcoin: QualifiedShieldedCoinInfo, coin: ShieldedCoinInfo): [] {"
+      "  forceProof();"
       "  createZswapInput(qcoin);"
       "  createZswapOutput(coin, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()));"
       "}"
@@ -52186,11 +53689,30 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"var\": 9, \"bits\": 248 },"
         "    { \"op\": \"constrain_bits\", \"var\": 10, \"bits\": 128 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 13 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 14 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 11, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 15 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 16 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 12 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 11, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 17 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 11, \"count\": 1 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"constrain_bits\", \"var\": 12, \"bits\": 8 },"
+        "    { \"op\": \"constrain_bits\", \"var\": 18, \"bits\": 8 },"
         "    { \"op\": \"private_input\", \"guard\": null },"
-        "    { \"op\": \"constrain_bits\", \"var\": 13, \"bits\": 248 },"
-        "    { \"op\": \"load_imm\", \"imm\": \"00\" }"
+        "    { \"op\": \"constrain_bits\", \"var\": 19, \"bits\": 248 }"
         "  ]"
         "}"))
     )
@@ -52391,9 +53913,9 @@ groups than for single tests.
   ;; constrained to be Uint with a size that wasn't a power of two.
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == 0, \"failed\");"
       "}"
       )
@@ -52408,18 +53930,37 @@ groups than for single tests.
         "    { \"op\": \"less_than\", \"a\": 0, \"b\": 1, \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": 2 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
         "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
-        "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 4 },"
-        "    { \"op\": \"assert\", \"cond\": 5 }"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 3, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 3, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 3, \"count\": 1 },"
+        "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 6 },"
+        "    { \"op\": \"assert\", \"cond\": 10 }"
         "  ]"
         "}"))
     )
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>, y: Uint<0..6>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -52437,17 +53978,37 @@ groups than for single tests.
         "    { \"op\": \"less_than\", \"a\": 1, \"b\": 4, \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": 5 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 6, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 10 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 6, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 12 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 6, \"count\": 1 },"
         "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 1 },"
-        "    { \"op\": \"assert\", \"cond\": 7 }"
+        "    { \"op\": \"assert\", \"cond\": 13 }"
         "  ]"
         "}"))
     )
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>, y: Uint<0..6>, z: Uint<0..7>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x + y == z, \"failed\");"
       "}"
       )
@@ -52468,9 +54029,28 @@ groups than for single tests.
         "    { \"op\": \"less_than\", \"a\": 2, \"b\": 7, \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": 8 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 10 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 11 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 9, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 12 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 13 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 9, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 14 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 9, \"count\": 1 },"
         "    { \"op\": \"add\", \"a\": 0, \"b\": 1 },"
-        "    { \"op\": \"test_eq\", \"a\": 10, \"b\": 2 },"
-        "    { \"op\": \"assert\", \"cond\": 11 }"
+        "    { \"op\": \"test_eq\", \"a\": 15, \"b\": 2 },"
+        "    { \"op\": \"assert\", \"cond\": 16 }"
         "  ]"
         "}"))
     )
@@ -52478,9 +54058,9 @@ groups than for single tests.
   ;; Mix powers of two with non-powers of two.
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>, y: Uint<4>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -52496,17 +54076,37 @@ groups than for single tests.
         "    { \"op\": \"assert\", \"cond\": 3 },"
         "    { \"op\": \"constrain_bits\", \"var\": 1, \"bits\": 4 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 10 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 1 },"
         "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 1 },"
-        "    { \"op\": \"assert\", \"cond\": 5 }"
+        "    { \"op\": \"assert\", \"cond\": 11 }"
         "  ]"
         "}"))
     )
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<4>, y: Uint<0..5>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -52522,17 +54122,37 @@ groups than for single tests.
         "    { \"op\": \"less_than\", \"a\": 1, \"b\": 2, \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": 3 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 9 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 10 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 4, \"count\": 1 },"
         "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 1 },"
-        "    { \"op\": \"assert\", \"cond\": 5 }"
+        "    { \"op\": \"assert\", \"cond\": 11 }"
         "  ]"
         "}"))
     )
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<4>, y: Uint<4>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -52546,8 +54166,28 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"var\": 0, \"bits\": 4 },"
         "    { \"op\": \"constrain_bits\", \"var\": 1, \"bits\": 4 },"
         "    { \"op\": \"load_imm\", \"imm\": \"01\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"07\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"10\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"00\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 4 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 5 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"11\" },"
+        "    { \"op\": \"load_imm\", \"imm\": \"-02\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 6 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 2 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 7 },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 3 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 5 },"
+        "    { \"op\": \"load_imm\", \"imm\": \"91\" },"
+        "    { \"op\": \"declare_pub_input\", \"var\": 8 },"
+        "    { \"op\": \"pi_skip\", \"guard\": 2, \"count\": 1 },"
         "    { \"op\": \"test_eq\", \"a\": 0, \"b\": 1 },"
-        "    { \"op\": \"assert\", \"cond\": 3 }"
+        "    { \"op\": \"assert\", \"cond\": 9 }"
         "  ]"
         "}"))
     )
@@ -52564,7 +54204,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 5 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Foo" "foo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("foo" "Foo" "line 5 char 1")))
     )
 
   (test
@@ -52583,23 +54223,29 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 6 char 3" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("MFoo for Foo" "Mfoo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Mfoo" "MFoo for Foo" "line 6 char 3")))
     )
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "circuit bar(v: Vector<5, Field>, i: Uint<0..5>): Field {"
       "  return v[i];"
       "}"
       "export circuit foo(v: Vector<5, Field>): Field {"
+      "  forceProof();"
       "  return bar(v, 3);"
       "}"
       )
     (returns
       (program
-        (public-ledger-declaration ())
-        (circuit %foo.0 ((argument
-                           (%v.1 %v.2 %v.3 %v.4 %v.5)
+        (kernel-declaration (%kernel.0 () (Kernel)))
+        (public-ledger-declaration
+          ((%forceField.1
+             (0)
+             (__compact_Cell (ty ((afield)) ((tfield)))))))
+        (circuit %foo.2 ((argument
+                           (%v.3 %v.4 %v.5 %v.6 %v.7)
                            (ty ((afield) (afield) (afield) (afield) (afield))
                                ((tfield)
                                  (tfield)
@@ -52607,7 +54253,8 @@ groups than for single tests.
                                  (tfield)
                                  (tfield)))))
              (ty ((afield)) ((tfield)))
-          (%v.4))))
+          (= () (public-ledger 1 %forceField.1 (0) write 7))
+          (%v.6))))
     )
 
   (test
@@ -54338,10 +55985,10 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "module M {"
-      "  export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a == 0; }"
+      "  export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a == 0; }"
       "}"
       ""
       "import M prefix A;"
@@ -54356,9 +56003,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a == 0; }"
+      "export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a == 0; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -54370,6 +56017,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_eq\", \"a\": \"%a.0\", \"b\": \"0x00\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.1\", \"a\": \"%a.0\", \"b\": \"0x00\" },"
         "    { \"op\": \"output\", \"val\": \"%t.1\" }"
         "  ]"
@@ -54380,9 +56028,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a != 0; }"
+      "export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a != 0; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -54394,6 +56042,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_eq\", \"a\": \"%a.0\", \"b\": \"0x00\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.1\", \"a\": \"%a.0\", \"b\": \"0x00\" },"
         "    { \"op\": \"cond_select\", \"output\": \"%t.2\", \"bit\": \"%t.1\", \"a\": \"0x00\", \"b\": \"0x01\" },"
         "    { \"op\": \"output\", \"val\": \"%t.2\" }"
@@ -54405,9 +56054,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<16>): Boolean { forcenonpure(); return a < 5; }"
+      "export circuit foo(a : Uint<16>): Boolean { forceProof(); return a < 5; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -54419,6 +56068,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_bits\", \"val\": \"%a.0\", \"bits\": 16 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"less_than\", \"output\": \"%t.1\", \"a\": \"%a.0\", \"b\": \"0x05\", \"bits\": 16 },"
         "    { \"op\": \"output\", \"val\": \"%t.1\" }"
         "  ]"
@@ -54429,9 +56079,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<16>): Boolean { forcenonpure(); return a < a + 5; }"
+      "export circuit foo(a : Uint<16>): Boolean { forceProof(); return a < a + 5; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -54443,6 +56093,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_bits\", \"val\": \"%a.0\", \"bits\": 16 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"add\", \"output\": \"%t.1\", \"a\": \"%a.0\", \"b\": \"0x05\" },"
         "    { \"op\": \"less_than\", \"output\": \"%t.2\", \"a\": \"%a.0\", \"b\": \"%t.1\", \"bits\": 17 },"
         "    { \"op\": \"output\", \"val\": \"%t.2\" }"
@@ -54454,9 +56105,9 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
-      "export circuit foo(a : Uint<0..1>): Boolean { forcenonpure(); return a <= 0; }"
+      "export circuit foo(a : Uint<0..1>): Boolean { forceProof(); return a <= 0; }"
       )
     (output-file "compiler/testdir/zkir/foo.zkir"
       '(
@@ -54468,6 +56119,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_eq\", \"a\": \"%a.0\", \"b\": \"0x00\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"less_than\", \"output\": \"%t.1\", \"a\": \"0x00\", \"b\": \"%a.0\", \"bits\": 1 },"
         "    { \"op\": \"cond_select\", \"output\": \"%t.2\", \"bit\": \"%t.1\", \"a\": \"0x00\", \"b\": \"0x01\" },"
         "    { \"op\": \"output\", \"val\": \"%t.2\" }"
@@ -54495,10 +56147,10 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "export circuit foo(a : Boolean): Boolean {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return a;"
       "}"
       ""
@@ -54516,6 +56168,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_to_boolean\", \"val\": \"%a.0\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"output\", \"val\": \"%a.0\" }"
         "  ]"
         "}"))
@@ -54529,6 +56182,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_to_boolean\", \"val\": \"%a.0\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"output\", \"val\": \"%a.0\" }"
         "  ]"
         "}"))
@@ -54538,14 +56192,14 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       ""
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "export circuit foo(a : Boolean): Boolean {"
       "  return a;"
       "}"
       ""
       "export circuit bar(a: Boolean): Boolean {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return foo(a);"
       "}"
       )
@@ -54560,6 +56214,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_to_boolean\", \"val\": \"%a.0\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"output\", \"val\": \"%a.0\" }"
         "  ]"
         "}"))
@@ -54568,7 +56223,7 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "struct Foo {"
       "  a: Field;"
@@ -54581,11 +56236,11 @@ groups than for single tests.
       "  d: Opaque<'string'>;"
       "}"
       "export circuit foo(): Bar {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return default<Bar>;"
       "}"
       "export circuit bar(x: Opaque<'string'>): Bar {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return Bar{ a: [Foo{ a: 0, b: false }, Foo{ a: 0, b: false }], b: '', c: 0, d: x };"
       "}"
       )
@@ -54597,6 +56252,7 @@ groups than for single tests.
         "  \"inputs\": ["
         "  ],"
         "  \"instructions\": ["
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"output\", \"val\": \"0x00\" },"
         "    { \"op\": \"output\", \"val\": \"0x00\" },"
         "    { \"op\": \"output\", \"val\": \"0x00\" },"
@@ -54614,6 +56270,7 @@ groups than for single tests.
         "    \"%x.0\""
         "  ],"
         "  \"instructions\": ["
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"output\", \"val\": \"0x00\" },"
         "    { \"op\": \"output\", \"val\": \"0x00\" },"
         "    { \"op\": \"output\", \"val\": \"0x00\" },"
@@ -54627,10 +56284,10 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       ""
       "export circuit bar(x: Bytes<32>, y: Uint<32>, z: Uint<16>): Field {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  const q = x as Field;"
       "  return q + y * z - q * (y - z);"
       "}"
@@ -54651,6 +56308,7 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"val\": \"%x.1\", \"bits\": 248 },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%y.2\", \"bits\": 32 },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%z.3\", \"bits\": 16 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"reconstitute_field\", \"output\": \"%q.4\", \"divisor\": \"%x.0\", \"modulus\": \"%x.1\", \"bits\": 248 },"
         "    { \"op\": \"mul\", \"output\": \"%t.5\", \"a\": \"%y.2\", \"b\": \"%z.3\" },"
         "    { \"op\": \"add\", \"output\": \"%t.6\", \"a\": \"%q.4\", \"b\": \"%t.5\" },"
@@ -54670,13 +56328,13 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "witness forcenonpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit foo(x: Field): Uint<16> {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return x as Uint<16>;"
       "}"
       "export circuit bar(x: Uint<32>): Uint<16> {"
-      "  forcenonpure();"
+      "  forceProof();"
       "  return x as Uint<16>;"
       "}"
       )
@@ -54689,6 +56347,7 @@ groups than for single tests.
         "    \"%x.0\""
         "  ],"
         "  \"instructions\": ["
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%x.0\", \"bits\": 16 },"
         "    { \"op\": \"copy\", \"output\": \"%t.1\", \"val\": \"%x.0\" },"
         "    { \"op\": \"output\", \"val\": \"%t.1\" }"
@@ -54704,6 +56363,7 @@ groups than for single tests.
         "  ],"
         "  \"instructions\": ["
         "    { \"op\": \"constrain_bits\", \"val\": \"%x.0\", \"bits\": 32 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%x.0\", \"bits\": 16 },"
         "    { \"op\": \"copy\", \"output\": \"%t.1\", \"val\": \"%x.0\" },"
         "    { \"op\": \"output\", \"val\": \"%t.1\" }"
@@ -55453,8 +57113,10 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness spam(): Bytes<32>;"
       "export circuit foo(): Field {"
+      "  forceProof();"
       "  return disclose(spam()) as Field;"
       "}"
      )
@@ -55466,6 +57128,7 @@ groups than for single tests.
         "  \"inputs\": ["
         "  ],"
         "  \"instructions\": ["
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"private_input\", \"output\": \"%t.0\", \"guard\": null },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%t.0\", \"bits\": 8 },"
         "    { \"op\": \"private_input\", \"output\": \"%t.1\", \"guard\": null },"
@@ -55641,9 +57304,11 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "struct S { x: Field; y: Field; }"
       "witness W(x: S): S;"
       "export circuit foo(x : S): S {"
+      "  forceProof();"
       "  return disclose(W(x));"
       "}"
      )
@@ -55657,6 +57322,7 @@ groups than for single tests.
         "    \"%x.1\""
         "  ],"
         "  \"instructions\": ["
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"private_input\", \"output\": \"%t.2\", \"guard\": null },"
         "    { \"op\": \"private_input\", \"output\": \"%t.3\", \"guard\": null },"
         "    { \"op\": \"output\", \"val\": \"%t.2\" },"
@@ -55667,9 +57333,11 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "struct S { x: Field; y: Field; }"
       "witness state(x: S): S;"
       "export circuit foo(x : S): S {"
+      "  forceProof();"
       "  return disclose(state(x));"
       "}"
      )
@@ -55683,6 +57351,7 @@ groups than for single tests.
         "    \"%x.1\""
         "  ],"
         "  \"instructions\": ["
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"private_input\", \"output\": \"%t.2\", \"guard\": null },"
         "    { \"op\": \"private_input\", \"output\": \"%t.3\", \"guard\": null },"
         "    { \"op\": \"output\", \"val\": \"%t.2\" },"
@@ -58932,6 +60601,7 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "module M1 {"
       "  import CompactStandardLibrary;"
       "  export { QualifiedShieldedCoinInfo, ShieldedCoinInfo, ZswapCoinPublicKey, ContractAddress };"
@@ -58939,12 +60609,14 @@ groups than for single tests.
       "}"
       "import M1 prefix std$;"
       "circuit foo(qcoin: std$QualifiedShieldedCoinInfo, coin: std$ShieldedCoinInfo): [] {"
+      "  forceProof();"
       "  std$createZswapInput(qcoin);"
       "  std$createZswapOutput(coin, std$left<std$ZswapCoinPublicKey, std$ContractAddress>(std$ownPublicKey()));"
       "}"
       "module M2 {"
       "  import CompactStandardLibrary;"
       "  export circuit bar(qcoin: QualifiedShieldedCoinInfo, coin: ShieldedCoinInfo): [] {"
+      "    forceProof();"
       "    createZswapInput(qcoin);"
       "    createZswapOutput(coin, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()));"
       "  }"
@@ -58983,6 +60655,7 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"val\": \"%coin.8\", \"bits\": 8 },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%coin.9\", \"bits\": 248 },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%coin.10\", \"bits\": 128 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"private_input\", \"output\": \"%value.11\", \"guard\": null },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%value.11\", \"bits\": 8 },"
         "    { \"op\": \"private_input\", \"output\": \"%value.12\", \"guard\": null },"
@@ -58997,15 +60670,17 @@ groups than for single tests.
 
   (test
     '(
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "witness W(): Field;"
       "module A<#n, t> {"
       "  export circuit foo(v : Vector<n, t>, b : Bytes<n>): Field {"
+      "    forceProof();"
       "    return disclose(W()) + 17;"
       "  }"
       "}"
       "module B {"
-      "  circuit foo(x : Field): Field { return x + disclose(W()); }"
-      "  circuit bar(x : Field): Field { return x - disclose(W()); }"
+      "  circuit foo(x : Field): Field { forceProof(); return x + disclose(W()); }"
+      "  circuit bar(x : Field): Field { forceProof(); return x - disclose(W()); }"
       "  import A<7, Field> prefix AA;"
       "  import A<30, Boolean> prefix AAA;"
       "  export {foo, AAfoo, AAAfoo, bar}"
@@ -59033,6 +60708,19 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       "export circuit foo(qcoin: QualifiedShieldedCoinInfo, coin: ShieldedCoinInfo): [] {"
+      "  createZswapInput(qcoin);"
+      "  createZswapOutput(coin, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()));"
+      "}"
+      )
+    (output-file "compiler/testdir/zkir/foo.zkir" #f)
+    )
+
+  (test
+    '(
+      "import CompactStandardLibrary;"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
+      "export circuit foo(qcoin: QualifiedShieldedCoinInfo, coin: ShieldedCoinInfo): [] {"
+      "  forceProof();"
       "  createZswapInput(qcoin);"
       "  createZswapOutput(coin, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()));"
       "}"
@@ -59067,6 +60755,7 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"val\": \"%coin.8\", \"bits\": 8 },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%coin.9\", \"bits\": 248 },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%coin.10\", \"bits\": 128 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"private_input\", \"output\": \"%value.11\", \"guard\": null },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%value.11\", \"bits\": 8 },"
         "    { \"op\": \"private_input\", \"output\": \"%value.12\", \"guard\": null },"
@@ -59255,9 +60944,9 @@ groups than for single tests.
   ;; constrained to be Uint with a size that wasn't a power of two.
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == 0, \"failed\");"
       "}"
       )
@@ -59272,6 +60961,7 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"less_than\", \"output\": \"%tmp.1\", \"a\": \"%x.0\", \"b\": \"0x05\", \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": \"%tmp.1\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.2\", \"a\": \"%x.0\", \"b\": \"0x00\" },"
         "    { \"op\": \"assert\", \"cond\": \"%t.2\" }"
         "  ]"
@@ -59280,9 +60970,9 @@ groups than for single tests.
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>, y: Uint<0..6>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -59300,6 +60990,7 @@ groups than for single tests.
         "    { \"op\": \"assert\", \"cond\": \"%tmp.2\" },"
         "    { \"op\": \"less_than\", \"output\": \"%tmp.3\", \"a\": \"%y.1\", \"b\": \"0x06\", \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": \"%tmp.3\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.4\", \"a\": \"%x.0\", \"b\": \"%y.1\" },"
         "    { \"op\": \"assert\", \"cond\": \"%t.4\" }"
         "  ]"
@@ -59308,9 +60999,9 @@ groups than for single tests.
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>, y: Uint<0..6>, z: Uint<0..7>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x + y == z, \"failed\");"
       "}"
       )
@@ -59331,6 +61022,7 @@ groups than for single tests.
         "    { \"op\": \"assert\", \"cond\": \"%tmp.4\" },"
         "    { \"op\": \"less_than\", \"output\": \"%tmp.5\", \"a\": \"%z.2\", \"b\": \"0x07\", \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": \"%tmp.5\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"add\", \"output\": \"%t.6\", \"a\": \"%x.0\", \"b\": \"%y.1\" },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.7\", \"a\": \"%t.6\", \"b\": \"%z.2\" },"
         "    { \"op\": \"assert\", \"cond\": \"%t.7\" }"
@@ -59341,9 +61033,9 @@ groups than for single tests.
   ;; Mix powers of two with non-powers of two.
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<0..5>, y: Uint<4>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -59360,6 +61052,7 @@ groups than for single tests.
         "    { \"op\": \"less_than\", \"output\": \"%tmp.2\", \"a\": \"%x.0\", \"b\": \"0x05\", \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": \"%tmp.2\" },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%y.1\", \"bits\": 4 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.3\", \"a\": \"%x.0\", \"b\": \"%y.1\" },"
         "    { \"op\": \"assert\", \"cond\": \"%t.3\" }"
         "  ]"
@@ -59368,9 +61061,9 @@ groups than for single tests.
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<4>, y: Uint<0..5>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -59387,6 +61080,7 @@ groups than for single tests.
         "    { \"op\": \"constrain_bits\", \"val\": \"%x.0\", \"bits\": 4 },"
         "    { \"op\": \"less_than\", \"output\": \"%tmp.2\", \"a\": \"%y.1\", \"b\": \"0x05\", \"bits\": 4 },"
         "    { \"op\": \"assert\", \"cond\": \"%tmp.2\" },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.3\", \"a\": \"%x.0\", \"b\": \"%y.1\" },"
         "    { \"op\": \"assert\", \"cond\": \"%t.3\" }"
         "  ]"
@@ -59395,9 +61089,9 @@ groups than for single tests.
 
   (test
     '(
-      "witness forceImpure(): [];"
+      "ledger forceField: Field; circuit forceProof(): [] { forceField = 7; }"
       "export circuit test(x: Uint<4>, y: Uint<4>): [] {"
-      "  forceImpure();"
+      "  forceProof();"
       "  assert(x == y, \"failed\");"
       "}"
       )
@@ -59413,6 +61107,7 @@ groups than for single tests.
         "  \"instructions\": ["
         "    { \"op\": \"constrain_bits\", \"val\": \"%x.0\", \"bits\": 4 },"
         "    { \"op\": \"constrain_bits\", \"val\": \"%y.1\", \"bits\": 4 },"
+        "    { \"op\": \"impact\", \"guard\": \"0x01\", \"inputs\": [\"0x10\", \"0x01\", \"0x01\", \"0x01\", \"0x00\", \"0x11\", \"0x01\", \"0x01\", \"-0x02\", \"0x07\", \"0x91\"] },"
         "    { \"op\": \"test_eq\", \"output\": \"%t.2\", \"a\": \"%x.0\", \"b\": \"%y.1\" },"
         "    { \"op\": \"assert\", \"cond\": \"%t.2\" }"
         "  ]"
@@ -59431,7 +61126,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 5 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Foo" "foo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("foo" "Foo" "line 5 char 1")))
     )
 
   (test
@@ -59450,7 +61145,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 6 char 3" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("MFoo for Foo" "Mfoo" "line 2 char 1")))
+      irritants: '("testfile.compact line 2 char 1" "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems" ("Mfoo" "MFoo for Foo" "line 6 char 3")))
     )
 
   (test
@@ -59462,9 +61157,27 @@ groups than for single tests.
       "  return bar(v, 3);"
       "}"
       )
+    (returns (program))
+    )
+
+  (test
+    '(
+      "ledger F: Field;"
+      "circuit bar(v: Vector<5, Field>, i: Uint<0..5>): Field {"
+      "  F = disclose(v[i]);"
+      "  return F;"
+      "}"
+      "export circuit foo(v: Vector<5, Field>): Field {"
+      "  return bar(v, 3);"
+      "}"
+      )
     (returns
       (program
-        (circuit (foo) (%v.0 %v.1 %v.2 %v.3 %v.4) (output %v.3))))
+        (circuit (foo) (%v.0 %v.1 %v.2 %v.3 %v.4)
+          (impact 1 16 1 1 1 0 17 1 1 -2 %v.3 145)
+          (public_input %t.5)
+          (impact 1 48 80 1 1 0 12 1 -2 %t.5)
+          (output %t.5))))
     )
 
   (test

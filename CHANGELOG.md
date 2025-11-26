@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased compiler version 0.27.105, language version 0.19.100]
+
+### Changed
+
+- The compiler no longer generates zkir code or proving keys for circuits that
+  do not directly touch the ledger.  Previously, it generated zkir code and
+  proving keys for all impure circuits, so merely calling a witness or invoking
+  one of the witness-like external circuits (`ownPublicKey`, `createZswapInput`,
+  `createZswapOutput`) would also trigger zkir and proving-key generation.
+
 ## [Unreleased compiler version 0.27.104, language version 0.19.100]
 
 ### Fixed
