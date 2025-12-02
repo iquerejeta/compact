@@ -22556,7 +22556,7 @@ groups than for single tests.
       "new type Ctr = Counter;"
       "export ledger C: Ctr;"
       "export circuit foo(): [] {"
-      "  C += 1;"
+      "  C -= 1;"
       "}"
       )
     (returns
@@ -22566,7 +22566,7 @@ groups than for single tests.
         (circuit %foo.2 ()
              (ttuple)
           (seq
-            (ledger-call increment
+            (ledger-call decrement
               %C.1
               (safe-cast (tunsigned 65535) (tunsigned 1) 1))
             (tuple)))))
