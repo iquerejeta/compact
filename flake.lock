@@ -352,16 +352,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1764790348,
-        "narHash": "sha256-T2N6G0tzniKs0eaJYI8HxrFZoY5JzpxctSTmcjS0Hus=",
+        "lastModified": 1765218918,
+        "narHash": "sha256-7EBOf410H/c0QbCoDQY1V5Fd5SD+GfJREVBBKwlMe7E=",
         "owner": "midnightntwrk",
         "repo": "midnight-ledger",
-        "rev": "ba2d7fa564e5262a144d7e39ae770999ea6bd84d",
+        "rev": "9caeb31bc495a40c452cb8ee5f582f49bcb5d077",
         "type": "github"
       },
       "original": {
         "owner": "midnightntwrk",
-        "ref": "ledger-6.2.0-rc.1",
+        "ref": "ledger-6.2.0-rc.2",
         "repo": "midnight-ledger",
         "type": "github"
       }
@@ -667,16 +667,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1765197249,
-        "narHash": "sha256-P8HrSda7swSvfUCxIMXWfYFYARxJ/8IuJ2jxDSAdwj8=",
+        "lastModified": 1765218918,
+        "narHash": "sha256-7EBOf410H/c0QbCoDQY1V5Fd5SD+GfJREVBBKwlMe7E=",
         "owner": "midnightntwrk",
         "repo": "midnight-ledger",
-        "rev": "f24ad9a3da0979490584744ad7cb64a9a80c19a1",
+        "rev": "9caeb31bc495a40c452cb8ee5f582f49bcb5d077",
         "type": "github"
       },
       "original": {
         "owner": "midnightntwrk",
-        "ref": "tkerber/patch-midnight-zk",
+        "ref": "ledger-6.2.0-rc.2",
         "repo": "midnight-ledger",
         "type": "github"
       }
@@ -692,16 +692,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1764790348,
-        "narHash": "sha256-T2N6G0tzniKs0eaJYI8HxrFZoY5JzpxctSTmcjS0Hus=",
+        "lastModified": 1765218918,
+        "narHash": "sha256-7EBOf410H/c0QbCoDQY1V5Fd5SD+GfJREVBBKwlMe7E=",
         "owner": "midnightntwrk",
         "repo": "midnight-ledger",
-        "rev": "ba2d7fa564e5262a144d7e39ae770999ea6bd84d",
+        "rev": "9caeb31bc495a40c452cb8ee5f582f49bcb5d077",
         "type": "github"
       },
       "original": {
         "owner": "midnightntwrk",
-        "ref": "ledger-6.2.0-rc.1",
+        "ref": "ledger-6.2.0-rc.2",
         "repo": "midnight-ledger",
         "type": "github"
       }
