@@ -13,13 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from './result-assertions';
-export * from './circuit-assertions';
-export * from './binary-utils';
-export * from './files-assertions';
-export * from './file-utils';
-export * from './logger-utils';
-export * from './man-utils';
-export * from './test-utils';
-export * from './types';
-export * from './parser';
+module T {
+  module T1 {
+    export witness test2(a: Field): Field;
+  }
+  
+  import { test2 } from T1;
+  export { test2 };
+}
+
+import { test2 } from T;
+
+circuit test(): Field {
+   const a = test2(1);
+   return a;
+}
+
+export circuit test1(a: Field): Field {
+   const a = disclose(test2(1));
+   return a;
+}
