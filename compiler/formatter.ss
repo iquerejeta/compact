@@ -654,11 +654,11 @@
             nl
             (fold-right
               (lambda (stmt q*)
-                (cons* 3 (Statement stmt) nl q*))
-              (add-closer 3 nl rbrace q*)
+                (cons* 2 (Statement stmt) nl q*))
+              (add-closer 2 nl rbrace q*)
               stmt*)))
         (define (add-other stmt q*)
-          (cons* 3 (Statement stmt) q*))
+          (cons* 2 (Statement stmt) q*))
         (define (add-one-armed-if kwd lparen expr rparen stmt)
           (add-header kwd lparen expr rparen
             (nanopass-case (Lparser Statement) stmt
@@ -706,9 +706,8 @@
           (add-header kwd lparen expr rparen
             (add-then stmt1
               (add-else kwd-else stmt2)))))
-      (define (make-Qcall qfun lparen expr* comma* rparen)
-        (let ([funbig? (Q-size>? qfun 7)]
-              [qexpr* (map Expression expr*)])
+      (define (make-Qcall qfun lparen qexpr* comma* rparen)
+        (let ([funbig? (Q-size>? qfun 7)])
           (apply make-Qconcat #f
             qfun
             (make-Qtoken lparen)
@@ -1139,15 +1138,9 @@
                    (add-closer 1 #f rparen '()))))))]
       [(assert ,src ,kwd ,lparen ,expr ,comma ,mesg ,rparen)
        (// src
-           (make-Qconcat #f
-             (make-Qtoken kwd)
-             (apply make-Qconcat #f
-               (make-Qtoken lparen)
-               (Expression expr)
-               (add-punctuation comma
-                 (cons*
-                   nbsp (make-Qtoken mesg)
-                   (add-closer 1 #f rparen '()))))))]
+           (let ([qexpr* (list (Expression expr) (make-Qtoken mesg))]
+                 [comma* (list comma)])
+             (make-Qcall (make-Qtoken kwd) lparen qexpr* comma* rparen)))]
       [(var-ref ,src ,var-name)
        (// src
            (make-Qtoken var-name))]
@@ -1175,7 +1168,7 @@
                          (Expression expr)
                          (make-Qtoken dot)
                          (make-Qtoken elt-name))])
-             (make-Qcall qfun lparen expr* comma* rparen)))]
+             (make-Qcall qfun lparen (map Expression expr*) comma* rparen)))]
       [(tuple ,src ,lbracket (,tuple-arg* ...) (,comma* ...) ,rbracket)
        (// src
            (make-Qconcat #f
@@ -1277,7 +1270,7 @@
                rparen)))]
       [(call ,src ,fun ,lparen (,expr* ...) (,comma* ...) ,rparen)
        (// src
-           (make-Qcall (Function fun) lparen expr* comma* rparen))]
+           (make-Qcall (Function fun) lparen (map Expression expr*) comma* rparen))]
       [(new ,src ,tref ,lbrace (,new-field* ...) (,comma* ...) ,rbrace)
        (// src
            (make-Qconcat #f

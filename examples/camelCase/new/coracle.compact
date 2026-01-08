@@ -187,7 +187,7 @@ export circuit is_player_alive(local_board: Committable<Board>, guess: Field): B
 export circuit start(pos: Field, wager: ShieldedCoinInfo, deposit: ShieldedCoinInfo): Player {
   assert(state == State.no_game || state == State.red_started, "The game already has two players");
   if (state == State.red_started) {
-     assert(wager.value == pot.value && wager.color == pot.color, "Blue must match Reds wager");
+    assert(wager.value == pot.value && wager.color == pot.color, "Blue must match Reds wager");
   }
   assert(deposit.value == 100000 && deposit.color == nativeToken(), "Invalid deposit");
   const b = Board { pos };
@@ -201,24 +201,24 @@ export circuit start(pos: Field, wager: ShieldedCoinInfo, deposit: ShieldedCoinI
   const cb = Committable<Board> { n, b };
 
   if (state == State.no_game) {
-     pot.writeCoin(wager, right<ZswapCoinPublicKey, ContractAddress>(kernel.self()));
-     red_deposit.writeCoin(deposit, right<ZswapCoinPublicKey, ContractAddress>(kernel.self()));
-     red = red_pk(sk);
-     red_board = commit<Board>(cb);
-     state = State.red_started;
-     local_set_board(cb);
-     return Player.red;
+    pot.writeCoin(wager, right<ZswapCoinPublicKey, ContractAddress>(kernel.self()));
+    red_deposit.writeCoin(deposit, right<ZswapCoinPublicKey, ContractAddress>(kernel.self()));
+    red = red_pk(sk);
+    red_board = commit<Board>(cb);
+    state = State.red_started;
+    local_set_board(cb);
+    return Player.red;
   } else {
-     pot.writeCoin(
-       mergeCoinImmediate(pot, wager),
-       right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
-       );
-     blue_deposit.writeCoin(deposit, right<ZswapCoinPublicKey, ContractAddress>(kernel.self()));
-     blue = blue_pk(sk);
-     blue_board = commit<Board>(cb);
-     state = State.blue_started;
-     local_set_board(cb);
-     return Player.blue;
+    pot.writeCoin(
+      mergeCoinImmediate(pot, wager),
+      right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
+      );
+    blue_deposit.writeCoin(deposit, right<ZswapCoinPublicKey, ContractAddress>(kernel.self()));
+    blue = blue_pk(sk);
+    blue_board = commit<Board>(cb);
+    state = State.blue_started;
+    local_set_board(cb);
+    return Player.blue;
   }
 }
 

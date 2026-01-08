@@ -29,12 +29,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     structure.  This special treatment is inhibited by end-of-line comments between
     the outer "else" keyword and the inner "if" keyword.
 
+- The formatter now accepts a --line-length <n> parameter that sets the target line
+  length to <n>.  The default line length currently defaults to 100.  The target line
+  length can be exceeded in cases where the formatter considers the portion of input
+  to be fit on a line to be unbreakable.
+
 ### Internal notes
 
 - Configuration parameters have been collected into a single new library, (config-params)
+
 - The formatter line length is now a configuration parameter, set to 100 by default.
-- copiler/go now catches keyboard interrupts while running the tests and aborts the tests.
+
+- compiler/go now catches keyboard interrupts while running the tests and aborts the tests.
+
 - compier.md now more accurately describes the composition of the token stream.
+
 - The formatter improvements are supported by the following changes:
   - add-block (appropriately renamed make-Qblock, since it returns a block)
     has been simplified to take a header rather than a proc that produces a header
