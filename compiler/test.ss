@@ -95,6 +95,7 @@ groups than for single tests.
         (parser)
         (passes)
         (sourcemaps)
+        (config-params)
         (utils)
         (json)
         (runtime-version)
@@ -1234,7 +1235,7 @@ groups than for single tests.
   (test
     '(
       "circuit foo(pos: Uint<32>): Uint<64> {"
-      "return pos + 1 + pos - 2 + pos - 3 + pos - 4 + pos - 5 + pos - 6 + pos - 7 + pos - 8 + pos - 9;"
+      "return pos + 1 + pos - 2 + pos - 3 + pos - 4 + pos - 5 + pos - 6 + pos - 7 + pos - 8 + pos - 9 + pos - 10 + pos - 11 + pos - 12 + pos - 13 + pos - 14 + pos - 15;"
       "}"
       )
     (output-file "compiler/testdir/formatter/testfile.compact"
@@ -1257,7 +1258,19 @@ groups than for single tests.
         "         pos -"
         "         8 +"
         "         pos -"
-        "         9;"
+        "         9 +"
+        "         pos -"
+        "         10 +"
+        "         pos -"
+        "         11 +"
+        "         pos -"
+        "         12 +"
+        "         pos -"
+        "         13 +"
+        "         pos -"
+        "         14 +"
+        "         pos -"
+        "         15;"
         "}"))
     )
 
@@ -1753,12 +1766,14 @@ groups than for single tests.
         ""
         "  pot.writeCoin("
         "    mergeCoinImmediate(pot, seedCoin),"
-        "    right<ZswapCoinPublicKey, ContractAddress>(kernel.self()));"
+        "    right<ZswapCoinPublicKey, ContractAddress>(kernel.self())"
+        "    );"
         "  return mintShieldedToken("
         "           dao_token_domain_separator(),"
         "           amount,"
         "           evolveNonce(0, coin.nonce),"
-        "           left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()));"
+        "           left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey())"
+        "           );"
         ""
         "  if (a) return b;"
         ""
@@ -1767,25 +1782,25 @@ groups than for single tests.
         "  }"
         ""
         "  if (a)"
-        "     return b;"
+        "    return b;"
         "  else"
-        "     return c;"
+        "    return c;"
         ""
         "  if (a)"
-        "     return b;"
+        "    return b;"
         "  else {"
-        "     return c;"
+        "    return c;"
         "  }"
         ""
         "  if (a) {"
-        "     return b;"
+        "    return b;"
         "  } else"
-        "     return c;"
+        "    return c;"
         ""
         "  if (a) {"
-        "     return b;"
+        "    return b;"
         "  } else {"
-        "     return c;"
+        "    return c;"
         "  }"
         ""
         "  if (a < f(a))"
@@ -1793,7 +1808,8 @@ groups than for single tests.
         "             dao_token_domain_separator(),"
         "             amount,"
         "             evolveNonce(0, coin.nonce),"
-        "             left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()));"
+        "             left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey())"
+        "             );"
         "}"))
     )
 
@@ -2578,6 +2594,616 @@ groups than for single tests.
         ""
         "export { foo, peter, paul, mary, red, blue, green, yellow };"))
     )
+
+  (test
+    '(
+      "export circuit sumVectorUntilZero(values: Vector<4, Field>): Field {"
+      "  resetForExamples();"
+      ""
+      "  const [sum, _] = fold(([sum, done], entry): [Field, Boolean] => {"
+      "                                                                    if (done) {"
+      "                                                                       return [sum, done];"
+      "                                                                    } else"
+      "                                                                       if (entry == 0) {"
+      "                                                                          return [sum, true];"
+      "                                                                       } else {"
+      "                                                                          return [sum + entry,"
+      "                                                                                  false];"
+      "                                                                       }"
+      "                                                                  }, [0, false], values);"
+      "  _vectorSum = disclose(sum);"
+      "  return sum;"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "export circuit sumVectorUntilZero(values: Vector<4, Field>): Field {"
+        "  resetForExamples();"
+        ""
+        "  const [sum, _] ="
+        "          fold(([sum, done], entry): [Field, Boolean] => {"
+        "                 if (done) {"
+        "                   return [sum, done];"
+        "                 } else if (entry == 0) {"
+        "                   return [sum, true];"
+        "                 } else {"
+        "                   return [sum + entry, false];"
+        "                 }"
+        "               },"
+        "               [0, false],"
+        "               values);"
+        "  _vectorSum = disclose(sum);"
+        "  return sum;"
+        "}"))
+    )
+
+  (test
+    '(
+      "export circuit sumVectorUntilZero(values: Vector<4, Field>): Field {"
+      "  resetForExamples();"
+      ""
+      "  const [sum, _] = fold(([sum, done], entry): [Field, Boolean] => {"
+      "                                                                    if (done)"
+      "                                                                       return [sum, done];"
+      "                                                                    else"
+      "                                                                       if (entry == 0)"
+      "                                                                          return [sum, true];"
+      "                                                                       else"
+      "                                                                          return [sum + entry,"
+      "                                                                                  false];"
+      "                                                                      "
+      "                                                                  }, [0, false], values);"
+      "  _vectorSum = disclose(sum);"
+      "  return sum;"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "export circuit sumVectorUntilZero(values: Vector<4, Field>): Field {"
+        "  resetForExamples();"
+        ""
+        "  const [sum, _] ="
+        "          fold(([sum, done], entry): [Field, Boolean] => {"
+        "                 if (done)"
+        "                   return [sum, done];"
+        "                 else if (entry == 0)"
+        "                   return [sum, true];"
+        "                 else"
+        "                   return [sum + entry, false];"
+        ""
+        "               },"
+        "               [0, false],"
+        "               values);"
+        "  _vectorSum = disclose(sum);"
+        "  return sum;"
+        "}"))
+    )
+
+  (test
+    '(
+      "export circuit sumVectorUntilZero(values: Vector<4, Field>, bools: Vector<4, Boolean>): Vector<4, Field> {"
+      "  resetForExamples();"
+      ""
+      "  const xyz = map((entry, b): [Field, Boolean] => {"
+      "                                                                    if (b)"
+      "                                                                       return entry * entry;"
+      "                                                                    else"
+      "                                                                       if (entry == 0)"
+      "                                                                          return 0;"
+      "                                                                       else"
+      "                                                                          return entry + entry;"
+      "                                                                      "
+      "                                                                  }, values);"
+      "  return xyz;"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "export circuit sumVectorUntilZero("
+        "                 values: Vector<4, Field>,"
+        "                 bools: Vector<4, Boolean>"
+        "                 ): Vector<4, Field> {"
+        "  resetForExamples();"
+        ""
+        "  const xyz = map((entry, b): [Field, Boolean] => {"
+        "                    if (b)"
+        "                      return entry * entry;"
+        "                    else if (entry == 0)"
+        "                      return 0;"
+        "                    else"
+        "                      return entry + entry;"
+        ""
+        "                  },"
+        "                  values);"
+        "  return xyz;"
+        "}"))
+    )
+
+  (test
+    '(
+      "export circuit sumVectorUntilZero(values: Vector<4, Field>, bools: Vector<4, Boolean>): Vector<4, Field> {"
+      "  resetForExamples();"
+      ""
+      "  const xyz = map((entry, b): [Field, Boolean] => /* hello */ {"
+      "                                                                    if (b)"
+      "                                                                       return entry * entry;"
+      "                                                                    else"
+      "                                                                       if (entry == 0)"
+      "                                                                          return 0;"
+      "                                                                       else"
+      "                                                                          return entry + entry;"
+      "                                                                      "
+      "                                                                  }, values);"
+      "  return xyz;"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "export circuit sumVectorUntilZero("
+        "                 values: Vector<4, Field>,"
+        "                 bools: Vector<4, Boolean>"
+        "                 ): Vector<4, Field> {"
+        "  resetForExamples();"
+        ""
+        "  const xyz = map((entry, b): [Field, Boolean] => /* hello */ {"
+        "                    if (b)"
+        "                      return entry * entry;"
+        "                    else if (entry == 0)"
+        "                      return 0;"
+        "                    else"
+        "                      return entry + entry;"
+        ""
+        "                  },"
+        "                  values);"
+        "  return xyz;"
+        "}"))
+    )
+
+  (test
+    '(
+      "export circuit sumVectorUntilZero(values: Vector<4, Field>, bools: Vector<4, Boolean>): Vector<4, Field> {"
+      "  resetForExamples();"
+      ""
+      "  const xyz = map((entry, b): [Field, Boolean] => // hello"
+      "                                                  {"
+      "                                                                    if (b)"
+      "                                                                       return entry * entry;"
+      "                                                                    else"
+      "                                                                       if (entry == 0)"
+      "                                                                          return 0;"
+      "                                                                       else"
+      "                                                                          return entry + entry;"
+      "                                                                      "
+      "                                                                  }, values);"
+      "  return xyz;"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "export circuit sumVectorUntilZero("
+        "                 values: Vector<4, Field>,"
+        "                 bools: Vector<4, Boolean>"
+        "                 ): Vector<4, Field> {"
+        "  resetForExamples();"
+        ""
+        "  const xyz = map((entry, b): [Field, Boolean] => // hello"
+        "                  {"
+        "                    if (b)"
+        "                      return entry * entry;"
+        "                    else if (entry == 0)"
+        "                      return 0;"
+        "                    else"
+        "                      return entry + entry;"
+        ""
+        "                  },"
+        "                  values);"
+        "  return xyz;"
+        "}"))
+    )
+
+  (test
+    '(
+      "constructor(arg1: Field, arg2: Field, arg3: Field, arg4: Field, arg5: Field, arg6: Field, arg7: Field, arg8: Field,) {"
+      "  return;"
+      "}"
+      "circuit fairlylongcircuitname1<typeA, typeB, sizeX>(vector1: Vector<sizeX, typeA>, vector2: Vector<sizeX, typeB>): Vector<sizeX, typeA> {"
+      "  return ((vector1: Vector<sizeX, typeA>, vector2: Vector<sizeX, typeB>, vector3: Vector<sizeX, typeB>): Vector<sizeX, typeA> => vector1)(vector1, vector2, vector3);"
+      "}"
+      "circuit fairlylongcircuitname2<typeA, typeB, sizeX>(vector1: Vector<sizeX, typeA>, vector2: Vector<sizeX, typeB>): Vector<sizeX, typeA> {"
+      "  return (vector1: Vector<sizeX, typeA>, vector2: Vector<sizeX, typeB>, vector3: Vector<sizeX, typeB>): Vector<sizeX, typeA> => { return vector1; }(vector1, vector2, vector3);"
+      "}"
+      "circuit fairlylongnativename<typeA, typeB, sizeX>(vector1: Vector<sizeX, typeA>, vector2: Vector<sizeX, typeB>): Vector<sizeX, typeA>;"
+      "witness fairlylongwitnessname<typeA, typeB, sizeX>(vector1: Vector<sizeX, typeA>, vector2: Vector<sizeX, typeB>): Vector<sizeX, typeA>;"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "constructor(arg1: Field,"
+        "            arg2: Field,"
+        "            arg3: Field,"
+        "            arg4: Field,"
+        "            arg5: Field,"
+        "            arg6: Field,"
+        "            arg7: Field,"
+        "            arg8: Field,"
+        "            ) {"
+        "  return;"
+        "}"
+        ""
+        "circuit fairlylongcircuitname1<typeA, typeB, sizeX>("
+        "          vector1: Vector<sizeX, typeA>,"
+        "          vector2: Vector<sizeX, typeB>"
+        "          ): Vector<sizeX, typeA> {"
+        "  return ((vector1: Vector<sizeX, typeA>,"
+        "           vector2: Vector<sizeX, typeB>,"
+        "           vector3: Vector<sizeX, typeB>"
+        "           ): Vector<sizeX, typeA> =>"
+        "          vector1)("
+        "           vector1,"
+        "           vector2,"
+        "           vector3"
+        "           );"
+        "}"
+        ""
+        "circuit fairlylongcircuitname2<typeA, typeB, sizeX>("
+        "          vector1: Vector<sizeX, typeA>,"
+        "          vector2: Vector<sizeX, typeB>"
+        "          ): Vector<sizeX, typeA> {"
+        "  return (vector1: Vector<sizeX, typeA>,"
+        "          vector2: Vector<sizeX, typeB>,"
+        "          vector3: Vector<sizeX, typeB>"
+        "          ): Vector<sizeX, typeA> => {"
+        "           return vector1;"
+        "         }("
+        "           vector1,"
+        "           vector2,"
+        "           vector3"
+        "           );"
+        "}"
+        ""
+        "circuit fairlylongnativename<typeA, typeB, sizeX>("
+        "          vector1: Vector<sizeX, typeA>,"
+        "          vector2: Vector<sizeX, typeB>"
+        "          ): Vector<sizeX, typeA>;"
+        ""
+        "witness fairlylongwitnessname<typeA, typeB, sizeX>("
+        "          vector1: Vector<sizeX, typeA>,"
+        "          vector2: Vector<sizeX, typeB>"
+        "          ): Vector<sizeX, typeA>;"))
+    )
+
+  (test
+    '(
+      "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+      "// line1"
+      "/* left1 */ if (a)"
+      "  return b;"
+      ""
+      "/* left2 */if (a)"
+      "/* left3 */{"
+      "  return b;"
+      "}"
+      ""
+      "/* left4 */if (a)"
+      "  return b;"
+      "/* left5 */else"
+      "  return c;"
+      ""
+      "/* left6 */if (a)"
+      "  return b;"
+      "/* left7 */else {"
+      "  return c;"
+      "}"
+      ""
+      "/* left8 */if (a)"
+      "/* left9 */{"
+      "  return b;"
+      "/* left10 */} /* left11 */else"
+      "  return c /* right1 */;"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+        "  // line1"
+        "  /* left1 */ if (a) return b;"
+        ""
+        "  /* left2 */ if (a) /* left3 */ {"
+        "    return b;"
+        "  }"
+        ""
+        "  /* left4 */ if (a)"
+        "    return b;"
+        "  /* left5 */ else"
+        "    return c;"
+        ""
+        "  /* left6 */ if (a)"
+        "    return b;"
+        "  /* left7 */ else {"
+        "    return c;"
+        "  }"
+        ""
+        "  /* left8 */ if (a) /* left9 */ {"
+        "    return b;"
+        "    /* left10 */"
+        "  } /* left11 */ else"
+        "    return c /* right1 */;"
+        "}"))
+    )
+
+  (test
+    '(
+      "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+      "  if (a)"
+      "    return b;"
+      "  else"
+      "    if (a)"
+      "      return b;"
+      "    else"
+      "      if (a)"
+      "        return b;"
+      "      else"
+      "        return c;"
+      ""
+      "  if (a)"
+      "    return b;"
+      "  else {"
+      "    if (a)"
+      "      return b;"
+      "    else {"
+      "      if (a)"
+      "        return b;"
+      "      else {"
+      "        return c;"
+      "      }"
+      "    }"
+      "  }"
+      ""
+      "  if (a) {"
+      "    return b;"
+      "  } else"
+      "    if (a) {"
+      "      return b;"
+      "      }"
+      "    else"
+      "      if (a) {"
+      "        return b;"
+      "      }"
+      "      else if (a) {"
+      "        return c;"
+      "      }"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+        "  if (a)"
+        "    return b;"
+        "  else if (a)"
+        "    return b;"
+        "  else if (a)"
+        "    return b;"
+        "  else"
+        "    return c;"
+        ""
+        "  if (a)"
+        "    return b;"
+        "  else {"
+        "    if (a)"
+        "      return b;"
+        "    else {"
+        "      if (a)"
+        "        return b;"
+        "      else {"
+        "        return c;"
+        "      }"
+        "    }"
+        "  }"
+        ""
+        "  if (a) {"
+        "    return b;"
+        "  } else if (a) {"
+        "    return b;"
+        "  } else if (a) {"
+        "    return b;"
+        "  } else if (a) {"
+        "    return c;"
+        "  }"
+        "}"))
+    )
+
+  (test
+    '(
+      "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+      "  /* left */if (a)"
+      "    return b;"
+      "  else"
+      "    /* left */if (a)"
+      "      return b;"
+      "    else"
+      "      /* left */if (a)"
+      "        return b;"
+      "      else"
+      "        return c;"
+      ""
+      "  /* left */if (a)"
+      "    return b;"
+      "  else {"
+      "    /* left */if (a)"
+      "      return b;"
+      "    else {"
+      "      /* left */if (a)"
+      "        return b;"
+      "      else {"
+      "        return c;"
+      "      }"
+      "    }"
+      "  }"
+      ""
+      "  /* left */if (a) {"
+      "    return b;"
+      "  } else"
+      "    /* left */if (a) {"
+      "      return b;"
+      "      }"
+      "    else"
+      "      /* left */if (a) {"
+      "        return b;"
+      "      }"
+      "      else /* left */if (a) {"
+      "        return c;"
+      "      }"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+        "  /* left */ if (a)"
+        "    return b;"
+        "  else /* left */ if (a)"
+        "    return b;"
+        "  else /* left */ if (a)"
+        "    return b;"
+        "  else"
+        "    return c;"
+        ""
+        "  /* left */ if (a)"
+        "    return b;"
+        "  else {"
+        "    /* left */ if (a)"
+        "      return b;"
+        "    else {"
+        "      /* left */ if (a)"
+        "        return b;"
+        "      else {"
+        "        return c;"
+        "      }"
+        "    }"
+        "  }"
+        ""
+        "  /* left */ if (a) {"
+        "    return b;"
+        "  } else /* left */ if (a) {"
+        "    return b;"
+        "  } else /* left */ if (a) {"
+        "    return b;"
+        "  } else /* left */ if (a) {"
+        "    return c;"
+        "  }"
+        "}"))
+    )
+
+  (test
+    '(
+      "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+      "  if (a)"
+      "    return b;"
+      "  else //right"
+      "    if (a)"
+      "      return b;"
+      "    else"
+      "      //line"
+      "      if (a)"
+      "        return b;"
+      "      else /* right */"
+      "        return c;"
+      ""
+      "  if (a)"
+      "    return b;"
+      "  else //right"
+      "  {"
+      "    if (a)"
+      "      return b;"
+      "    //line"
+      "    else {"
+      "      if (a)"
+      "        return b;"
+      "      else /* left */{"
+      "        return c;"
+      "      }"
+      "    }"
+      "  }"
+      ""
+      "  if (a) {"
+      "    return b;"
+      "  } else //right"
+      "    if (a) {"
+      "      return b;"
+      "      }"
+      "    else /*right */"
+      "      if (a) {"
+      "        return b;"
+      "      }"
+      "      else /* left*/ if (a) {"
+      "        return c;"
+      "      }"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "circuit foo(a: Boolean, b: Field, c: Field): Field {"
+        "  if (a)"
+        "    return b;"
+        "  else //right"
+        "    if (a)"
+        "      return b;"
+        "    else"
+        "      //line"
+        "      if (a)"
+        "        return b;"
+        "      else /* right */"
+        "        return c;"
+        ""
+        "  if (a)"
+        "    return b;"
+        "  else //right"
+        "    {"
+        "      if (a)"
+        "        return b;"
+        "      //line"
+        "      else {"
+        "        if (a)"
+        "          return b;"
+        "        else /* left */ {"
+        "          return c;"
+        "        }"
+        "      }"
+        "    }"
+        ""
+        "  if (a) {"
+        "    return b;"
+        "  } else //right"
+        "    if (a) {"
+        "      return b;"
+        "    } else /*right */"
+        "      if (a) {"
+        "        return b;"
+        "      } else /* left*/ if (a) {"
+        "        return c;"
+        "      }"
+        "}"))
+    )
+
+  (test
+    '(
+      "import CompactStandardLibrary;"
+      "ledger quitealongmapnameinfactasyoumightnotice: Map<Field, Field>;"
+      "circuit foo(seeherequitealongvariablename1: Field, seeherequitealongvariablename2: Field): [] {"
+      "  quitealongmapnameinfactasyoumightnotice.insert(seeherequitealongvariablename1, seeherequitealongvariablename1);"
+      "}"
+      )
+    (output-file "compiler/testdir/formatter/testfile.compact"
+      '(
+        "import CompactStandardLibrary;"
+        ""
+        "ledger quitealongmapnameinfactasyoumightnotice: Map<Field, Field>;"
+        ""
+        "circuit foo(seeherequitealongvariablename1: Field, seeherequitealongvariablename2: Field): [] {"
+        "  quitealongmapnameinfactasyoumightnotice.insert("
+        "    seeherequitealongvariablename1,"
+        "    seeherequitealongvariablename1"
+        "    );"
+        "}"))
+    )
 )
 
 (run-tests parse-file/fixup/format/reparse
@@ -2810,7 +3436,7 @@ groups than for single tests.
   (test
     '(
       "circuit foo(pos: Uint<32>): Uint<64> {"
-      "return pos + 1 + pos - 2 + pos - 3 + pos - 4 + pos - 5 + pos - 6 + pos - 7 + pos - 8 + pos - 9;"
+      "return pos + 1 + pos - 2 + pos - 3 + pos - 4 + pos - 5 + pos - 6 + pos - 7 + pos - 8 + pos - 9 + pos - 10 + pos - 11 + pos - 12 + pos - 13 + pos - 14 + pos - 15;"
       "}"
       )
     (output-file "compiler/testdir/fixup/testfile.compact"
@@ -2833,7 +3459,19 @@ groups than for single tests.
         "         pos -"
         "         8 +"
         "         pos -"
-        "         9;"
+        "         9 +"
+        "         pos -"
+        "         10 +"
+        "         pos -"
+        "         11 +"
+        "         pos -"
+        "         12 +"
+        "         pos -"
+        "         13 +"
+        "         pos -"
+        "         14 +"
+        "         pos -"
+        "         15;"
         "}"))
     )
 
@@ -12434,7 +13072,7 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "export circuit ecAdd(a: CurvePoint, b: CurvePoint): CurvePoint;"
+      "export circuit ecAdd(a: NativePoint, b: NativePoint): NativePoint;"
       )
     (oops
       message: "~a:\n  ~?"
@@ -16170,41 +16808,36 @@ groups than for single tests.
 
   (test
     '(
-      "export struct CurvePoint {"
-      "  x: Field;"
-      "  y: Field;"
-      "}"
-      "circuit ecAdd(x: Bytes<32>, y: CurvePoint): CurvePoint;"
+      "import {NativePoint} from CompactStandardLibrary;"
+      "circuit ecAdd(x: Bytes<32>, y: NativePoint): NativePoint;"
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 5 char 1" "mismatch between declared type ~a and expected type ~a for ~:r argument of native ~s~@[ (~a)~]" ("Bytes<32>" "Struct<Field, Field>" 1 ecAdd #f)))
+      irritants: '("testfile.compact line 2 char 1" "mismatch between declared type ~a and expected type ~a for ~:r argument of native ~s~@[ (~a)~]" ("Bytes<32>" "NativePoint" 1 ecAdd #f)))
     )
 
   (test
     '(
-      "export struct CurvePoint {"
+      "import {NativePoint} from CompactStandardLibrary;"
+      "export struct NonNativePoint {"
       "  x: Field;"
       "  y: Field;"
       "}"
-      "circuit ecAdd(x: CurvePoint, y: Boolean): CurvePoint;"
+      "circuit ecAdd(x: NonNativePoint, y: NativePoint): NativePoint;"
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 5 char 1" "mismatch between declared type ~a and expected type ~a for ~:r argument of native ~s~@[ (~a)~]" ("Boolean" "Struct<Field, Field>" 2 ecAdd #f)))
+      irritants: '("testfile.compact line 6 char 1" "mismatch between declared type ~a and expected type ~a for ~:r argument of native ~s~@[ (~a)~]" ("struct NonNativePoint<x: Field, y: Field>" "NativePoint" 1 ecAdd #f)))
     )
 
   (test
     '(
-      "export struct CurvePoint {"
-      "  x: Field;"
-      "  y: Field;"
-      "}"
-      "circuit ecAdd(x: CurvePoint, y: CurvePoint): Field;"
+      "import {NativePoint} from CompactStandardLibrary;"
+      "circuit ecAdd(x: NativePoint, y: NativePoint): Field;"
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 5 char 1" "mismatch between declared type ~a and expected type ~a for return value of native ~a~@[ (~a)~]" ("Field" "Struct<Field, Field>" ecAdd #f)))
+      irritants: '("testfile.compact line 2 char 1" "mismatch between declared type ~a and expected type ~a for return value of native ~a~@[ (~a)~]" ("Field" "NativePoint" ecAdd #f)))
     )
 
   #|
@@ -16244,29 +16877,42 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "export circuit foo(c: CurvePoint): CurvePoint {"
+      "export circuit foo(c: NativePoint): NativePoint {"
       "  return ecAdd(c, ecMul(c, 3));"
       "}"
       )
     (returns
       (program
         (public-ledger-declaration %kernel.0 (Kernel))
-        (external %ecAdd.1 ([%a.2 (tstruct CurvePoint
-                                     (x (tfield))
-                                     (y (tfield)))]
-                             [%b.3 (tstruct CurvePoint
-                                     (x (tfield))
-                                     (y (tfield)))])
-             (tstruct CurvePoint (x (tfield)) (y (tfield))))
-        (external %ecMul.4 ([%a.5 (tstruct CurvePoint
-                                     (x (tfield))
-                                     (y (tfield)))]
+        (external %ecAdd.1 ([%a.2 (talias #t NativePoint
+                                    (tstruct SimplePoint
+                                      (x (tfield))
+                                      (y (tfield))))]
+                             [%b.3 (talias #t NativePoint
+                                    (tstruct SimplePoint
+                                      (x (tfield))
+                                      (y (tfield))))])
+             (talias #t NativePoint
+               (tstruct SimplePoint
+                 (x (tfield))
+                 (y (tfield)))))
+        (external %ecMul.4 ([%a.5 (talias #t NativePoint
+                                    (tstruct SimplePoint
+                                      (x (tfield))
+                                      (y (tfield))))]
                              [%b.6 (tfield)])
-             (tstruct CurvePoint (x (tfield)) (y (tfield))))
-        (circuit %foo.7 ([%c.8 (tstruct CurvePoint
-                                 (x (tfield))
-                                 (y (tfield)))])
-             (tstruct CurvePoint (x (tfield)) (y (tfield)))
+             (talias #t NativePoint
+               (tstruct SimplePoint
+                 (x (tfield))
+                 (y (tfield)))))
+        (circuit %foo.7 ([%c.8 (talias #t NativePoint
+                                  (tstruct SimplePoint
+                                    (x (tfield))
+                                    (y (tfield))))])
+             (talias #t NativePoint
+               (tstruct SimplePoint
+                 (x (tfield))
+                 (y (tfield))))
           (call %ecAdd.1
             %c.8
             (call %ecMul.4 %c.8 (safe-cast (tfield) (tunsigned 3) 3))))))
@@ -22184,7 +22830,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 4 char 3" "mismatch between actual return type ~a and declared return type ~a of ~a" ("U32=Uint<32>" "Uint<32>" "circuit foo")))
+      irritants: '("testfile.compact line 4 char 3" "mismatch between actual return type ~a and declared return type ~a of ~a" ("U32" "Uint<32>" "circuit foo")))
     )
 
   (test
@@ -22333,7 +22979,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 3 char 10" "incompatible combination of types ~a and ~a for binary arithmetic operator ~s" ("T=Uint<32>" "Uint<32>" +)))
+      irritants: '("testfile.compact line 3 char 10" "incompatible combination of types ~a and ~a for binary arithmetic operator ~s" ("T" "Uint<32>" +)))
     )
 
   (test
@@ -22346,7 +22992,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 4 char 10" "incompatible types ~a and ~a for equality operator" ("T1=Uint<32>" "T2=Uint<32>")))
+      irritants: '("testfile.compact line 4 char 10" "incompatible types ~a and ~a for equality operator" ("T1" "T2")))
     )
 
   (test
@@ -22359,7 +23005,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 4 char 10" "incompatible combination of types ~a and ~a for relational operator" ("T1=Uint<32>" "T2=Uint<32>")))
+      irritants: '("testfile.compact line 4 char 10" "incompatible combination of types ~a and ~a for relational operator" ("T1" "T2")))
     )
 
   (test
@@ -22372,7 +23018,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 4 char 10" "incompatible combination of types ~a and ~a for binary arithmetic operator ~s" ("T1=Uint<32>" "T2=Uint<32>" *)))
+      irritants: '("testfile.compact line 4 char 10" "incompatible combination of types ~a and ~a for binary arithmetic operator ~s" ("T1" "T2" *)))
     )
 
   (test
@@ -22459,7 +23105,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 7 char 4" "expected ~:r argument of ~s to have type ~a but received ~a" (2 insert "T1=Map<Field, Field>" "Map<Field, Field>")))
+      irritants: '("testfile.compact line 7 char 4" "expected ~:r argument of ~s to have type ~a but received ~a" (2 insert "T1" "Map<Field, Field>")))
     )
 
   (test
@@ -22534,7 +23180,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 6 char 4" "operation ~a undefined for ledger field type ~a" (insertCoin "Set<QSCI=struct QualifiedShieldedCoinInfo<nonce: Bytes<32>, color: Bytes<32>, value: Uint<128>, mt_index: Uint<64>>>")))
+      irritants: '("testfile.compact line 6 char 4" "operation ~a undefined for ledger field type ~a" (insertCoin "Set<QSCI>")))
     )
 
   (test
@@ -29083,8 +29729,8 @@ groups than for single tests.
       message: "~a:\n  ~?"
       irritants: '("<standard library>" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter input of exported circuit sendImmediateShielded at <standard library>" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the result of a subtraction involving the witness value")))
       message: "~a:\n  ~?"
-      irritants: '("<standard library>" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter value of exported circuit sendImmediateShielded at <standard library>" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the result of a subtraction involving the witness value")))
-    ))
+      irritants: '("<standard library>" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter value of exported circuit sendImmediateShielded at <standard library>" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the result of a subtraction involving the witness value"))))
+    )
 
   (test
     '("import CompactStandardLibrary;"
@@ -29114,8 +29760,8 @@ groups than for single tests.
       message: "~a:\n  ~?"
       irritants: '("<standard library>" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter input of exported circuit sendShielded at <standard library>" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the result of a subtraction involving the witness value")))
       message: "~a:\n  ~?"
-      irritants: '("<standard library>" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter value of exported circuit sendShielded at <standard library>" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the result of a subtraction involving the witness value")))
-    ))
+      irritants: '("<standard library>" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter value of exported circuit sendShielded at <standard library>" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the result of a subtraction involving the witness value"))))
+    )
 
   (test
     '("import CompactStandardLibrary;"
@@ -30331,7 +30977,7 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       "witness W(): Boolean;"
-      "export circuit foo(): CurvePoint {"
+      "export circuit foo(): NativePoint {"
       "  return hashToCurve<Boolean>(W());"
       "}"
       )
@@ -30344,7 +30990,7 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       "witness W(): Boolean;"
-      "export circuit foo(): CurvePoint {"
+      "export circuit foo(): NativePoint {"
       "  return disclose(hashToCurve<Boolean>(W()));"
       "}"
       )
@@ -34403,7 +35049,7 @@ groups than for single tests.
          ))
      (oops
        message: "~a:\n  ~?"
-       irritants: '("testfile.compact line 6 char 1" "invalid type ~a for witness ~a return value:\n  witness return values cannot include contract values" ("C1=contract C<foo(Bytes<32>): [], pure bar(): Bytes<32>>" W)))
+       irritants: '("testfile.compact line 6 char 1" "invalid type ~a for witness ~a return value:\n  witness return values cannot include contract values" ("C1" W)))
      ))
 
   (test-group
@@ -34445,7 +35091,7 @@ groups than for single tests.
          ))
      (oops
        message: "~a:\n  ~?"
-       irritants: '("testfile.compact line 6 char 1" "invalid type ~a for circuit ~a argument ~d:\n  exported circuit arguments cannot include contract values" ("C1=contract C<foo(Bytes<32>): [], pure bar(): Bytes<32>>" foo 2)))
+       irritants: '("testfile.compact line 6 char 1" "invalid type ~a for circuit ~a argument ~d:\n  exported circuit arguments cannot include contract values" ("C1" foo 2)))
      ))
 
   (test-group
@@ -34466,7 +35112,7 @@ groups than for single tests.
          ))
      (oops
        message: "~a:\n  ~?"
-       irritants: '("testfile.compact line 6 char 1" "invalid type ~a for circuit ~a argument ~d:\n  exported circuit arguments cannot include contract values" ("[C1=contract C<foo(Bytes<32>): [], pure bar(): Bytes<32>>, Uint<32>]" foo 2)))
+       irritants: '("testfile.compact line 6 char 1" "invalid type ~a for circuit ~a argument ~d:\n  exported circuit arguments cannot include contract values" ("[C1, Uint<32>]" foo 2)))
      ))
 
   (test-group
@@ -45596,7 +46242,7 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "export circuit foo(p1: CurvePoint, p2: CurvePoint): CurvePoint {"
+      "export circuit foo(p1: NativePoint, p2: NativePoint): NativePoint {"
       "  return ecAdd(ecAdd(ecAdd(ecMul(p1, transientHash<Vector<2, Field>>([p1.x, p2.x])), ecMulGenerator(17)), hashToCurve<ContractAddress>(kernel.self())), hashToCurve<Vector<0, Field>>([]));"
       "}"
       )
@@ -50691,7 +51337,7 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       "ledger impure: Boolean;"
-      "export circuit foo(c: CurvePoint): CurvePoint {"
+      "export circuit foo(c: NativePoint): NativePoint {"
       "  impure = true;"
       "  return ecAdd(c, ecMul(c, 3));"
       "}"
@@ -51524,7 +52170,7 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       "ledger impure: Boolean;"
-      "export circuit foo(x: Boolean): CurvePoint {"
+      "export circuit foo(x: Boolean): NativePoint {"
       "  impure = true;"
       "  return hashToCurve<Boolean>(x);"
       "}"
@@ -56566,7 +57212,7 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "export circuit foo(p1: CurvePoint, p2: CurvePoint): CurvePoint {"
+      "export circuit foo(p1: NativePoint, p2: NativePoint): NativePoint {"
       "  return ecAdd(ecAdd(ecAdd(ecMul(p1, transientHash<Vector<2, Field>>([p1.x, p2.x])), ecMulGenerator(17)), hashToCurve<ContractAddress>(kernel.self())), hashToCurve<Vector<0, Field>>([]));"
       "}"
       )
@@ -59213,7 +59859,7 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       "ledger impure: Boolean;"
-      "export circuit foo(c: CurvePoint): CurvePoint {"
+      "export circuit foo(c: NativePoint): NativePoint {"
       "  impure = true;"
       "  return ecAdd(c, ecMul(c, 3));"
       "}"
@@ -59798,7 +60444,7 @@ groups than for single tests.
     '(
       "import CompactStandardLibrary;"
       "ledger impure: Boolean;"
-      "export circuit foo(x: Boolean): CurvePoint {"
+      "export circuit foo(x: Boolean): NativePoint {"
       "  impure = true;"
       "  return hashToCurve<Boolean>(x);"
       "}"
@@ -65719,10 +66365,10 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "export circuit foo(c: CurvePoint): CurvePoint {"
+      "export circuit foo(c: NativePoint): NativePoint {"
       "  return ecAdd(c, ecMul(c, 3));"
       "}"
-      "export circuit bar(x: Field): CurvePoint {"
+      "export circuit bar(x: Field): NativePoint {"
       "  return ecMulGenerator(x);"
       "}"
       )
@@ -66345,7 +66991,7 @@ groups than for single tests.
   (test
     '(
       "import CompactStandardLibrary;"
-      "export circuit foo(x: Boolean): CurvePoint {"
+      "export circuit foo(x: Boolean): NativePoint {"
       "  return hashToCurve<Boolean>(x);"
       "}"
       )
@@ -69347,9 +69993,9 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 6 char 11" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter ops of exported circuit foo at line 12 char 30" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the witness value\n    via this path through the program:\n      the first argument to bar at line 13 char 36\n      the comparison at line 5 char 7\n      the conditional branch at line 5 char 3")))
-      message: "~a:\n  ~?"
       irritants: '("testfile.compact line 6 char 11" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter vals of exported circuit foo at line 12 char 50" ("\n    nature of the disclosure:\n      ledger operation might disclose the result of an addition involving the witness value\n    via this path through the program:\n      the second argument to bar at line 13 char 36\n      the computation at line 6 char 13\n      the right-hand side of = at line 6 char 11")))
+      message: "~a:\n  ~?"
+      irritants: '("testfile.compact line 6 char 11" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter ops of exported circuit foo at line 12 char 30" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the witness value\n    via this path through the program:\n      the first argument to bar at line 13 char 36\n      the comparison at line 5 char 7\n      the conditional branch at line 5 char 3")))
       message: "~a:\n  ~?"
       irritants: '("testfile.compact line 6 char 13" "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}" ("the value of parameter ops of exported circuit foo at line 12 char 30" ("\n    nature of the disclosure:\n      performing this ledger operation might disclose the boolean value of the result of a comparison involving the witness value\n    via this path through the program:\n      the first argument to bar at line 13 char 36\n      the comparison at line 5 char 7\n      the conditional branch at line 5 char 3")))
       message: "~a:\n  ~?"
@@ -77465,6 +78111,27 @@ groups than for single tests.
         "test('check 1', () => {"
         "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
         "  expect(C.circuits.foo(Ctxt).result).toEqual([]);"
+        "});"
+        ))
+    )
+
+  (test
+    '(
+      "import CompactStandardLibrary;"
+      "ledger F: NativePoint;"
+      ""
+      "export circuit foo(np: NativePoint): [Field, Field] {"
+      "  F = disclose(np);"
+      "  const q = F;"
+      "  return [NativePointY(q), NativePointX(q)];"
+      "}"
+      )
+    (stage-javascript
+      `(
+        "test('check 1', () => {"
+        "  const [C, Ctxt] = startContract(contractCode, {}, 0);"
+        "  // NB: assumes the representation of NativePoint current as of the creation of this test"
+        "  expect(C.circuits.foo(Ctxt, {x: 3n, y: 7n}).result).toEqual([7n, 3n]);"
         "});"
         ))
     )

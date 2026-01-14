@@ -5,6 +5,85 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased compiler version 0.28.0, language version 0.20.0]
+
+This release includes all changes for compiler versions in the range 0.27.100
+(inclusive) and 0.28.0 (exclusive); and language versions in the range 0.19.100
+(inclusive) and 0.20.0.  It uses compact-runtime 0.14.0-rc.0 and 
+on-chain runtime 2.0.0-alpha.1.
+
+## [Unreleased compiler version 0.27.113, language version 0.19.103]
+
+### Changed
+
+- The formatter's handling of several forms has been improved:
+  - When the signature of a function needs to be broken up into multiple lines,
+    the parameter list is also broken up into multiple lines (even if it would itself
+    fit on one line), and the return-type declaration appears on a line following
+    the last parameter declaration. This change applies to circuit definitions,
+    external declarations, witness declarations, the constructor, and anonymous
+    circuit definitions.
+  - When a call expression needs to be broken up into multiple lines, the argument
+    list is also broken up into multiple lines (even if it would itself
+    fit on one line), and the closing parenthesis of the call appears on a line
+    following the last argument expression.
+  - When an anonymous circuit needs to be broken up into multiple lines, the body
+    of the circuit is indented a few spaces in from the start of the parameter
+    list rather than all the way out beyond the circuit's signature.
+  - When the "else" expression of an "if" expression is itself an "if" expression,
+    the inner "if" expression begins on the same line as the "else" and appears at
+    at the same level of indentation as the outer "if" expression, in a case-like
+    structure.  This special treatment is inhibited by end-of-line comments between
+    the outer "else" keyword and the inner "if" keyword.
+
+- The formatter now accepts a --line-length <n> parameter that sets the target line
+  length to <n>.  The default line length currently defaults to 100.  The target line
+  length can be exceeded in cases where the formatter considers the portion of input
+  to be fit on a line to be unbreakable.
+
+### Internal notes
+
+- Configuration parameters have been collected into a single new library, (config-params)
+
+- The formatter line length is now a configuration parameter, set to 100 by default.
+
+- compiler/go now catches keyboard interrupts while running the tests and aborts the tests.
+
+- compiler.md now more accurately describes the composition of the token stream.
+
+- The formatter improvements are supported by the following changes:
+  - add-block (appropriately renamed make-Qblock, since it returns a block)
+    has been simplified to take a header rather than a proc that produces a header
+  - make-Qsep has been split into two routines, one that expects a closer and one
+    that doesn't.
+  - make-Qsep and make-Qconcat now take an inherit-break? flag whose value is
+    recorded in the resulting Qconcat record.  Processing a Qconcat with this
+    flag set in the context in which lines are being broken causes the contents
+    of the Qconcat itself to be broken into multiple lines.  The contents of a
+    Qconcat q with this flag set are still indented relative to q.
+  - The code for handling function signatures is now commonized into a single
+    constructor make-Qsignature.
+
+## [Unreleased compiler version 0.27.112, language version 0.19.103]
+
+### Changed
+
+- The Compact standard library structure type NativePoint (nee CurvePoint)
+  is now a nominal type alias for an unexported internal type.  The standard
+  library also now exports two new circuits, NativePointX and NativePointY,
+  that can be used to access the x and y coordinates of a native point as Fields.
+  This is a breaking change because the internal representation of NativePoint
+  is no longer exposed.
+
+- In type errors produced by the Compact compiler, Nominal type aliases are
+  now shown simply as TypeName rather than as TypeName=Type.
+
+## [Unreleased compiler version 0.27.111, language version 0.19.102]
+
+### Changed
+
+- Changes `CurvePoint` to `NativePoint`
+
 ## [Unreleased compiler version 0.27.110, language version 0.19.101]
 
 ### Changed

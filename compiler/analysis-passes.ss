@@ -1358,10 +1358,9 @@
           [(tenum ,src ,enum-name ,elt-name ,elt-name* ...)
            (format "Enum<~a, ~s~{, ~s~}>" enum-name elt-name elt-name*)]
           [(talias ,src ,nominal? ,type-name ,type)
-           (let ([s (format-type type)])
-             (if nominal?
-                 (format "~a=~a" type-name s)
-                 s))]
+           (if nominal?
+               (format "~a" type-name)
+               (format-type type))]
           [(tadt ,src ,adt-name ([,adt-formal* ,adt-arg*] ...) ,vm-expr (,adt-op* ...) (,adt-rt-op* ...))
            (format-public-adt adt-name adt-arg*)]
           [else (internal-errorf 'format-type "unrecognized type ~a" type)]))
@@ -2172,6 +2171,7 @@
             (format "Vector<~a, ~a>" (format-native-nat native-nat) (format-native-type native-type))]
            [(native-type-struct native-type*)
             (format "Struct<~{~a~^, ~}>" (map format-native-type native-type*))]
+           [(native-type-alias name) (format "~a" name)]
            ; this can be tested by uncommenting the justfortesting in test.ss and midnight-natives.ss
            [(native-type-param name) (format "~a" name)]
            [(native-type-void) "[]"]))
@@ -2219,6 +2219,10 @@
                 [(tstruct ,src^ ,struct-name (,elt-name* ,type*) ...)
                  (and (= (length type*) (length native-type*))
                       (andmap verify-native-type native-type* type*))]
+                [else #f])]
+             [(native-type-alias name)
+              (nanopass-case (Ltypes Type) type
+                [(talias ,src^ ,nominal? ,type-name ,type) (eq? type-name name)]
                 [else #f])]
              [(native-type-param name)
               (let ([a (hashtable-cell param-ht name #f)])
@@ -4827,15 +4831,6 @@
               (and (same-path? pathA1 pathB1) (same-path? pathA2 pathB2))]
              [else #f])]))
 
-      (define (sort-witnesses witness*)
-        (let f ([n (length witness*)] [witness* witness*])
-          (if (fx<? n 2)
-              witness*
-              (let ([n/2 (fxsrl n 1)])
-                (merge-witnesses
-                  (f n/2 (list-head witness* n/2))
-                  (f (fx- n n/2) (list-tail witness* n/2)))))))
-
       (define (merge-witnesses witness1* witness2*)
         ; invariant: witness1* and witness2* are sorted and have no duplicates
         (cond
@@ -5058,12 +5053,15 @@
         (define leak-table (make-hashtable (lambda (x) (+ (source-object-hash (car x)) (string-hash (cdr x)))) equal?))
         (define (record-leak! src what witness*)
           (hashtable-update! leak-table (cons src what)
-            (lambda (witness0*) (append witness* witness0*))
+            (lambda (witness0*) (merge-witnesses witness* witness0*))
             '()))
         (define (get-leaks)
           (let-values ([(vkey vval) (hashtable-entries leak-table)])
             (vector-sort
-              (lambda (key1 key2) (source-object<? (car key1) (car key2)))
+              (lambda (key1 key2)
+                (or (source-object<? (car key1) (car key2))
+                    (and (not (source-object<? (car key2) (car key1)))
+                         (string<? (cadr key1) (cadr key2)))))
               (vector-map (lambda (key val) (list (car key) (cdr key) val)) vkey vval)))))
 
       (define (complain src what witness*)
@@ -5121,7 +5119,10 @@
                              (and (not (null? desc*))
                                   (reverse desc*)))))
                        via*))))
-            (sort-witnesses witness*))))
+            ; witnesses are sorted by uid.  resort by source position for the error message.
+            (sort
+              (lambda (w1 w2) (source-object<? (witness-src w1) (witness-src w2)))
+              witness*))))
       (define (de-alias type)
         (nanopass-case (Lwithpaths Type) type
           [(talias ,src ,nominal? ,type-name ,type)
