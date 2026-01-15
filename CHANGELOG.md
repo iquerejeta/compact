@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased compiler version 0.28.0, language version 0.20.0]
+## [Unreleased compiler 0.28.100, language 0.20.0]
+
+### Changed
+
+- The informal parser rule that "else" clauses belong to the innermost "if"
+  expression is now explicit in the grammar.  Previously, we were relying on a
+  shaky assumption about how the parser generator treats grammar ambiguities.
+  This change is reflected in the formal grammar specification in doc/Compact.html
+  but has no impact on how programs are compiled.
+
+## [Compiler version 0.28.0, language version 0.20.0]
 
 This release includes all changes for compiler versions in the range 0.27.100
 (inclusive) and 0.28.0 (exclusive); and language versions in the range 0.19.100
