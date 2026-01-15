@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased compiler 0.28.100, language 0.20.0]
 
+There are no user-visible changes.
+
+### Changed
+
+- Instead of pulling test contracts from the separate (private) repository
+  `midnight-contracts`, they are added to this repository under
+  `test-center/test-contracts`.
+  
+## [Unreleased compiler 0.28.100, language 0.20.0]
+
 ### Changed
 
 - The informal parser rule that "else" clauses belong to the innermost "if"
