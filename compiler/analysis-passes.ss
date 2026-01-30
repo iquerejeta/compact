@@ -5407,12 +5407,16 @@
 
       [(bytes-ref ,src ,type ,[* abs] ,[* abs^])
        (add-witnesses
-         (abs->witnesses abs^)
+         (abs->witnesses
+           (add-path-point src "the bytes-value reference" "the element selected by"
+             abs^))
          abs)]
 
       [(vector-ref ,src ,type ,[* abs] ,[* abs^])
        (add-witnesses
-         (abs->witnesses abs^)
+         (abs->witnesses
+           (add-path-point src "the vector or tuple reference" "the element selected by"
+             abs^))
          (Abs-case abs
            [(Abs-single abs) abs]
            ; Eventually all vector-ref indices must reduce to constants, so this is overly restrictive.
@@ -5428,12 +5432,16 @@
 
       [(bytes-slice ,src ,type ,[* abs] ,[* abs^] ,len)
        (add-witnesses
-         (abs->witnesses abs^)
+         (abs->witnesses
+           (add-path-point src "the bytes-value slice" "the elements selected by"
+             abs^))
          abs)]
 
       [(vector-slice ,src ,type ,[* abs] ,[* abs^] ,len)
        (add-witnesses
-         (abs->witnesses abs^)
+         (abs->witnesses
+           (add-path-point src "the vector or tuple slice" "the elements selected by"
+             abs^))
          (Abs-single
            (Abs-case abs
              [(Abs-single abs) abs]
