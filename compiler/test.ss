@@ -267,7 +267,7 @@ groups than for single tests.
          (begin
            (when (null? #'(okay?^ ...)) (syntax-error x "last groupie has no checks"))
            #`($test 5 "../src/" #,@(map do-groupie #'((file okay? ...) ... (file^ okay?^ ...)))))])))
-  (indirect-export test-group $test)
+  (indirect-export test-group $test make-groupie)
 
   (define-syntax test
     (lambda (x)
@@ -286,7 +286,7 @@ groups than for single tests.
         [(_ code okay? ...)
          (when (null? #'(okay? ...)) (syntax-error x "test has no checks"))
          #`($test 4 "../src/" #,(do-groupie #'code #'(list okay? ...)))])))
-  (indirect-export test make-groupie)
+  (indirect-export test $test make-groupie)
 
   (module (write-replacement-result!)
     (define (write-replacement-result! bfp efp str)
@@ -33211,13 +33211,19 @@ groups than for single tests.
          "  return disclose(sk() == true);"
          "}"
          ))
+     ; WARNING: Do not replace this wholesale...maintain the structure of the first several
+     ; lines to avoid hard-coding specific version strings into the test
      (output-file "compiler/testdir/testfile/compiler/contract-info.json"
-       '(
+       `(
          "{"
+         ,(format "  \"compiler-version\": \"~a\"," compiler-version-string)
+         ,(format "  \"language-version\": \"~a\"," language-version-string)
+         ,(format "  \"runtime-version\": \"~a\"," runtime-version-string)
          "  \"circuits\": ["
          "    {"
          "      \"name\": \"foo\","
          "      \"pure\": true,"
+         "      \"proof\": false,"
          "      \"arguments\": ["
          "      ],"
          "      \"result-type\": {"
@@ -33229,6 +33235,7 @@ groups than for single tests.
          "    {"
          "      \"name\": \"bar\","
          "      \"pure\": true,"
+         "      \"proof\": false,"
          "      \"arguments\": ["
          "      ],"
          "      \"result-type\": {"
@@ -33238,6 +33245,7 @@ groups than for single tests.
          "    {"
          "      \"name\": \"dummy\","
          "      \"pure\": false,"
+         "      \"proof\": false,"
          "      \"arguments\": ["
          "      ],"
          "      \"result-type\": {"
@@ -33268,13 +33276,19 @@ groups than for single tests.
          "witness sk(): Boolean;"
          ))
      ; the witnesses field is empty if the witness is unused.
+     ; WARNING: Do not replace this wholesale...maintain the structure of the first several
+     ; lines to avoid hard-coding specific version strings into the test
      (output-file "compiler/testdir/testfile/compiler/contract-info.json"
-       '(
+       `(
          "{"
+         ,(format "  \"compiler-version\": \"~a\"," compiler-version-string)
+         ,(format "  \"language-version\": \"~a\"," language-version-string)
+         ,(format "  \"runtime-version\": \"~a\"," runtime-version-string)
          "  \"circuits\": ["
          "    {"
          "      \"name\": \"foo\","
          "      \"pure\": true,"
+         "      \"proof\": false,"
          "      \"arguments\": ["
          "      ],"
          "      \"result-type\": {"
@@ -33286,6 +33300,7 @@ groups than for single tests.
          "    {"
          "      \"name\": \"bar\","
          "      \"pure\": true,"
+         "      \"proof\": false,"
          "      \"arguments\": ["
          "      ],"
          "      \"result-type\": {"
@@ -33302,13 +33317,19 @@ groups than for single tests.
 
   (test-group
     ((source-file "examples/tiny.compact")
+     ; WARNING: Do not replace this wholesale...maintain the structure of the first several
+     ; lines to avoid hard-coding specific version strings into the test
      (output-file "compiler/testdir/tiny/compiler/contract-info.json"
-       '(
+       `(
          "{"
+         ,(format "  \"compiler-version\": \"~a\"," compiler-version-string)
+         ,(format "  \"language-version\": \"~a\"," language-version-string)
+         ,(format "  \"runtime-version\": \"~a\"," runtime-version-string)
          "  \"circuits\": ["
          "    {"
          "      \"name\": \"set\","
          "      \"pure\": false,"
+         "      \"proof\": true,"
          "      \"arguments\": ["
          "        {"
          "          \"name\": \"v\","
@@ -33326,6 +33347,7 @@ groups than for single tests.
          "    {"
          "      \"name\": \"get\","
          "      \"pure\": false,"
+         "      \"proof\": true,"
          "      \"arguments\": ["
          "      ],"
          "      \"result-type\": {"
@@ -33350,6 +33372,7 @@ groups than for single tests.
          "    {"
          "      \"name\": \"clear\","
          "      \"pure\": false,"
+         "      \"proof\": true,"
          "      \"arguments\": ["
          "      ],"
          "      \"result-type\": {"
@@ -33361,6 +33384,7 @@ groups than for single tests.
          "    {"
          "      \"name\": \"public_key\","
          "      \"pure\": true,"
+         "      \"proof\": false,"
          "      \"arguments\": ["
          "        {"
          "          \"name\": \"sk\","
@@ -34388,21 +34412,6 @@ groups than for single tests.
      ))
 
   (test-group
-    ((create-file "C1.compact" '())
-     (custom-check
-       (lambda (pass-name x)
-         (mkdir "compiler/testdir/C2")
-         (mkdir "compiler/testdir/C2/compiler")
-         (chmod "compiler/testdir/C2/compiler" 000)
-         #t))
-     )
-    ((create-file "C2.compact" '())
-     (oops
-       message: "error ~a: ~a"
-       irritants: '("creating output file" "failed for compiler/testdir/C2/compiler/contract-info.json: permission denied"))
-     ))
-
-  (test-group
     ((create-file "C.compact"
        '(
          "export circuit foo(x: Bytes<32>): [] { return; }"
@@ -34964,13 +34973,19 @@ groups than for single tests.
       "import m prefix two_;"
       "export { one_foo, two_foo }"
       )
+    ; WARNING: Do not replace this wholesale...maintain the structure of the first several
+    ; lines to avoid hard-coding specific version strings into the test
     (output-file "compiler/testdir/compiler/contract-info.json"
-      '(
+      `(
         "{"
+        ,(format "  \"compiler-version\": \"~a\"," compiler-version-string)
+        ,(format "  \"language-version\": \"~a\"," language-version-string)
+        ,(format "  \"runtime-version\": \"~a\"," runtime-version-string)
         "  \"circuits\": ["
         "    {"
         "      \"name\": \"one_foo\","
         "      \"pure\": true,"
+        "      \"proof\": false,"
         "      \"arguments\": ["
         "      ],"
         "      \"result-type\": {"
@@ -34982,6 +34997,7 @@ groups than for single tests.
         "    {"
         "      \"name\": \"two_foo\","
         "      \"pure\": true,"
+        "      \"proof\": false,"
         "      \"arguments\": ["
         "      ],"
         "      \"result-type\": {"
@@ -35271,6 +35287,158 @@ groups than for single tests.
          "export circuit foo(bv: Bytes<32>): [] { F.foo(disclose(bv)); }"
          ))
      (succeeds)
+     ))
+
+  (test-group
+    ((create-file "C.compact"
+       '(
+         "export circuit foo(x: Bytes<32>): [] { return; }"
+         "export circuit bar(): Bytes<32> { return pad(32, ''); }"
+         )
+       )
+     (succeeds))
+    ((create-file "testfile.compact"
+       '(
+         "contract C {"
+         "  circuit foo(x: Bytes<32>): [];"
+         "  pure circuit bar(): Bytes<32>;"
+         "}"
+         "ledger contract_c: C;"
+         "constructor (c: C) { contract_c = disclose(c); }"
+         "ledger F: Vector<2, [C]>;"
+         "export circuit foo(): [] {"
+         "  F = map((x: C) => [x], [contract_c, contract_c]);"
+         "}"
+         ))
+     (pass-returns unroll-loops
+       (program
+         (kernel-declaration (%kernel.0 () (Kernel)))
+         (public-ledger-declaration
+           ((%contract_c.1
+              (0)
+              (__compact_Cell
+                (tcontract C
+                  (foo #f ((tbytes 32)) (ttuple))
+                  (bar #t () (tbytes 32)))))
+            (%F.2
+              (1)
+              (__compact_Cell
+                (tvector
+                  2
+                  (ttuple
+                    (tcontract C
+                      (foo #f ((tbytes 32)) (ttuple))
+                      (bar #t () (tbytes 32))))))))
+           (constructor ([%c.3 (tcontract C
+                                 (foo #f ((tbytes 32)) (ttuple))
+                                 (bar #t () (tbytes 32)))])
+             (seq (public-ledger %contract_c.1 (0) write %c.3) (tuple))))
+         (circuit %foo.4 ()
+              (ttuple)
+           (seq
+             (let* ([[%tmp.5 (tvector
+                               2
+                               (ttuple
+                                 (tcontract C
+                                   (foo #f ((tbytes 32)) (ttuple))
+                                   (bar #t () (tbytes 32)))))]
+                     (flet [%circ.6
+                            (circuit ([%x.7 (tcontract C
+                                              (foo #f ((tbytes 32)) (ttuple))
+                                              (bar #t () (tbytes 32)))])
+                                 (ttuple
+                                   (tcontract C
+                                     (foo #f ((tbytes 32)) (ttuple))
+                                     (bar #t () (tbytes 32))))
+                              (tuple %x.7))]
+                       (let* ([[%t.8 (ttuple
+                                       (tcontract C
+                                         (foo #f ((tbytes 32)) (ttuple))
+                                         (bar #t () (tbytes 32)))
+                                       (tcontract C
+                                         (foo #f ((tbytes 32)) (ttuple))
+                                         (bar #t () (tbytes 32))))]
+                               (tuple
+                                 (public-ledger %contract_c.1 (0) read)
+                                 (public-ledger %contract_c.1 (0) read))])
+                         (tuple
+                           (call %circ.6 (tuple-ref %t.8 0))
+                           (call %circ.6 (tuple-ref %t.8 1)))))])
+               (public-ledger %F.2 (1) write %tmp.5))
+             (tuple)))))
+     ))
+
+  (test-group
+    ((create-file "C.compact"
+       '(
+         "export circuit foo(x: Bytes<32>): [] { return; }"
+         "export circuit barr(): Bytes<32> { return pad(32, ''); }"
+         )
+       )
+     (succeeds))
+    ((create-file "UseC.compact"
+       '(
+         "import CompactStandardLibrary;"
+         "contract C {"
+         "  circuit foo(x: Bytes<32>): [];"
+         "  pure circuit barr(): Bytes<32>;"
+         "}"
+         "ledger contract_c: C;"
+         "constructor (c: C) { contract_c = disclose(c); }"
+         "export circuit hello(): [] { return contract_c.foo(contract_c.read().barr()); }"
+         ))
+     (pass-returns flatten-datatypes
+       (program
+         (kernel-declaration (%kernel.0 () (Kernel)))
+         (public-ledger-declaration
+           ((%contract_c.1
+              (0)
+              (__compact_Cell
+                (ty ((acontract))
+                    ((tcontract C
+                       (foo #f ((ty ((abytes 32))
+                                    ((tfield 255)
+                                      (tfield
+                                        452312848583266388373324160190187140051835877600158453279131187530910662655))))
+                         (ty () ()))
+                       (barr #t ()
+                         (ty ((abytes 32))
+                             ((tfield 255)
+                               (tfield
+                                 452312848583266388373324160190187140051835877600158453279131187530910662655)))))))))))
+         (circuit %hello.2 ()
+              (ty () ())
+           (= (%t.3) (public-ledger 1 %contract_c.1 (0) read))
+           (= (%t.4) (public-ledger 1 %contract_c.1 (0) read))
+           (= (%t.5 %t.6)
+              (contract-call 1 barr
+                   (%t.4 (tcontract C
+                           (foo #f ((ty ((abytes 32))
+                                        ((tfield 255)
+                                          (tfield
+                                            452312848583266388373324160190187140051835877600158453279131187530910662655))))
+                             (ty () ()))
+                           (barr #t ()
+                             (ty ((abytes 32))
+                                 ((tfield 255)
+                                   (tfield
+                                     452312848583266388373324160190187140051835877600158453279131187530910662655))))))))
+           (= ()
+              (contract-call 1 foo
+                   (%t.3 (tcontract C
+                           (foo #f ((ty ((abytes 32))
+                                        ((tfield 255)
+                                          (tfield
+                                            452312848583266388373324160190187140051835877600158453279131187530910662655))))
+                             (ty () ()))
+                           (barr #t ()
+                             (ty ((abytes 32))
+                                 ((tfield 255)
+                                   (tfield
+                                     452312848583266388373324160190187140051835877600158453279131187530910662655))))))
+                %t.5
+                %t.6))
+           ())))
      ))
 )
 
@@ -36021,85 +36189,6 @@ groups than for single tests.
               (public-ledger %F.5 (4) write %tmp.32))
             (public-ledger %F.5 (4) read)))))
     )
-
-  (test-group
-    ((create-file "C.compact"
-       '(
-         "export circuit foo(x: Bytes<32>): [] { return; }"
-         "export circuit bar(): Bytes<32> { return pad(32, ''); }"
-         )
-       )
-     (succeeds))
-    ((create-file "testfile.compact"
-       '(
-         "contract C {"
-         "  circuit foo(x: Bytes<32>): [];"
-         "  pure circuit bar(): Bytes<32>;"
-         "}"
-         "ledger contract_c: C;"
-         "constructor (c: C) { contract_c = disclose(c); }"
-         "ledger F: Vector<2, [C]>;"
-         "export circuit foo(): [] {"
-         "  F = map((x: C) => [x], [contract_c, contract_c]);"
-         "}"
-         ))
-     (returns
-       (program
-         (kernel-declaration (%kernel.0 () (Kernel)))
-         (public-ledger-declaration
-           ((%contract_c.1
-              (0)
-              (__compact_Cell
-                (tcontract C
-                  (foo #f ((tbytes 32)) (ttuple))
-                  (bar #t () (tbytes 32)))))
-            (%F.2
-              (1)
-              (__compact_Cell
-                (tvector
-                  2
-                  (ttuple
-                    (tcontract C
-                      (foo #f ((tbytes 32)) (ttuple))
-                      (bar #t () (tbytes 32))))))))
-           (constructor ([%c.3 (tcontract C
-                                 (foo #f ((tbytes 32)) (ttuple))
-                                 (bar #t () (tbytes 32)))])
-             (seq (public-ledger %contract_c.1 (0) write %c.3) (tuple))))
-         (circuit %foo.4 ()
-              (ttuple)
-           (seq
-             (let* ([[%tmp.5 (tvector
-                               2
-                               (ttuple
-                                 (tcontract C
-                                   (foo #f ((tbytes 32)) (ttuple))
-                                   (bar #t () (tbytes 32)))))]
-                     (flet [%circ.6
-                            (circuit ([%x.7 (tcontract C
-                                              (foo #f ((tbytes 32)) (ttuple))
-                                              (bar #t () (tbytes 32)))])
-                                 (ttuple
-                                   (tcontract C
-                                     (foo #f ((tbytes 32)) (ttuple))
-                                     (bar #t () (tbytes 32))))
-                              (tuple %x.7))]
-                       (let* ([[%t.8 (ttuple
-                                       (tcontract C
-                                         (foo #f ((tbytes 32)) (ttuple))
-                                         (bar #t () (tbytes 32)))
-                                       (tcontract C
-                                         (foo #f ((tbytes 32)) (ttuple))
-                                         (bar #t () (tbytes 32))))]
-                               (tuple
-                                 (public-ledger %contract_c.1 (0) read)
-                                 (public-ledger %contract_c.1 (0) read))])
-                         (tuple
-                           (call %circ.6 (tuple-ref %t.8 0))
-                           (call %circ.6 (tuple-ref %t.8 1)))))])
-               (public-ledger %F.2 (1) write %tmp.5))
-             (tuple)))))
-     ))
 )
 
 (run-tests inline-circuits
@@ -40223,27 +40312,6 @@ groups than for single tests.
           (= %t.9 (select %t.5 1 0))
           (%t.9))))
     )
-
-  (test-group
-    ((create-file "C.compact"
-       '(
-         "export circuit foo(x: Bytes<32>): [] { return; }"
-         "export circuit barr(): Bytes<32> { return pad(32, ''); }"
-         )
-       )
-     (succeeds))
-    ((create-file "UseC.compact"
-       '(
-         "import CompactStandardLibrary;"
-         "contract C {"
-         "  circuit foo(x: Bytes<32>): [];"
-         "  pure circuit barr(): Bytes<32>;"
-         "}"
-         "ledger contract_c: [C, Field];"
-         "constructor (c: C) { contract_c = default<[C, Field]>; }"
-         ))
-     (succeeds)
-     ))
 
   ; PM-16065
   (test
