@@ -4967,11 +4967,10 @@
               (and (fx= n1 n2)
                    (let loop ([x1* x1*] [x2* x2*])
                      (and (not (null? x1*))
-                          (let ([x1 (car x1*)] [x2 (car x2*)])
-                            (case (elt-compare (car x1*) (car x2*))
-                              [(<) #t]
-                              [(>) #f]
-                              [else (loop (cdr x1*) (cdr x2*))]))))))))
+                          (case (elt-compare (car x1*) (car x2*))
+                            [(<) #t]
+                            [(>) #f]
+                            [else (loop (cdr x1*) (cdr x2*))])))))))
 
       (define (string-compare s1 s2)
         (cond
@@ -5229,18 +5228,6 @@
         (define-record-type via
           (nongenerative)
           (fields desc* exposure))
-        (define (via<? via1 via2)
-          (let ([n1 (string-length (via-exposure via1))]
-                [n2 (string-length (via-exposure via2))])
-            (or (fx< n1 n2)
-                (and (fx= n1 n2)
-                     (or (string<? (via-exposure via1) (via-exposure via2))
-                         (and (not (string<? (via-exposure via1) (via-exposure via2)))
-                              (let ([n1 (length (via-desc* via1))]
-                                    [n2 (length (via-desc* via2))])
-                                (or (fx< n1 n2)
-                                    (and (fx= n1 n2)
-                                         (list<? string-compare (via-desc* via1) (via-desc* via2)))))))))))
         (parameterize ([parent-src src])
           (for-each
             (lambda (witness)
@@ -5259,29 +5246,28 @@
                                           (id-sym argument-name)
                                           (id-sym function-name)
                                           where)]))]
-                    [via* (sort via<?
-                                (map (lambda (pp*)
-                                       (make-via
-                                         (fold-right
-                                           (lambda (pp desc*)
-                                             (let ([src (path-point-src pp)])
-                                               (if (stdlib-src? src)
-                                                   desc*
-                                                   (cons (format "~a at ~a"
-                                                           (path-point-description pp)
-                                                           (format-source-object src))
-                                                         desc*))))
-                                           '()
-                                           pp*)
-                                         (fold-right
-                                           (lambda (pp exposure)
-                                             (let ([exposure^ (path-point-exposure pp)])
-                                               (if (equal? exposure^ "")
-                                                   exposure
-                                                   (format "~a ~a" exposure^ exposure))))
-                                           "the witness value"
-                                           pp*)))
-                                     (witness-path* witness)))])
+                    [via* (map (lambda (pp*)
+                                 (make-via
+                                   (fold-right
+                                     (lambda (pp desc*)
+                                       (let ([src (path-point-src pp)])
+                                         (if (stdlib-src? src)
+                                             desc*
+                                             (cons (format "~a at ~a"
+                                                     (path-point-description pp)
+                                                     (format-source-object src))
+                                                   desc*))))
+                                     '()
+                                     pp*)
+                                   (fold-right
+                                     (lambda (pp exposure)
+                                       (let ([exposure^ (path-point-exposure pp)])
+                                         (if (equal? exposure^ "")
+                                             exposure
+                                             (format "~a ~a" exposure^ exposure))))
+                                     "the witness value"
+                                     pp*)))
+                               (witness-path* witness))])
                 (pending-errorf src
                   "potential witness-value disclosure must be declared but is not:\n    witness value potentially disclosed:\n      ~a~{~a~}"
                   witness-value
