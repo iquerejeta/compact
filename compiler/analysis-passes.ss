@@ -4954,7 +4954,7 @@
              (andmap same-path? path1* path2*)))
 
       ; NB: list<? treats any shorter list as less than any longer list.  this is
-      ; useful for sorting paths and vias (with more direct problems first) and is more
+      ; useful for sorting paths (with more direct problems first) and is more
       ; efficient when the list lengths differ and the comparisons are expensive.
       ;
       ; elt-compare should take two arguments and return one of <, >, or = depending on
@@ -4966,7 +4966,7 @@
           (or (fx< n1 n2)
               (and (fx= n1 n2)
                    (let loop ([x1* x1*] [x2* x2*])
-                     (and (not (null? x1*))
+                     (and (not (eq? x1* x2*)) ; quit when lists are null if not sooner
                           (case (elt-compare (car x1*) (car x2*))
                             [(<) #t]
                             [(>) #f]
