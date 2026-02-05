@@ -99,11 +99,6 @@
                (assert (string=? (symbol->string old) (token-string token)))
                (make-token (token-src token) (token-type token) new (symbol->string new))))]
           [else token])))
-    (External-Declaration : External-Declaration (ir) -> External-Declaration ()
-      [(external ,src ,kwd-export? ,kwd ,function-name ,generic-param-list? ,arg-list ,[type] ,semicolon)
-       (let ([function-name (maybe-rename src function-name)]
-             [generic-param-list? (and generic-param-list? (Generic-Param-List generic-param-list?))])
-         `(external ,src ,kwd-export? ,kwd ,function-name ,generic-param-list? ,arg-list ,type ,semicolon))])
     (Export-Declaration : Export-Declaration (ir) -> Export-Declaration ()
       [(export ,src ,kwd ,lbrace (,name* ...) (,sep* ...) ,rbrace ,semicolon)
        (let ([name* (map (lambda (name) (maybe-rename (token-src name) name)) name*)])
@@ -123,7 +118,7 @@
     (Generic-Param-List : Generic-Param-List (ir) -> Generic-Param-List ())
     (Generic-Arg-List : Generic-Arg-List (ir) -> Generic-Arg-List ()))
 
-  (define (parse-file/fixup/format source-pathname line-length)
+  (define (parse-file/fixup/format source-pathname)
     (let-values ([(token-stream ir) (parse-file/token-stream source-pathname)])
       (parameterize ([deferred-warnings '()])
         ; pre-fixup is used to fix things that don't depend on running the analysis passes and
@@ -146,6 +141,6 @@
               (sort (lambda (w1 w2) (source-object<? (deferred-warning-src w1) (deferred-warning-src w2)))
                     (deferred-warnings)))
             (let-values ([(op get) (open-string-output-port)])
-              (print-Lparser ir token-stream line-length op)
+              (print-Lparser ir token-stream op)
               (get)))))))
 )

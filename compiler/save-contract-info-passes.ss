@@ -23,15 +23,27 @@
           (nanopass)
           (json)
           (langs)
+          (compiler-version)
+          (language-version)
+          (runtime-version)
           (pass-helpers))
 
   ; NB: must come after identify-pure-circuits
-  (define-pass save-contract-info : Lnodisclose (ir) -> Lnodisclose ()
+  (define-pass save-contract-info : Lnodisclose (ir proof-circuit-name*) -> Lnodisclose ()
     (Program : Program (ir) -> Program ()
       [(program ,src (,contract-name* ...) ((,export-name* ,name*) ...) ,pelt* ...)
        (let ([op (get-target-port 'contract-info.json)])
          (print-json op
            (list
+             (cons
+               "compiler-version"
+               compiler-version-string)
+             (cons
+               "language-version"
+               language-version-string)
+             (cons
+               "runtime-version"
+               runtime-version-string)
              (cons
                "circuits"
                (list->vector
@@ -84,6 +96,9 @@
                (cons
                  "pure"
                  (id-pure? function-name))
+               (cons
+                 "proof"
+                 (and (memq (id-sym function-name) proof-circuit-name*) #t))
                (cons
                  "arguments"
                  (list->vector (map Argument arg*)))
@@ -166,6 +181,13 @@
          (cons
            "elements"
            (list->vector (map symbol->string (cons elt-name elt-name*)))))]
+      [(talias ,src ,nominal? ,type-name ,type)
+       (if nominal?
+           (list
+             (cons "type-name" "Alias")
+             (cons "name" (symbol->string type-name))
+             (cons "type" (Type type)))
+           (Type type))]
       [else (assert cannot-happen)]))
 
   (define-passes save-contract-info-passes

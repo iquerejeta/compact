@@ -28,6 +28,7 @@ export enum Arguments {
     VERSION = '--version',
     LANGUAGE_VERSION = '--language-version',
     VSCODE = '--vscode',
+    LINES_LENGTH = '--line-length',
 }
 
 type FailedContract = {
@@ -73,6 +74,22 @@ export function extractCompilerVersion(): string {
         return `${major}.${minor}.${patch}`;
     }
     throw new Error(`Could not extract compiler version from: ${filePath}`);
+}
+
+export async function getCompilerVersion(): Promise<string> {
+    const result = await execa(getCompactcBinary(), [Arguments.VERSION], { reject: false });
+    if (result.exitCode !== 0) {
+        throw new Error(`Failed to get compiler version: ${result.stderr}`);
+    }
+    return result.stdout.trim();
+}
+
+export async function getLanguageVersion(): Promise<string> {
+    const result = await execa(getCompactcBinary(), [Arguments.LANGUAGE_VERSION], { reject: false });
+    if (result.exitCode !== 0) {
+        throw new Error(`Failed to get language version: ${result.stderr}`);
+    }
+    return result.stdout.trim();
 }
 
 /*

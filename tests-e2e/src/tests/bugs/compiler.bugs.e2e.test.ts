@@ -18,6 +18,7 @@ import { describe, expect, test } from 'vitest';
 import { Project } from 'ts-morph';
 import {
     Arguments,
+    AssertContract,
     buildPathTo,
     compile,
     compilerDefaultOutput,
@@ -127,7 +128,7 @@ describe('[Bugs] Compiler', () => {
             testcase: '[PM-16999] should return an error if exported circuit name is same, just in different letter cases',
             file: 'pm-16999.compact',
             output: {
-                stderr: 'Exception: pm-16999.compact line 33 char 1: the exported impure circuit name iNcrement is identical to the exported circuit name "increment" at line 25 char 1 modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems',
+                stderr: 'Exception: pm-16999.compact line 33 char 1: the exported impure circuit name iNcrement is identical to the exported circuit name "INcrement" at line 29 char 1 modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems',
                 stdout: compilerDefaultOutput(),
                 exitCode: ExitCodes.Failure,
             },
@@ -146,7 +147,7 @@ describe('[Bugs] Compiler', () => {
             file: 'pm-19287.compact',
             output: {
                 stderr: 'Compiling 11 circuits:',
-                stdout: "WARNING: The dominant factor in your circuit's size is the number of public inputs, which causes the verifier to perform linear work.\nWARNING: The dominant factor in your circuit's size is the number of public inputs, which causes the verifier to perform linear work.",
+                stdout: '',
                 exitCode: ExitCodes.Success,
             },
         },
@@ -307,7 +308,7 @@ describe('[Bugs] Compiler', () => {
                 testcase: 'should return proper error when constructor have multiple return statements (including for loop)',
                 file: 'multiple_constructor_returns.compact',
                 output: {
-                    stderr: 'Exception: multiple_constructor_returns.compact line 20 char 7:\n  unreachable statement',
+                    stderr: 'Exception: multiple_constructor_returns.compact line 24 char 5:\n  return is not supported within for loops',
                     stdout: compilerDefaultOutput(),
                     exitCode: ExitCodes.Failure,
                 },
@@ -379,9 +380,13 @@ describe('[Bugs] Compiler', () => {
         const result: Result = await compile([Arguments.SKIP_ZK, contractDir + 'pm-16603.compact', outputDir]);
         expectCompilerResult(result).toBeSuccess('', compilerDefaultOutput());
 
-        const expectedContractInfo = getFileContent(contractDir + 'contract-info.json');
-        const actualContractInfo = getFileContent(outputDir + '/compiler/contract-info.json');
-        expect(actualContractInfo).toEqual(expectedContractInfo);
+        const actualContract = new AssertContract().expect(outputDir);
+        const actualContractInfo = actualContract.getContractInfoCircuits();
+
+        const expectedContract = new AssertContract().expect(contractDir);
+        const expectedContractInfo = expectedContract.getContractInfoCircuits();
+
+        expect(actualContractInfo?.keys()).toEqual(expectedContractInfo?.keys());
     });
 
     describe('[PM-16893]', () => {

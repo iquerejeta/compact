@@ -54,19 +54,19 @@
 
   ; NB: check this list regularly.  ideally, we would generate it automatically.
   (define keywordBoolean '(
-    true
-    false))
+    false
+    true))
   (define keywordImport '(
     export
-    import
     from
+    import
     module))
   (define keywordControl '(
     as
     assert
     circuit
-    constructor
     const
+    constructor
     contract
     default
     disclose
@@ -78,6 +78,7 @@
     include
     ledger
     map
+    new
     of
     pad
     pragma
@@ -87,17 +88,50 @@
     sealed
     slice
     struct
+    type
     witness))
   (define keywordDataTypes '(
-    Bytes
     Boolean
+    Bytes
     Field
     Opaque
     Uint
     Vector))
   (define-syntax keywordReservedForFutureUse (identifier-syntax '(
+    await
+    break
+    case
+    catch
+    class
+    continue
+    debugger
+    delete
+    do
+    extends
+    finally
+    function
+    implements
+    in
+    instanceof
+    interface
+    let
+    null
+    package
+    private
+    protected
+    public
+    static
+    super
+    switch
     this ; use as an identifier can cause problems with generated Javascript code, so we reserve
-    )))
+    throw
+    try
+    typeof
+    var
+    void
+    while
+    with
+    yield)))
   (define (parser-keywords)
     `((keywordBoolean ,keywordBoolean)
       (keywordImport ,keywordImport)
@@ -107,7 +141,12 @@
 
   (define keyword?
     (let ([ht (make-hashtable symbol-hash eq?)])
-      (for-each (lambda (x) (hashtable-set! ht x #t)) all-keywords)
+      (for-each
+        (lambda (x)
+          (let ([a (hashtable-cell ht x #f)])
+            (assertf (not (cdr a)) "duplicate keyword ~s" x)
+            (set-cdr! a #t)))
+        all-keywords)
       (lambda (x) (hashtable-contains? ht x))))
 
   (define (unreserved? x)
@@ -217,7 +256,7 @@
       (end-of-file (eof)
         (DESCRIPTION
           ("end of file")))
-      (identifier (id module-name function-name struct-name enum-name contract-name tvar-name)
+      (identifier (id module-name function-name struct-name enum-name contract-name tvar-name type-name)
         (DESCRIPTION
           ("identifiers have the same syntax as Typescript identifiers")))
       (field-literal (nat)
@@ -243,11 +282,11 @@
       [program-element-ledger-declaration :: ldecl => values]
       [program-element-ledger-constructor :: lconstructor => values]
       [program-element-circuit-definition :: cdefn => values]
-      [program-element-external-declaration :: edecl => values]
       [program-element-witness-declaration :: wdecl => values]
       [program-element-contract-declaration :: ecdecl => values]
       [program-element-struct-declaration :: struct => values]
-      [program-element-enum-declaration :: enumdef => values])
+      [program-element-enum-declaration :: enumdef => values]
+      [program-element-type-declaration :: tdefn => values])
     (Pragma (pragma)
       [pragma :: src (KEYWORD pragma) id version-expr #\; =>
        (lambda (src kwd id ve semicolon)
@@ -390,11 +429,6 @@
        (lambda (src kwd-export? kwd-pure? kwd function-name generic-param-list? pattern-param-list colon type block)
          (with-output-language (Lparser Circuit-Definition)
            `(circuit ,src ,kwd-export? ,kwd-pure? ,kwd ,function-name ,generic-param-list? ,pattern-param-list (,colon ,type) ,block)))])
-    (External-declaration (edecl)
-      [external-declaration :: src (OPT (KEYWORD export) #f) (KEYWORD circuit) id (OPT gparams #f) simple-parameter-list #\: type #\; =>
-       (lambda (src kwd-export? kwd id generic-param-list? simple-param-list colon type semicolon)
-         (with-output-language (Lparser External-Declaration)
-           `(external ,src ,kwd-export? ,kwd ,id ,generic-param-list? ,simple-param-list (,colon ,type) ,semicolon)))])
     (Witness-declaration (wdecl)
       [witness-declaration :: src (OPT (KEYWORD export) #f) (KEYWORD witness) id (OPT gparams #f) simple-parameter-list #\: type #\; =>
        (lambda (src kwd-export? kwd id generic-param-list? simple-param-list colon type semicolon)
@@ -434,6 +468,12 @@
          (with-output-language (Lparser Enum-Definition)
            (let-values ([(elt-name+ sep*) (split-sep elt-name-sep+)])
              `(enum ,src ,kwd-export? ,kwd ,enum-name ,lbrace (,(car elt-name+) ,(cdr elt-name+) ...) (,sep* ...) ,rbrace ,semicolon?))))])
+    (Type-definition (tdefn)
+      ; FIXME: consider eliminating struct syntax and supporting { x: type, ... } as a type
+      [type-definition :: src (OPT (KEYWORD export) #f) (OPT (KEYWORD new) #f) (KEYWORD type) type-name (OPT gparams #f) #\= type #\; =>
+       (lambda (src kwd-export? kwd-new? kwd type-name generic-param-list? op type semicolon)
+         (with-output-language (Lparser Type-Definition)
+           `(typedef ,src ,kwd-export? ,kwd-new? ,kwd ,type-name ,generic-param-list? ,op ,type ,semicolon)))])
     (Typed-identifier (typed-identifier)
       [typed-identifier :: src id #\: type =>
        (lambda (src id colon type)
@@ -511,6 +551,12 @@
          (with-output-language (Lparser Block)
            `(block ,src ,lbrace ,stmt* ... ,rbrace)))])
     (Statement (stmt)
+      [statement-one-armed-if :: src (KEYWORD if) #\( expr-seq #\) stmt =>
+       (lambda (src kwd lparen expr rparen stmt)
+         (with-output-language (Lparser Statement)
+           `(if ,src ,kwd ,lparen ,expr ,rparen ,stmt)))]
+      [#f :: stmt0 => values])
+    (Statement0 (stmt0)
       [statement-expr :: src expr-seq #\; =>
        (lambda (src expr semicolon)
          (with-output-language (Lparser Statement)
@@ -523,8 +569,7 @@
        (lambda (src kwd semicolon)
          (with-output-language (Lparser Statement)
            `(return ,src ,kwd ,semicolon)))]
-      ; see ez-grammar.ss left-factoring note related to the ordering of the "if" clauses
-      [statement-if :: src (KEYWORD if) #\( expr-seq #\) stmt (KEYWORD else) stmt =>
+      [statement-if :: src (KEYWORD if) #\( expr-seq #\) stmt0 (KEYWORD else) stmt =>
        (lambda (src kwd lparen expr rparen stmt1 kwd-else stmt2)
          (with-output-language (Lparser Statement)
            `(if ,src ,kwd ,lparen ,expr ,rparen ,stmt1 ,kwd-else ,stmt2)))]
@@ -803,9 +848,15 @@
             '()
             failure+))
         (define (format-input-token token)
-          (if (eq? (token-type token) 'eof)
-              "end of file"
-              (format "~s" (token-string token))))
+          (cond
+            [(eq? (token-type token) 'eof) "end of file"]
+            [(and (eq? (token-type token) 'id)
+                  (memq (token-value token) keywordReservedForFutureUse))
+             (format "keyword ~s (which is reserved for future use)" (token-string token))]
+            [(and (eq? (token-type token) 'id)
+                  (memq (token-value token) all-keywords))
+             (format "keyword ~s" (token-string token))]
+            [else (format "~s" (token-string token))]))
         (define (format-failure failure)
           (define (format-nonterminal-name nt)
             (format "~a ~a"

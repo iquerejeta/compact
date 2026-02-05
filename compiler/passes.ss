@@ -16,18 +16,13 @@
 ;;; limitations under the License.
 
 (library (passes)
-  (export trace-passes
-          skip-zk
-          no-communications-commitment
-          generate-everything
+  (export generate-everything
           pass-name-condition?
           condition-pass-name
-
-          ;; Feature flags:
-          zkir-v3
           )
   (import (except (chezscheme) errorf)
           (utils)
+          (config-params)
           (nanopass)
           (langs)
           (parser)
@@ -48,12 +43,6 @@
     (pass-name condition-pass-name))
 
   (define zkir-warning-issued (make-parameter #f))
-
-  (define trace-passes (make-parameter #f))
-
-  (define skip-zk (make-parameter #t))
-
-  (define zkir-v3 (make-parameter #f))
 
   (define generate-everything
     (case-lambda
@@ -148,74 +137,66 @@
                        [else
                         (let* ([lsrc-ir (run-passes parser-passes pathname)]
                                [frontend-ir (run-passes frontend-passes lsrc-ir)]
-                               [analyzed-ir (run-passes analysis-passes frontend-ir)])
+                               [analyzed-ir (run-passes analysis-passes frontend-ir)]
+                               [circuit-ir (run-passes circuit-passes analyzed-ir)]
+                               [proof-circuit-name* (extract-circuit-names circuit-ir)])
+                          (rm-rf (format "~a/compiler" output-directory-pathname))
+                          (rm-rf (format "~a/zkir" output-directory-pathname))
+                          (rm-rf (format "~a/keys" output-directory-pathname))
                           (with-target-ports
                             '((contract-info.json . "compiler/contract-info.json"))
-                            (run-passes save-contract-info-passes analyzed-ir))
-                          (let ([circuit-names (exported-impure-circuit-names analyzed-ir)]
-                                [circuit-ir (run-passes circuit-passes analyzed-ir)])
-                            (rm-rf (format "~a/zkir" output-directory-pathname))
-                            (rm-rf (format "~a/keys" output-directory-pathname))
-                            (with-target-ports
-                              (map (lambda (sym) (cons sym (format "zkir/~a.zkir" sym)))
-                                   circuit-names)
-                              (run-passes (if (zkir-v3) zkir-v3-passes zkir-passes) circuit-ir))
-                            (unless (null? (pending-conditions)) (raise (make-halt-condition)))
-                            (unless (skip-zk)
-                              (if (zero? (system "command -v zkir > /dev/null"))
-                                ;; If we have zero circuits, the zkir directory won't exist,
-                                ;; and zkir will fail to read it. Skip in that case silently.
-                                (when (file-exists? (format "~a/zkir" output-directory-pathname))
-                                  ;; TODO: Properly string escape!
-                                  (let ([res (system (format "exec zkir compile-many '~a/zkir' '~a/keys'"
-                                                             output-directory-pathname
-                                                             output-directory-pathname))])
-                                    (unless (zero? res)
-                                      (external-errorf "zkir returned a non-zero exit status ~d" res))))
-                                (unless (zkir-warning-issued)
-                                  (zkir-warning-issued #t)
-                                  (fprintf (console-error-port)
-                                           "Warning: ZKIR not found; skipping final circuit compilation.\n"))))
-                            (with-target-ports
-                             '((contract.js . "contract/index.js")
-                               (contract.d.ts . "contract/index.d.ts")
-                               (contract.js.map . "contract/index.js.map"))
-                             (run-passes typescript-passes analyzed-ir))
-                            (when final-pass (internal-errorf 'generate-everything "never encountered final pass ~s" final-pass))))]))))))))]))
+                            (run-passes save-contract-info-passes analyzed-ir proof-circuit-name*))
+                          (with-target-ports
+                            (map (lambda (sym) (cons sym (format "zkir/~a.zkir" sym)))
+                                 proof-circuit-name*)
+                            (run-passes (if (zkir-v3) zkir-v3-passes zkir-passes) circuit-ir))
+                          (unless (null? (pending-conditions)) (raise (make-halt-condition)))
+                          (unless (skip-zk)
+                            (if (zero? (system "command -v zkir > /dev/null"))
+                              ;; If we have zero circuits, the zkir directory won't exist,
+                              ;; and zkir will fail to read it. Skip in that case silently.
+                              (when (file-exists? (format "~a/zkir" output-directory-pathname))
+                                ;; TODO: Properly string escape!
+                                (let ([res (system (format "exec zkir compile-many '~a/zkir' '~a/keys'"
+                                                           output-directory-pathname
+                                                           output-directory-pathname))])
+                                  (unless (zero? res)
+                                    (external-errorf "zkir returned a non-zero exit status ~d" res))))
+                              (unless (zkir-warning-issued)
+                                (zkir-warning-issued #t)
+                                (fprintf (console-error-port)
+                                         "Warning: ZKIR not found; skipping final circuit compilation.\n"))))
+                          (with-target-ports
+                           '((contract.js . "contract/index.js")
+                             (contract.d.ts . "contract/index.d.ts")
+                             (contract.js.map . "contract/index.js.map"))
+                           (run-passes typescript-passes analyzed-ir))
+                          (when final-pass (internal-errorf 'generate-everything "never encountered final pass ~s" final-pass)))]))))))))]))
 
-  (define-pass exported-impure-circuit-names : Lnodisclose (ir) -> * (ls)
+  (define-pass extract-circuit-names : Lflattened (ir) -> * (ls)
     (definitions
-      (define impure-circuit-ht (make-eq-hashtable))
       (define export-name-table (make-hashtable string-ci-hash string-ci=?))
       )
-    (Program : Program (ir) -> * (ls)
-      [(program ,src (,contract-name* ...) ((,export-name* ,name*) ...) ,pelt* ...)
-       (for-each Program-Element pelt*)
-       (fold-right
-         (lambda (export-name name ls)
-           (if (hashtable-contains? impure-circuit-ht name)
-               (begin
-                 (let ([a (hashtable-cell export-name-table (symbol->string export-name) #f)])
-                   (if (cdr a)
-                       (let ([export-name^ (cadr a)] [name^ (cddr a)])
-                         (define (format-export export-name name)
-                           (let ([sym (id-sym name)])
-                             (if (eq? sym export-name)
-                                 (format "~s" sym)
-                                 (format "~s for ~s" export-name sym))))
-                         (source-errorf (id-src name)
-                                        "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems"
-                                        (format-export export-name name)
-                                        (format-export export-name^ name^)
-                                        (format-source-object (id-src name^))))
-                       (set-cdr! a (cons export-name name))))
-                 (cons export-name ls))
-               ls))
-         '() export-name* name*)])
-    (Program-Element : Program-Element (ir) -> * ()
-      [(circuit ,src ,function-name (,arg* ...) ,type ,expr)
-       (guard (not (id-pure? function-name)))
-       (hashtable-set! impure-circuit-ht function-name #t)]
-      [else (void)])
+    (Program : Program (ir) -> * (circuit-name*)
+      [(program ,src ((,export-name* ,name*) ...) ,pelt* ...)
+       (for-each
+         (lambda (export-name name)
+           (let ([a (hashtable-cell export-name-table (symbol->string export-name) #f)])
+             (if (cdr a)
+                 (let ([export-name^ (cadr a)] [name^ (cddr a)])
+                   (define (format-export export-name name)
+                     (let ([sym (id-sym name)])
+                       (if (eq? sym export-name)
+                           (format "~s" sym)
+                           (format "~s for ~s" export-name sym))))
+                   (source-errorf (id-src name)
+                                  "the exported impure circuit name ~a is identical to the exported circuit name ~s at ~a modulo case; please rename to avoid zkir and prover-key filename clashes on case-insensitive filesystems"
+                                  (format-export export-name name)
+                                  (format-export export-name^ name^)
+                                  (format-source-object (id-src name^))))
+                 (set-cdr! a (cons export-name name)))))
+         export-name*
+         name*)
+       export-name*])
     (Program ir))
 )

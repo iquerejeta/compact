@@ -18,6 +18,7 @@
 (library (zkir-passes)
   (export zkir-passes)
   (import (except (chezscheme) errorf)
+          (config-params)
           (utils)
           (datatype)
           (nanopass)
@@ -163,8 +164,6 @@
           (define std-circuits
             (let ([ht (make-hashtable symbol-hash eq?)])
               (define (register-handler! name handler)
-                (unless (hashtable-contains? native-table name)
-                  (internal-errorf 'print-zkir "undeclared native name ~s" name))
                 (let ([a (hashtable-cell ht name #f)])
                   (when (cdr a) (internal-errorf 'print-zkir "duplicate circuit name ~s" name))
                   (set-cdr! a handler)))
@@ -305,7 +304,7 @@
              (for-each Statement stmt*)
              (for-each (lambda (triv) (print-gate "output" `[var ,(Triv triv)])) triv*)
              (printf "\n  ]\n"))]
-          [(external ,src ,function-name ,native-entry (,arg* ...) ,type)
+          [(native ,src ,function-name ,native-entry (,arg* ...) ,type)
            (if (eq? (native-entry-class native-entry) 'witness)
                (begin
                  (set-calltype! function-name '(witness . #f))
@@ -313,7 +312,7 @@
                (set-calltype! function-name
                  (cons*
                    'builtin-circuit
-                   (native-entry-name native-entry)
+                   (id-sym function-name)
                    (list (map (lambda (arg)
                                 (nanopass-case (Lflattened Argument) arg
                                   [(argument (,var-name ...) (ty (,alignment* ...) (,primitive-type* ...)))
@@ -329,11 +328,8 @@
           [(public-ledger-declaration ,pl-array)
            (for-each Public-Ledger-Binding (pl-array->public-bindings pl-array))])
         (Public-Ledger-Binding : Public-Ledger-Binding (ir) -> * (void)
-          [(,src ,ledger-field-name (,path-index* ...) ,[Public-Ledger-ADT : public-adt -> * ops])
+          [(,src ,ledger-field-name (,path-index* ...) ,primitive-type)
            (void)])
-        (Public-Ledger-ADT : Public-Ledger-ADT (ir) -> * (ops)
-          [(,src ,adt-name ((,adt-formal* ,adt-arg*) ...) ,vm-expr (,adt-op* ...))
-           (map ADT-Op adt-op*)])
         (ADT-Op : ADT-Op (ir) -> * (op)
           [(,ledger-op ,op-class (,adt-name (,adt-formal* ,adt-arg*) ...) (,ledger-op-formal* ...) (,type* ...) ,type ,vm-code)
            (let ([type-length (lambda (type)
@@ -362,6 +358,8 @@
                   (assert (hashtable-ref returntype-ht function-name #f))
                   var-name*)]
                [else (assert cannot-happen)]))]
+          [(= (,var-name* ...) (contract-call ,src ,test ,elt-name (,triv ,primitive-type) ,triv* ...))
+           (source-errorf src "cross-contract calls are not yet supported")]
           [(= (,var-name* ...) (bytes->vector ,[* triv]))
            (assert (not (null? var-name*)))
            (let loop ([var-name* var-name*] [triv triv])
@@ -440,21 +438,15 @@
                                              [(VMstate-value-cell val) (list* 1 (vm-eval val))]
                                              [(VMstate-value-ADT val type)
                                               ; wrap val in a cell, unless it is already an ADT
-                                              (let ([public-adt (nanopass-case (Lflattened Type) type
-                                                                  [(ty (,alignment* ...) (,primitive-type* ...))
-                                                                   (and (not (null? primitive-type*))
-                                                                        (null? (cdr primitive-type*))
-                                                                        (Lflattened-Public-Ledger-ADT? (car primitive-type*))
-                                                                        (car primitive-type*))])])
-                                                (if public-adt
-                                                    (nanopass-case (Lflattened Public-Ledger-ADT) public-adt
-                                                      [(,src ,adt-name ([,adt-formal* ,adt-arg*] ...) ,vm-expr (,adt-op* ...))
-                                                       (vm-eval
-                                                         (expand-vm-expr
-                                                           src
-                                                           (map cons adt-formal* adt-arg*)
-                                                           (vm-expr-expr vm-expr)))])
-                                                    (list* 1 (vm-eval val))))]
+                                              (or (nanopass-case (Lflattened Type) type
+                                                    [(ty (,alignment* ...) ((tadt ,src ,adt-name ([,adt-formal* ,adt-arg*] ...) ,vm-expr (,adt-op* ...))))
+                                                     (vm-eval
+                                                       (expand-vm-expr
+                                                         src
+                                                         (map cons adt-formal* adt-arg*)
+                                                         (vm-expr-expr vm-expr)))]
+                                                    [else #f])
+                                                  (list* 1 (vm-eval val)))]
                                              [(VMstate-value-map key* val*)
                                               (append (list (+ 2 (* (length key*) 16)))
                                                       (apply append (maplr vm-eval key*))
@@ -519,7 +511,7 @@
                                                      [abytes (lambda (n)
                                                                (with-output-language (Lflattened Alignment)
                                                                  `(abytes ,n)))]
-                                                     [domain-sep-string "mdn:cc"]
+                                                     [domain-sep-string "midnight:zswap-cc[v1]"]
                                                      [domain-sep-bytes (bytevector->u8-list (string->utf8 domain-sep-string))]
                                                      [domain-sep-field (fold-right (lambda (byte acc) (+ byte (* 256 acc))) 0 domain-sep-bytes)]
                                                      [data1 (make-temp-id src 'data1)]
@@ -538,18 +530,18 @@
                                                        (list*
                                                          ;; alignment of `CoinPreimage` in std.compact
                                                          (list (list (list
+                                                           (abytes (length domain-sep-bytes))
                                                            (abytes 32)
                                                            (abytes 32)
                                                            (abytes 16)
                                                            (abytes 1)
-                                                           (abytes 32)
-                                                           (abytes (length domain-sep-bytes)))))
+                                                           (abytes 32))))
                                                          (list hash1 hash2)
                                                          (append
+                                                           (list (literal domain-sep-field))
                                                            coin
                                                            (list (car recipient))
-                                                           (list (var-idx data1) (var-idx data2))
-                                                           (list (literal domain-sep-field)))))
+                                                           (list (var-idx data1) (var-idx data2)))))
                                                 `(1 32 (ref . ,(var-idx hash1)) (ref . ,(var-idx hash2))))]
                                              ;; There's room to tighten this in future, we just need to be careful to keep it
                                              ;; in-sync with the rust version.
