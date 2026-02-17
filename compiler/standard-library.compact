@@ -353,7 +353,7 @@ export circuit unshieldedBalanceLte(color: Bytes<32>, amount: Uint<128>): Boolea
 
 // Schnorr signature
 export struct JubjubSchnorrSignature {
-  announcement: NativePoint,
+  announcement: JubjubPoint,
   response: Field,
 }
 
@@ -366,18 +366,18 @@ struct JubjubSchnorrHashInput<#n> {
   msg: Vector<n, Field>
 }
 
-export circuit jubjubSchnorrVerify<#n>(msg: Vector<n, Field>, signature: JubjubSchnorrSignature, pk: NativePoint): [] {
+export circuit jubjubSchnorrVerify<#n>(msg: Vector<n, Field>, signature: JubjubSchnorrSignature, pk: JubjubPoint): [] {
   const {announcement, response} = signature;
   const c: Field = transientHash<JubjubSchnorrHashInput<n>>(JubjubSchnorrHashInput<n>{
-    ann_x: nativePointX(announcement),
-    ann_y: nativePointY(announcement),
-    pk_x: nativePointX(pk),
-    pk_y: nativePointY(pk),
+    ann_x: jubjubPointX(announcement),
+    ann_y: jubjubPointY(announcement),
+    pk_x: jubjubPointX(pk),
+    pk_y: jubjubPointY(pk),
     msg: msg
   });
 
-  const lhs: NativePoint = ecMulGenerator(response);
-  const rhs: NativePoint = ecAdd(announcement, ecMul(pk, c));
+  const lhs: JubjubPoint = ecMulGenerator(response);
+  const rhs: JubjubPoint = ecAdd(announcement, ecMul(pk, c));
 
   assert(lhs == rhs, "Invalid signature");
 }
