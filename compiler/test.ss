@@ -16777,7 +16777,7 @@ groups than for single tests.
   (test ; jubjubSchnorrVerify with a simple message
     '(
       "import CompactStandardLibrary;"
-      "export circuit foo(msg: Vector<2, Field>, sig: JubjubSchnorrSignature, vk: NativePoint): [] {"
+      "export circuit foo(msg: Vector<2, Field>, sig: JubjubSchnorrSignature, vk: JubjubPoint): [] {"
       "  return jubjubSchnorrVerify<2>(msg, sig, vk);"
       "}"
       )
@@ -16793,7 +16793,7 @@ groups than for single tests.
       )
     (oops
       message: "~a:\n  ~?"
-      irritants: '("testfile.compact line 3 char 10" "no compatible function named ~a is in scope at this call~@[~a~]~@[~a~]~@[~a~]" (jubjubSchnorrVerify #f "\n    one function is incompatible with the supplied argument types\n      supplied argument types:\n        (Vector<2, Field>, struct JubjubSchnorrSignature<announcement: NativePoint, response: Field>, Bytes<32>)\n      declared argument types for function at <standard library>:\n        (Vector<2, Field>, struct JubjubSchnorrSignature<announcement: NativePoint, response: Field>, NativePoint)" #f)))
+      irritants: '("testfile.compact line 3 char 10" "no compatible function named ~a is in scope at this call~@[~a~]~@[~a~]~@[~a~]" (jubjubSchnorrVerify #f "\n    one function is incompatible with the supplied argument types\n      supplied argument types:\n        (Vector<2, Field>, struct JubjubSchnorrSignature<announcement: JubjubPoint, response: Field>, Bytes<32>)\n      declared argument types for function at <standard library>:\n        (Vector<2, Field>, struct JubjubSchnorrSignature<announcement: JubjubPoint, response: Field>, JubjubPoint)" #f)))
     )
 
   (test
