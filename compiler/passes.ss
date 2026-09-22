@@ -203,12 +203,10 @@
                         (when final-pass (internal-errorf 'generate-everything "never encountered final pass ~s" final-pass)))])))))))]))
 
   ;; Re-encodes each distinct inner verifying key through `zkir-v3 inner-vk`,
-  ;; returning a pair of the `verify_proof_vks` blob and its lowercase hex
-  ;; SHA-256. The tool is asked rather than the bytes reshaped here, because a
-  ;; `.verifier` file wraps the key in a tag and a SCALE length that only zkir
-  ;; knows how to strip. Memoized on the resolved pathname: one contract may
-  ;; verify against the same key more than once, and the conversion is a
-  ;; subprocess.
+  ;; returning a pair of the `verify_proof_vks` blob and its lowercase hex SHA-256.
+  ;; The tool is asked rather than the bytes reshaped here because only it can
+  ;; validate that the key is one the instruction can read. Memoized on the
+  ;; resolved pathname: one contract may name the same key more than once.
   (define (make-inner-verifying-key-converter output-directory-pathname)
     (let ([table (make-hashtable string-hash string=?)]
           [n 0])
@@ -227,12 +225,11 @@
                          (let ([blob-pathname (format "~a/inner-vk-~d.ivk" dir n)])
                            (set! n (fx+ n 1))
                            blob-pathname))])
-                  ;; `--decider 0` is the only place the decider kind is
-                  ;; chosen, and every key reaching Compact today comes from
-                  ;; outside it -- but a key that itself verifies a proof would
-                  ;; need `1`, and declaring `0` for it is a silent soundness
-                  ;; bug.
-                  (let ([res (system (format "exec zkir-v3 inner-vk --decider 0 ~a ~a"
+                  ;; The kind comes from `--inner-decider`, because a verifying key
+                  ;; file cannot state its own. Declaring the wrong one is a silent
+                  ;; soundness bug, not an error the tool can catch.
+                  (let ([res (system (format "exec zkir-v3 inner-vk --decider ~d ~a ~a"
+                                       (inner-decider)
                                        (shell-quote key-pathname)
                                        (shell-quote blob-pathname)))])
                     (unless (zero? res)

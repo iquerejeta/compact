@@ -50,6 +50,18 @@ The following flags, if present, affect the compiler's behavior as follows:
   --feature-zkir-v3 causes the compiler to generate circuits using ZKIR version 3,
     overriding the default (version 2).
 
+  --inner-decider <kind> declares what every verifying key named by a verifyProof
+    in this compilation carries beyond a plain proof, where <kind> is one of:
+      none       the inner proof defers nothing.  This is the default.
+      collapsed  the inner proof carries one collapsed accumulator in the tail of
+                 its instance, as a recursive or IVC chain proof does.
+    A verifying key file is the processed key alone and cannot state its own kind,
+    so this flag is the only place the declaration is made.  Declaring none for an
+    inner proof that does carry an accumulator is not diagnosed: the accumulator is
+    never folded in, and nothing checks it.  The kind is part of what the circuit
+    commits to, so two compilations of one source under different kinds produce
+    different circuits.  Requires --feature-zkir-v3.
+
   --vscode causes error messages to be printed on a single line so they are
     rendered properly within the VS Code extension for Compact.
 
@@ -86,6 +98,21 @@ The following flags, if present, affect the compiler's behavior as follows:
 
 (usage "<flag> ... <source-pathname> <target-directory-pathname>")
 
+;;; The `DeciderKind` byte `--inner-decider` names, or the default when absent.
+;;; Kinds are spelled out rather than taken as the raw byte, because declaring the
+;;; wrong one is a silent soundness bug rather than an error.
+(define (inner-decider-tag given? kind zkir-v3?)
+  (define (reject fmt . arg*)
+    (apply fprintf (current-error-port) fmt arg*)
+    (print-usage #t)
+    (exit 1))
+  (cond
+    [(not given?) (inner-decider)]
+    [(not zkir-v3?)
+     (reject "--inner-decider applies to verifyProof, which requires --feature-zkir-v3\n")]
+    [(assoc kind '(("none" . 0) ("collapsed" . 1))) => cdr]
+    [else (reject "--inner-decider expects none or collapsed, received ~s\n" kind)]))
+
 (parameterize ([reset-handler abort])
   (command-line-case (command-line)
     [((flags [(--help) $ (begin (print-help) (exit))]
@@ -100,6 +127,7 @@ The following flags, if present, affect the compiler's behavior as follows:
              [(--compact-path) (string search-list)]
              [(--trace-search)]
              [(--trace-passes)]
+             [(--inner-decider) (string inner-decider-kind)]
              [(--feature-zkir-v3)])
       (string source-pathname)
       (string target-directory-pathname))
@@ -109,6 +137,9 @@ The following flags, if present, affect the compiler's behavior as follows:
                     [skip-zk ?--skip-zk]
                     [no-communications-commitment ?--no-communications-commitment]
                     [feature-zkir-v3 ?--feature-zkir-v3]
+                    [inner-decider (inner-decider-tag ?--inner-decider
+                                                      inner-decider-kind
+                                                      ?--feature-zkir-v3)]
                     [compact-path (if ?--compact-path (split-search-path search-list) (compact-path))]
                     [trace-search ?--trace-search])
        (when source-root (register-source-root! source-root))

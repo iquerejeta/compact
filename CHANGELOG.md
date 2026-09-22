@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Toolchain 0.34.103, language 0.26.100, runtime 0.19.102]
+## [Toolchain 0.34.104, language 0.26.100, runtime 0.19.102]
 
 ### Added
 
@@ -34,6 +34,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   decides whether a well-formed proof is true, so it is the verdict and not a
   screen: a malformed proof, a wrong key and a proof that does not hold for the
   instance given are all rejected before anything reaches the ledger.
+
+- `--inner-decider <kind>` declares what the inner proofs verified in a
+  compilation carry beyond a plain proof: `none`, the default and what every
+  non-recursive proof is, or `collapsed` for a proof that carries one collapsed
+  accumulator in the tail of its instance, as a recursive or IVC chain proof
+  does. Previously `none` was assumed and there was no way to say otherwise, so
+  a recursive inner proof could not be verified soundly.
+
+  A verifying key file is the processed key alone and cannot state its own kind,
+  so the flag is the only place the declaration is made. It is per compilation
+  rather than per key: a contract naming two keys of different kinds cannot be
+  expressed. Declaring `none` for a proof that does carry an accumulator is not
+  diagnosed — the accumulator is never folded in, and nothing checks it.
+
+  The kind is part of what the circuit commits to, so one source compiled under
+  two kinds yields two different circuits, with different verifier keys.
+  Requires `--feature-zkir-v3`.
 
 ### Changed
 

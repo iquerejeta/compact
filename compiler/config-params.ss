@@ -41,4 +41,9 @@
 
   ; feature flags
   (export-parameter feature-zkir-v3 #f)
+
+  ;; The `DeciderKind` byte stamped onto every inner verifying key a `verifyProof`
+  ;; names: 0 for `None`, 1 for `Collapsed`.  A verifying key file cannot state its
+  ;; own kind, so `--inner-decider` is the only place the declaration is made.
+  (export-parameter inner-decider 0)
 )
